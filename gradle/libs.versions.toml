@@ -1,0 +1,97 @@
+[versions]
+# Platform
+buildTools = "33.0.0"
+minSdk = "26"
+compileSdk = "33"
+targetJvm = "VERSION_17"
+kotlin = "1.8.20" # update in root settings.gradle too
+agp = "8.0.1" # update in root settings.gradle too
+
+# Libs
+androidCore = "1.9.0"
+compose = "1.4.2"
+composeFoundation = "1.4.2"
+composeMaterial3 = "1.1.1"
+accompanist = "0.30.1"
+composeCompiler = "1.4.6"
+coroutines = "1.6.4"
+dagger = "2.45"
+okhttp = "4.11.0"
+retrofit = "2.9.0"
+gson = "2.10.1"
+lifecycle = "2.6.1"
+timber = "5.0.1"
+navigation = "2.6.0"
+datastore = "1.0.0"
+wireguard = "1.0.20211029"
+hiltNavigation = "1.0.0"
+mapsCompose = "2.10.0"
+maps = "18.1.0"
+
+[libraries]
+# Android
+android-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidCore" }
+# Compose
+compose-animation = { module = "androidx.compose.animation:animation", version.ref = "compose" }
+compose-runtime = { module = "androidx.compose.runtime:runtime", version.ref = "compose" }
+compose-runtime-saveable = { module = "androidx.compose.runtime:runtime-saveable", version.ref = "compose" }
+compose-ui = { module = "androidx.compose.ui:ui", version.ref = "compose" }
+compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose" }
+compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose" }
+compose-ui-util = { module = "androidx.compose.ui:ui-util", version.ref = "compose" }
+compose-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "composeFoundation" }
+compose-layout = { module = "androidx.compose.foundation:foundation-layout", version.ref = "composeFoundation" }
+compose-material3 = { module = "androidx.compose.material3:material3", version.ref = "composeMaterial3" }
+accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist" }
+# DI
+dagger-hilt = { module = "com.google.dagger:hilt-android", version.ref = "dagger" }
+hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "dagger" }
+hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigation" }
+# Google
+google-firebase-bom = { module = "com.google.firebase:firebase-bom", version = "32.0.0" }
+google-firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics-ktx" }
+# Lifecycle
+lifecycle-runtime = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycle" }
+# Kotlin
+kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
+kotlin-collection-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version = "0.3.5" }
+# Gradle
+agp = { module = "com.android.tools.build:gradle", version.ref = "agp" }
+# Coroutines
+coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+# Network
+retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
+http-logger = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "okhttp" }
+gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
+gson-converter = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
+# Navigation
+navigation = { module = "androidx.navigation:navigation-compose", version.ref = "navigation" }
+# Maps
+google-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "maps" }
+google-maps-compose = { module = "com.google.maps.android:maps-compose", version.ref = "mapsCompose" }
+# Other
+accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanist" }
+timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
+datastore = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
+wireguard = { module = "com.wireguard.android:tunnel", version.ref = "wireguard" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+android-library = { id = "com.android.library", version.ref = "agp" }
+crashlytics = { id = "com.google.firebase.crashlytics", version = "2.9.4" }
+google-services = { id = "com.google.gms.google-services", version = "4.3.15" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
+dagger-hilt = { id = "com.google.dagger.hilt.android", version.ref = "dagger" }
+
+[bundles]
+compose = [
+    "compose-foundation",
+    "compose-material3",
+    "compose-runtime",
+    "compose-layout",
+    "compose-ui",
+    "compose-ui-tooling",
+    "compose-ui-tooling-preview",
+    "kotlin-collection-immutable",
+]

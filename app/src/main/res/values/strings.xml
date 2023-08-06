@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">BasedVPN</string>
+
+    <string name="settings_dns_cloudflare">Cloudflare DNS</string>
+    <string name="settings_dns_google">Google DNS</string>
+    <string name="settings_dns_handshake">Handshake DNS</string>
+</resources>

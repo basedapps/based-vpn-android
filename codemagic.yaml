@@ -3,6 +3,7 @@ workflows:
     native-android:
         name: Android Build
         environment:
+          java: 17
           groups:
             - default
             - basedapps_google_play

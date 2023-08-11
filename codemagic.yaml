@@ -22,9 +22,6 @@ workflows:
             - name: Fix ./gradlew permission
               script: |
                     chmod +x ./gradlew
-            - name: Fix git depth
-              script: |
-                    git fetch --unshallow
             - name: Set up keystore
               script: |
                     cp $CM_KEYSTORE_PATH /tmp/keystore.keystore

@@ -1,6 +1,6 @@
-package co.uk.basedapps.vpn.network
+package co.uk.basedapps.vpn.network.model
 
-import co.uk.basedapps.vpn.common.CountryFlag
+import co.uk.basedapps.vpn.common.flags.CountryFlag
 import com.google.gson.annotations.SerializedName
 
 data class DataObj<T>(

@@ -1,8 +1,8 @@
 package co.uk.basedapps.vpn.storage
 
 import android.content.SharedPreferences
-import co.uk.basedapps.vpn.network.City
-import co.uk.basedapps.vpn.network.Country
+import co.uk.basedapps.vpn.network.model.City
+import co.uk.basedapps.vpn.network.model.Country
 import co.uk.basedapps.vpn.prefs.delegate
 import co.uk.basedapps.vpn.prefs.getValue
 import co.uk.basedapps.vpn.prefs.setValue

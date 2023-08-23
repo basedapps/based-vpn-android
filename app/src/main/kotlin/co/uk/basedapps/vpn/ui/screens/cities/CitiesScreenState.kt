@@ -2,8 +2,8 @@ package co.uk.basedapps.vpn.ui.screens.cities
 
 import co.uk.basedapps.vpn.common.Status
 import co.uk.basedapps.vpn.common.ViewStateHolder
-import co.uk.basedapps.vpn.network.City
-import co.uk.basedapps.vpn.network.Country
+import co.uk.basedapps.vpn.network.model.City
+import co.uk.basedapps.vpn.network.model.Country
 import javax.inject.Inject
 
 class CitiesScreenStateHolder

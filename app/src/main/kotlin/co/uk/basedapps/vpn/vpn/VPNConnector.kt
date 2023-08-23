@@ -12,8 +12,8 @@ import co.uk.basedapps.domain_wireguard.core.repo.WireguardRepository
 import co.uk.basedapps.vpn.common.decodeV2RayVpnProfile
 import co.uk.basedapps.vpn.common.decodeWireguardVpnProfile
 import co.uk.basedapps.vpn.network.BasedRepository
-import co.uk.basedapps.vpn.network.Credentials
-import co.uk.basedapps.vpn.network.Protocol
+import co.uk.basedapps.vpn.network.model.Credentials
+import co.uk.basedapps.vpn.network.model.Protocol
 import co.uk.basedapps.vpn.storage.SelectedCity
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers

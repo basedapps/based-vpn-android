@@ -1,6 +1,6 @@
 package co.uk.basedapps.vpn.storage
 
-import co.uk.basedapps.vpn.common.CountryFlag
+import co.uk.basedapps.vpn.common.flags.CountryFlag
 import com.google.gson.annotations.SerializedName
 
 data class SelectedCity(

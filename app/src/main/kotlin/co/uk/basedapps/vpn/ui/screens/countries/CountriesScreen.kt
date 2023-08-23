@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import co.uk.basedapps.vpn.common.EffectHandler
 import co.uk.basedapps.vpn.common.Status
-import co.uk.basedapps.vpn.network.Country
+import co.uk.basedapps.vpn.network.model.Country
 import co.uk.basedapps.vpn.ui.screens.countries.CountriesScreenEffect as Effect
 import co.uk.basedapps.vpn.ui.screens.countries.CountriesScreenState as State
 import co.uk.basedapps.vpn.ui.theme.BasedAppColor

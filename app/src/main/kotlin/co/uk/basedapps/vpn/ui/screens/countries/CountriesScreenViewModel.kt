@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import co.uk.basedapps.domain.functional.getOrNull
 import co.uk.basedapps.vpn.common.Status
 import co.uk.basedapps.vpn.network.BasedRepository
-import co.uk.basedapps.vpn.network.Country
+import co.uk.basedapps.vpn.network.model.Country
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.launch

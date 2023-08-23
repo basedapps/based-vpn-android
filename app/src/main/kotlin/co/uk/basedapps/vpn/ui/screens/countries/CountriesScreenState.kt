@@ -2,7 +2,7 @@ package co.uk.basedapps.vpn.ui.screens.countries
 
 import co.uk.basedapps.vpn.common.Status
 import co.uk.basedapps.vpn.common.ViewStateHolder
-import co.uk.basedapps.vpn.network.Country
+import co.uk.basedapps.vpn.network.model.Country
 import javax.inject.Inject
 
 class CountriesScreenStateHolder

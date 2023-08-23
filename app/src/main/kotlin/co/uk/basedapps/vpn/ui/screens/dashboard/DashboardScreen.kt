@@ -52,9 +52,9 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import co.uk.basedapps.domain_wireguard.core.init.getVpnPermissionRequest
 import co.uk.basedapps.vpn.R
-import co.uk.basedapps.vpn.common.CountryFlag
 import co.uk.basedapps.vpn.common.EffectHandler
 import co.uk.basedapps.vpn.common.Status
+import co.uk.basedapps.vpn.common.flags.CountryFlag
 import co.uk.basedapps.vpn.storage.SelectedCity
 import co.uk.basedapps.vpn.ui.screens.dashboard.DashboardScreenEffect as Effect
 import co.uk.basedapps.vpn.ui.screens.dashboard.DashboardScreenState as State

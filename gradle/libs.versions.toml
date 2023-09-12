@@ -1,27 +1,26 @@
 [versions]
 # Platform
-buildTools = "33.0.0"
 minSdk = "26"
-compileSdk = "33"
+compileSdk = "34"
 targetJvm = "VERSION_17"
-kotlin = "1.8.20" # update in root settings.gradle too
-agp = "8.0.1" # update in root settings.gradle too
+kotlin = "1.9.10"
+agp = "8.1.1"
 
 # Libs
-androidCore = "1.9.0"
-compose = "1.4.2"
-composeFoundation = "1.4.2"
+androidCore = "1.12.0"
+compose = "1.5.1"
+composeFoundation = "1.5.1"
 composeMaterial3 = "1.1.1"
-accompanist = "0.30.1"
-composeCompiler = "1.4.6"
-coroutines = "1.6.4"
-dagger = "2.45"
+accompanist = "0.32.0"
+composeCompiler = "1.5.3"
+coroutines = "1.7.2"
+dagger = "2.48"
 okhttp = "4.11.0"
 retrofit = "2.9.0"
 gson = "2.10.1"
-lifecycle = "2.6.1"
+lifecycle = "2.6.2"
 timber = "5.0.1"
-navigation = "2.6.0"
+navigation = "2.7.2"
 datastore = "1.0.0"
 wireguard = "1.0.20211029"
 hiltNavigation = "1.0.0"
@@ -48,7 +47,7 @@ dagger-hilt = { module = "com.google.dagger:hilt-android", version.ref = "dagger
 hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "dagger" }
 hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigation" }
 # Google
-google-firebase-bom = { module = "com.google.firebase:firebase-bom", version = "32.0.0" }
+google-firebase-bom = { module = "com.google.firebase:firebase-bom", version = "32.2.3" }
 google-firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics-ktx" }
 # Lifecycle
 lifecycle-runtime = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycle" }

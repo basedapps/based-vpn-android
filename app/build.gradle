@@ -7,12 +7,14 @@ plugins {
 
 android {
     namespace 'co.uk.basedapps.vpn'
-    compileSdk 33
 
     defaultConfig {
         applicationId "co.uk.basedapps.vpn"
+
         minSdk libs.versions.minSdk.get().toInteger()
         targetSdk libs.versions.compileSdk.get().toInteger()
+        compileSdk libs.versions.compileSdk.get().toInteger()
+
         versionCode 4
         versionName "1.1.0"
 

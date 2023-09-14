@@ -3,6 +3,8 @@ package co.uk.basedapps.vpn
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.core.view.WindowCompat
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -35,6 +37,8 @@ class MainActivity : ComponentActivity() {
         NavHost(
           navController = navController,
           startDestination = Destination.Dashboard,
+          enterTransition = { EnterTransition.None },
+          exitTransition = { ExitTransition.None },
         ) {
           composable(Destination.Dashboard) {
             DashboardScreen(

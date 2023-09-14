@@ -39,7 +39,7 @@ fun ErrorScreen(
     Icon(
       painter = painterResource(R.drawable.ic_error),
       modifier = Modifier.size(64.dp),
-      tint = BasedAppColor.Primary,
+      tint = BasedAppColor.Accent,
       contentDescription = null,
     )
     Spacer(modifier = Modifier.size(20.dp))

@@ -12,19 +12,19 @@ val Pink40 = Color(0xFF7D5260)
 
 object BasedAppColor {
 
-  val Primary = Color(0xFF2E79AE)
+  val Accent = Color(0xFF2E79AE)
 
   val TextPrimary = Color(0xFF000000)
   val TextSecondary = Color(0xFFAEAEB2)
 
-  val ButtonPrimary = Primary
+  val ButtonPrimary = Accent
   val ButtonPrimaryText = Color.White
 
   val ButtonSecondary = Color(0xFFD1D1D6)
   val ButtonSecondaryText = Color.Black
 
   val ButtonTertiary = Color(0xFFF4F4F5)
-  val ButtonTertiaryIcon = Primary
+  val ButtonTertiaryIcon = Accent
 
   val Elevation = Color(0x14747480)
 

@@ -104,7 +104,7 @@ class DashboardScreenViewModel
 
   private fun onCityChanged(city: SelectedCity?) {
     Timber.tag(Tag).d("City changed to ${city?.name} (prev: ${state.selectedCity?.name})")
-    if (state.selectedCity != null) {
+    if (state.selectedCity != null && state.isConnected) {
       disconnect()
     }
     stateHolder.updateState {

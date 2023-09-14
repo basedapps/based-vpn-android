@@ -66,7 +66,7 @@ fun SettingsScreenStateless(
     containerColor = BasedAppColor.Background,
     topBar = {
       TopBar(
-        title = "Settings",
+        title = stringResource(R.string.settings_title),
         navigateBack = navigateBack,
       )
     },
@@ -96,7 +96,7 @@ fun Content(
         .padding(paddingValues),
     ) {
       SettingsRow(
-        title = "DNS Server",
+        title = stringResource(R.string.settings_row_dns),
         value = state.currentDns
           ?.let { stringResource(it.getLabelRes()) } ?: "",
         modifier = Modifier
@@ -159,7 +159,7 @@ private fun DnsDialog(
   var radioState by remember { mutableStateOf(state.currentDns) }
   AlertDialog(
     onDismissRequest = onDismissRequest,
-    title = { Text("Choose type") },
+    title = { Text(stringResource(R.string.settings_dns_change_title)) },
     text = {
       Column {
         state.dnsOptions.forEach { dns ->
@@ -190,13 +190,13 @@ private fun DnsDialog(
     confirmButton = {
       Button(
         onClick = { radioState?.let(onConfirmClick) },
-      ) { Text("Ok") }
+      ) { Text(stringResource(R.string.common_ok)) }
     },
     dismissButton = {
       Button(
         onClick = onDismissClick,
       ) {
-        Text("Cancel")
+        Text(stringResource(R.string.common_cancel))
       }
     },
   )

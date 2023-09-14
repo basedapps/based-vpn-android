@@ -27,10 +27,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import co.uk.basedapps.vpn.R
 import co.uk.basedapps.vpn.common.EffectHandler
 import co.uk.basedapps.vpn.common.Status
 import co.uk.basedapps.vpn.network.model.Country
@@ -74,7 +76,7 @@ fun CountriesScreenStateless(
     containerColor = BasedAppColor.Background,
     topBar = {
       TopBar(
-        title = "Choose country",
+        title = stringResource(R.string.countries_title),
         navigateBack = navigateBack,
       )
     },

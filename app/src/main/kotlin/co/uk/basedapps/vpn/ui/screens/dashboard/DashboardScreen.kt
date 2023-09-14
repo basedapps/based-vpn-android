@@ -41,6 +41,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -194,8 +195,8 @@ private fun Content(
     }
     if (state.isErrorAlertVisible) {
       BasedAlertDialog(
-        title = "Unable to connect to the server",
-        description = "Please choose another server or try again later",
+        title = stringResource(R.string.dashboard_error_connection_title),
+        description = stringResource(R.string.dashboard_error_connection_description),
         onConfirmClick = onAlertConfirmClick,
         onDismissRequest = onAlertDismissRequest,
       )
@@ -272,7 +273,7 @@ private fun TopBar(
           .padding(horizontal = 50.dp),
       ) {
         Text(
-          text = "Your IP address".uppercase(),
+          text = stringResource(R.string.dashboard_your_ip).uppercase(),
           color = BasedAppColor.TextSecondary,
           fontSize = 12.sp,
           fontWeight = FontWeight.Bold,
@@ -299,7 +300,7 @@ private fun TopBar(
       ) {
         Icon(
           painter = painterResource(R.drawable.ic_settings),
-          contentDescription = "Settings",
+          contentDescription = stringResource(R.string.dashboard_menu_settings),
           modifier = Modifier.size(24.dp),
           tint = BasedAppColor.ButtonTertiaryIcon,
         )
@@ -339,7 +340,12 @@ fun BoxScope.BottomBar(
         Spacer(modifier = Modifier.size(16.dp))
       }
       BasedButton(
-        text = if (state.isConnected) "Disconnect" else "Connect to VPN",
+        text = stringResource(
+          when (state.isConnected) {
+            true -> R.string.dashboard_disconnect_from_vpn
+            false -> R.string.dashboard_connect_to_vpn
+          },
+        ),
         style = if (state.isConnected) ButtonStyle.Secondary else ButtonStyle.Primary,
         onClick = onConnectClick,
         modifier = Modifier.fillMaxWidth(),

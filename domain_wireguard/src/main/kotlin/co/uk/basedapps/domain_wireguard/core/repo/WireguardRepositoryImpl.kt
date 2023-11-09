@@ -29,6 +29,8 @@ import com.wireguard.android.util.ToolsInstaller
 import com.wireguard.config.Config
 import com.wireguard.crypto.Key
 import com.wireguard.crypto.KeyPair
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import timber.log.Timber
 
@@ -47,6 +49,8 @@ class WireguardRepositoryImpl(
   private lateinit var toolsInstaller: ToolsInstaller
 
   private var haveLoaded = false
+
+  private val isInitialized = MutableStateFlow(false)
 
   override suspend fun init(alwaysOnCallback: () -> Unit) {
     rootShell = RootShell(context)
@@ -228,10 +232,12 @@ class WireguardRepositoryImpl(
       Timber.e(it)
     }.getOrNull() ?: Either.Left(Unit)
 
-  override suspend fun isConnected(): Boolean =
-    getTunnel(DefaultTunnelName)
+  override suspend fun isConnected(): Boolean {
+    isInitialized.first { it }
+    return getTunnel(DefaultTunnelName)
       ?.let { it.state == VpnTunnel.State.UP }
       ?: false
+  }
 
   override suspend fun getTunnelConfig(tunnelName: String): Either<Exception?, TunnelConfig> =
     kotlin.runCatching {
@@ -265,6 +271,7 @@ class WireguardRepositoryImpl(
       }
       haveLoaded = true
       restoreState(isForce = true)
+      isInitialized.value = true
       true
     } catch (e: Exception) {
       Timber.e(e)
@@ -439,10 +446,13 @@ class WireguardRepositoryImpl(
           tunnelCacheStore.updateLastUsedTunnel(tunnel)
         }
       } catch (e: Throwable) {
+        Timber.e(e)
         throwable = e
       }
 
-      tunnel.onStateChanged(newState)
+      tunnel.onStateChanged(
+        if (throwable == null) newState else Tunnel.State.DOWN,
+      )
       saveState()
 
       if (throwable != null) {

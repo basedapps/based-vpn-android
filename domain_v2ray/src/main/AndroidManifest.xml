@@ -1,18 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+
     <application>
 
         <service
-            android:name="dev.dev7.lib.v2ray.services.V2rayProxyOnlyService"
+            android:name="com.v2ray.ang.service.V2RayProxyOnlyService"
             android:exported="false"
             android:process=":RunSoLibV2RayDaemon" />
 
         <service
-            android:name="dev.dev7.lib.v2ray.services.V2rayVPNService"
+            android:name="com.v2ray.ang.service.V2RayVpnService"
             android:exported="false"
+            android:foregroundServiceType="specialUse"
             android:permission="android.permission.BIND_VPN_SERVICE"
             android:process=":RunSoLibV2RayDaemon">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Establishing VPN connection" />
             <intent-filter>
                 <action android:name="android.net.VpnService" />
             </intent-filter>

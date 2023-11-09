@@ -1,16 +1,21 @@
 package co.uk.basedapps.vpn
 
 import android.app.Application
+import co.uk.basedapps.vpn.vpn.VpnInitializer
 import dagger.hilt.android.HiltAndroidApp
-import dev.dev7.lib.v2ray.V2rayController
+import javax.inject.Inject
 import timber.log.Timber
 
 @HiltAndroidApp
 class App : Application() {
 
+  @Inject
+  lateinit var vpnInitializer: VpnInitializer
+
   override fun onCreate() {
     super.onCreate()
     setupTimber()
+    vpnInitializer.setupVPN(this)
   }
 
   private fun setupTimber() {

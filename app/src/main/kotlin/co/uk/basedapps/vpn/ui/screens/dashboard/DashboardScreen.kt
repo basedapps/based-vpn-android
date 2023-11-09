@@ -1,3 +1,5 @@
+@file:OptIn(MapboxExperimental::class)
+
 package co.uk.basedapps.vpn.ui.screens.dashboard
 
 import android.app.Activity
@@ -31,7 +33,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -45,33 +46,36 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import co.uk.basedapps.domain_wireguard.core.init.getVpnPermissionRequest
 import co.uk.basedapps.vpn.R
 import co.uk.basedapps.vpn.common.EffectHandler
-import co.uk.basedapps.vpn.common.Status
 import co.uk.basedapps.vpn.common.flags.CountryFlag
+import co.uk.basedapps.vpn.common.state.Status
 import co.uk.basedapps.vpn.storage.SelectedCity
-import co.uk.basedapps.vpn.ui.screens.dashboard.DashboardScreenEffect as Effect
-import co.uk.basedapps.vpn.ui.screens.dashboard.DashboardScreenState as State
+import co.uk.basedapps.vpn.ui.screens.dashboard.widgets.MapboxConfiguredMap
 import co.uk.basedapps.vpn.ui.theme.BasedAppColor
 import co.uk.basedapps.vpn.ui.theme.BasedVPNTheme
 import co.uk.basedapps.vpn.ui.widget.BasedAlertDialog
 import co.uk.basedapps.vpn.ui.widget.BasedButton
 import co.uk.basedapps.vpn.ui.widget.ButtonStyle
 import co.uk.basedapps.vpn.ui.widget.ErrorScreen
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.compose.CameraPositionState
-import com.google.maps.android.compose.GoogleMap
-import com.google.maps.android.compose.MapUiSettings
-import com.google.maps.android.compose.rememberCameraPositionState
+import co.uk.basedapps.vpn.viewModel.dashboard.DashboardScreenEffect as Effect
+import co.uk.basedapps.vpn.viewModel.dashboard.DashboardScreenState as State
+import co.uk.basedapps.vpn.viewModel.dashboard.DashboardScreenViewModel
+import co.uk.basedapps.vpn.viewModel.dashboard.VpnStatus
+import co.uk.basedapps.vpn.vpn.getVpnPermissionRequest
+import com.mapbox.geojson.Point
+import com.mapbox.maps.CameraOptions
+import com.mapbox.maps.MapboxExperimental
+import com.mapbox.maps.extension.compose.animation.viewport.MapViewportState
+import com.mapbox.maps.extension.compose.animation.viewport.rememberMapViewportState
+import com.mapbox.maps.plugin.animation.MapAnimationOptions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -86,7 +90,7 @@ fun DashboardScreen(
   val context = LocalContext.current
 
   val scope = rememberCoroutineScope()
-  val mapPositionState = rememberCameraPositionState()
+  val mapViewportState = rememberMapViewportState {}
 
   val vpnPermissionRequest = rememberLauncherForActivityResult(
     ActivityResultContracts.StartActivityForResult(),
@@ -111,14 +115,14 @@ fun DashboardScreen(
 
       is Effect.ChangeMapPosition -> {
         scope.launch(Dispatchers.Main) {
-          mapPositionState.animate(
-            update = CameraUpdateFactory.newCameraPosition(
-              CameraPosition.fromLatLngZoom(
-                LatLng(effect.latitude, effect.longitude),
-                10f,
-              ),
-            ),
-            durationMs = 2000,
+          mapViewportState.flyTo(
+            animationOptions = MapAnimationOptions.mapAnimationOptions {
+              duration(2000)
+            },
+            cameraOptions = CameraOptions.Builder()
+              .center(Point.fromLngLat(effect.longitude, effect.latitude))
+              .zoom(9.0)
+              .build(),
           )
         }
       }
@@ -127,7 +131,7 @@ fun DashboardScreen(
 
   DashboardScreenStateless(
     state = state,
-    mapPositionState = mapPositionState,
+    mapViewportState = mapViewportState,
     onConnectClick = viewModel::onConnectClick,
     onSelectServerClick = viewModel::onSelectServerClick,
     onSettingsClick = viewModel::onSettingsClick,
@@ -140,7 +144,7 @@ fun DashboardScreen(
 @Composable
 fun DashboardScreenStateless(
   state: State,
-  mapPositionState: CameraPositionState,
+  mapViewportState: MapViewportState,
   onConnectClick: () -> Unit,
   onSelectServerClick: () -> Unit,
   onSettingsClick: () -> Unit,
@@ -150,13 +154,13 @@ fun DashboardScreenStateless(
 ) {
   when (state.status) {
     is Status.Error -> ErrorScreen(
-      isLoading = state.status.isLoading,
+      isLoading = (state.status as Status.Error).isLoading,
       onButtonClick = onTryAgainClick,
     )
 
     else -> Content(
       state = state,
-      mapPositionState = mapPositionState,
+      mapViewportState = mapViewportState,
       onConnectClick = onConnectClick,
       onSelectServerClick = onSelectServerClick,
       onSettingsClick = onSettingsClick,
@@ -169,7 +173,7 @@ fun DashboardScreenStateless(
 @Composable
 private fun Content(
   state: State,
-  mapPositionState: CameraPositionState,
+  mapViewportState: MapViewportState,
   onConnectClick: () -> Unit,
   onSelectServerClick: () -> Unit,
   onSettingsClick: () -> Unit,
@@ -180,7 +184,10 @@ private fun Content(
     modifier = Modifier
       .fillMaxSize(),
   ) {
-    Map(mapPositionState)
+    MapboxConfiguredMap(
+      modifier = Modifier.fillMaxSize(),
+      mapViewportState = mapViewportState,
+    )
     TopBar(
       state = state,
       onSettingsClick = onSettingsClick,
@@ -215,35 +222,27 @@ private fun LoadingOverlay() {
         onClick = {},
       )
       .navigationBarsPadding()
-      .background(Color.Black.copy(alpha = 0.3f))
+      .background(Color.Black.copy(alpha = 0.5f))
       .fillMaxSize(),
   ) {
-    CircularProgressIndicator(
-      color = Color.White,
-    )
+    Column(
+      horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+      CircularProgressIndicator(
+        color = Color.White,
+      )
+      Spacer(modifier = Modifier.size(24.dp))
+      Text(
+        text = stringResource(R.string.dashboard_loading),
+        fontSize = 16.sp,
+        color = Color.White,
+        textAlign = TextAlign.Center,
+        modifier = Modifier
+          .fillMaxWidth()
+          .padding(horizontal = 48.dp),
+      )
+    }
   }
-}
-
-@Composable
-private fun Map(
-  mapPositionState: CameraPositionState,
-) {
-  val uiSettings by remember {
-    mutableStateOf(
-      MapUiSettings(
-        myLocationButtonEnabled = false,
-        zoomControlsEnabled = false,
-        scrollGesturesEnabled = false,
-        zoomGesturesEnabled = false,
-        tiltGesturesEnabled = false,
-        rotationGesturesEnabled = false,
-      ),
-    )
-  }
-  GoogleMap(
-    uiSettings = uiSettings,
-    cameraPositionState = mapPositionState,
-  )
 }
 
 @Composable
@@ -341,12 +340,19 @@ fun BoxScope.BottomBar(
       }
       BasedButton(
         text = stringResource(
-          when (state.isConnected) {
-            true -> R.string.dashboard_disconnect_from_vpn
-            false -> R.string.dashboard_connect_to_vpn
+          when (state.vpnStatus) {
+            VpnStatus.Connected -> R.string.dashboard_disconnect_from_vpn
+            else -> R.string.dashboard_connect_to_vpn
           },
         ),
-        style = if (state.isConnected) ButtonStyle.Secondary else ButtonStyle.Primary,
+        style = when (state.vpnStatus) {
+          VpnStatus.Connected -> ButtonStyle.Secondary
+          else -> ButtonStyle.Primary
+        },
+        isLoading = when (state.vpnStatus) {
+          VpnStatus.Connecting, VpnStatus.Disconnecting -> true
+          else -> false
+        },
         onClick = onConnectClick,
         modifier = Modifier.fillMaxWidth(),
       )
@@ -419,7 +425,7 @@ fun DashboardScreenPreview() {
         ),
         ipAddress = "91.208.132.23",
       ),
-      mapPositionState = rememberCameraPositionState(),
+      mapViewportState = rememberMapViewportState(),
       onConnectClick = {},
       onSelectServerClick = {},
       onSettingsClick = {},

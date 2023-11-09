@@ -12,7 +12,7 @@ interface V2RayRepository {
     serverName: String,
   ): Either<Unit, Unit>
 
-  fun stopV2ray()
+  suspend fun stopV2ray()
 
   fun isConnected(): Boolean
 

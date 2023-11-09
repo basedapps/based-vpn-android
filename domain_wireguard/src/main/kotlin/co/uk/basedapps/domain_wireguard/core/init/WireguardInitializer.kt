@@ -12,14 +12,14 @@ class WireguardInitializer(
   private val scope = CoroutineScope(Dispatchers.Main)
 
   fun init() {
-    scope.launch {
+    scope.launch(Dispatchers.IO) {
       repository.init(::handleAlwaysOn)
       repository.loadTunnels()
     }
   }
 
   private fun handleAlwaysOn() {
-    scope.launch {
+    scope.launch(Dispatchers.IO) {
       repository.restoreState(isForce = true)
     }
   }

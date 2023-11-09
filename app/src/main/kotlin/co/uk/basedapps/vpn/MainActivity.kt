@@ -11,25 +11,18 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import co.uk.basedapps.domain_wireguard.core.init.WireguardInitializer
 import co.uk.basedapps.vpn.ui.screens.cities.CitiesScreen
 import co.uk.basedapps.vpn.ui.screens.countries.CountriesScreen
 import co.uk.basedapps.vpn.ui.screens.dashboard.DashboardScreen
 import co.uk.basedapps.vpn.ui.screens.settings.SettingsScreen
 import co.uk.basedapps.vpn.ui.theme.BasedVPNTheme
 import dagger.hilt.android.AndroidEntryPoint
-import dev.dev7.lib.v2ray.V2rayController
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-  @Inject
-  lateinit var wireguardInitializer: WireguardInitializer
-
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setupVPN()
     setFullScreen()
     setContent {
       BasedVPNTheme {
@@ -77,11 +70,6 @@ class MainActivity : ComponentActivity() {
         }
       }
     }
-  }
-
-  private fun setupVPN() {
-    V2rayController.init(applicationContext, R.drawable.ic_settings, getString(R.string.app_name))
-    wireguardInitializer.init()
   }
 }
 

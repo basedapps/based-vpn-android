@@ -1,14 +1,15 @@
 plugins {
-    id 'com.android.library'
+    alias libs.plugins.android.library
+    alias libs.plugins.kotlin.android
 }
 
 android {
-    namespace 'dev.dev7.v2ray'
-    compileSdk 33
+    namespace 'com.v2ray.ang'
 
     defaultConfig {
-        minSdk 21
-        targetSdk 33
+        minSdk libs.versions.minSdk.get().toInteger()
+        targetSdk libs.versions.compileSdk.get().toInteger()
+        compileSdk libs.versions.compileSdk.get().toInteger()
     }
 
     sourceSets {
@@ -25,12 +26,16 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 }
 
 dependencies {
     implementation(name: "libv2ray", ext: "aar")
-    implementation 'androidx.appcompat:appcompat:1.6.1'
+
+    implementation libs.mmkv
+    implementation libs.gson
+    implementation libs.android.preference.ktx
+    implementation libs.android.core.ktx
 }

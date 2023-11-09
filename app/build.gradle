@@ -15,22 +15,28 @@ android {
         targetSdk libs.versions.compileSdk.get().toInteger()
         compileSdk libs.versions.compileSdk.get().toInteger()
 
-        versionCode 4
-        versionName "1.1.0"
+        versionCode 5
+        versionName "1.2.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    applicationVariants.configureEach { variant ->
+        variant.outputs.configureEach {
+            def versionName = variant.versionName
+            outputFileName = "${applicationId}_${versionName}.apk"
+        }
+    }
+
     buildTypes {
         debug {
-            buildConfigField "String", "API_URL", "\"https://vpn-api-staging.basedapps.co.uk\""
-            resValue "string", "google_maps_key", System.getenv("BASED_VPN_MAPS_KEY")
+            // buildConfigField "String", "API_URL", "\"https://vpn-api-staging.basedapps.co.uk\""
+            buildConfigField "String", "API_URL", "\"https://vpn-api.basedapps.co.uk\""
         }
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             buildConfigField "String", "API_URL", "\"https://vpn-api.basedapps.co.uk\""
-            resValue "string", "google_maps_key", System.getenv("BASED_VPN_MAPS_KEY")
         }
     }
     compileOptions {
@@ -50,8 +56,9 @@ android {
         resources {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
         }
+        // This fix aab issue
+        jniLibs.useLegacyPackaging = true
     }
-    sourceSets.main.res.srcDirs += 'src/main/res-flags'
     buildFeatures {
         buildConfig = true
     }
@@ -68,18 +75,11 @@ dependencies {
     implementation libs.lifecycle.runtime
     implementation libs.bundles.compose
     implementation libs.navigation
-    implementation libs.retrofit
-    implementation libs.http.logger
-    implementation libs.gson
-    implementation libs.gson.converter
     implementation libs.accompanist.systemuicontroller
-    implementation libs.google.maps
-    implementation libs.google.maps.compose
+    implementation libs.map.box.compose
+    implementation libs.map.box.android
 
     kapt libs.hilt.compiler
 
-    implementation project(path: ':domain')
-    implementation project(path: ':v2ray')
-    implementation project(path: ':domain_v2ray')
-    implementation project(path: ':domain_wireguard')
+    implementation project(path: ':based_vpn')
 }

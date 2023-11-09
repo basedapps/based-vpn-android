@@ -6,6 +6,7 @@
     <string name="common_cancel">Cancel</string>
 
     <string name="dashboard_your_ip">Your IP address</string>
+    <string name="dashboard_loading">Preparing your account…</string>
     <string name="dashboard_connect_to_vpn">Connect to VPN</string>
     <string name="dashboard_disconnect_from_vpn">Disconnect</string>
     <string name="dashboard_error_connection_title">Unable to connect to the server</string>
@@ -19,6 +20,10 @@
 
     <string name="settings_title">@string/common_settings</string>
     <string name="settings_row_dns">DNS Server</string>
+    <string name="settings_row_protocol">VPN protocol</string>
+
+    <string name="settings_protocol_change_title">Choose protocol</string>
+
     <string name="settings_dns_cloudflare">Cloudflare DNS</string>
     <string name="settings_dns_google">Google DNS</string>
     <string name="settings_dns_handshake">Handshake DNS</string>

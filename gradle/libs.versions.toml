@@ -49,8 +49,9 @@ dagger-hilt = { module = "com.google.dagger:hilt-android", version.ref = "dagger
 hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "dagger" }
 hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigation" }
 # Google
-google-firebase-bom = { module = "com.google.firebase:firebase-bom", version = "32.2.3" }
-google-firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics-ktx" }
+google-firebase-bom = { module = "com.google.firebase:firebase-bom", version = "32.6.0" }
+google-firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
+google-firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics" }
 # Lifecycle
 lifecycle-runtime = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycle" }
 # Kotlin
@@ -82,8 +83,8 @@ wireguard = { module = "com.wireguard.android:tunnel", version.ref = "wireguard"
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 android-library = { id = "com.android.library", version.ref = "agp" }
-crashlytics = { id = "com.google.firebase.crashlytics", version = "2.9.4" }
-google-services = { id = "com.google.gms.google-services", version = "4.3.15" }
+google-crashlytics = { id = "com.google.firebase.crashlytics", version = "2.9.9" }
+google-services = { id = "com.google.gms.google-services", version = "4.4.0" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 dagger-hilt = { id = "com.google.dagger.hilt.android", version.ref = "dagger" }

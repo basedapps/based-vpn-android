@@ -41,7 +41,7 @@ class WireguardRepositoryImpl(
   private val userPreferenceStore: WireguardUserPreferenceStore,
 ) : WireguardRepository {
   companion object {
-    const val DEFAULT_DNS = "103.196.38.38, 103.196.38.39, 103.196.38.40"
+    const val DEFAULT_DNS = "1.1.1.1, 1.0.0.1"
   }
 
   private var backend: Backend? = null

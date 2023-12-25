@@ -10,6 +10,7 @@
 # Application
 -keep class co.uk.basedapps.vpn.network.model.** { *; }
 -keep class co.uk.basedapps.vpn.common.flags.** { *; }
+-keep class com.v2ray.ang.dto.** { *; }
 
 # Please add these rules to your existing keep rules in order to suppress warnings.
 # This is generated automatically by the Android Gradle plugin.
@@ -28,4 +29,10 @@
 -dontwarn com.google.android.gms.location.LocationRequest
 -dontwarn com.google.android.gms.location.LocationResult
 -dontwarn com.google.android.gms.location.LocationServices
+-dontwarn com.google.android.gms.tasks.OnCanceledListener
+-dontwarn com.google.android.gms.tasks.OnCompleteListener
+-dontwarn com.google.android.gms.tasks.OnFailureListener
+-dontwarn com.google.android.gms.tasks.OnSuccessListener
+-dontwarn com.google.android.gms.tasks.RuntimeExecutionException
+-dontwarn com.google.android.gms.tasks.Task
 -dontwarn com.tobrun.datacompat.annotation.Default

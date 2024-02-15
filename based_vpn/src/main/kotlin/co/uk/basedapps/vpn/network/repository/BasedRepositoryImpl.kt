@@ -11,6 +11,7 @@ import co.uk.basedapps.vpn.network.model.DataObj
 import co.uk.basedapps.vpn.network.model.IpModel
 import co.uk.basedapps.vpn.network.model.Protocol
 import co.uk.basedapps.vpn.network.model.TokenModel
+import co.uk.basedapps.vpn.network.model.VersionModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
@@ -58,6 +59,9 @@ class BasedRepositoryImpl(
 
   override suspend fun getIp(): NetResult<DataObj<IpModel>> =
     execute { api.getIp() }
+
+  override suspend fun getVersion(): NetResult<DataObj<VersionModel>> =
+    execute { api.getVersion() }
 
   override suspend fun resetConnection() {
     withContext(Dispatchers.IO) {

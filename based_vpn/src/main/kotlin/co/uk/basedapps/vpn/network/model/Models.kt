@@ -66,6 +66,13 @@ data class IpModel(
   val longitude: Double,
 )
 
+data class VersionModel(
+  @SerializedName("ANDROID")
+  val appVersion: Long,
+  @SerializedName("API")
+  val apiVersion: Long,
+)
+
 enum class Protocol(
   val strValue: String,
   @StringRes val labelRes: Int,

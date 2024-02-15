@@ -2,6 +2,7 @@ package co.uk.basedapps.vpn.network.repository
 
 import co.uk.basedapps.domain.functional.Either
 import co.uk.basedapps.vpn.common.flags.CountryFlag
+import co.uk.basedapps.vpn.network.NetResult
 import co.uk.basedapps.vpn.network.model.City
 import co.uk.basedapps.vpn.network.model.Country
 import co.uk.basedapps.vpn.network.model.Credentials
@@ -10,6 +11,7 @@ import co.uk.basedapps.vpn.network.model.DataObj
 import co.uk.basedapps.vpn.network.model.IpModel
 import co.uk.basedapps.vpn.network.model.Protocol
 import co.uk.basedapps.vpn.network.model.TokenModel
+import co.uk.basedapps.vpn.network.model.VersionModel
 
 class BasedRepositoryMock : BasedRepository {
 
@@ -99,6 +101,13 @@ class BasedRepositoryMock : BasedRepository {
       ip = "192.168.0.1",
       latitude = 0.0,
       longitude = 0.0,
+    ),
+  )
+
+  override suspend fun getVersion() = dataObj(
+    VersionModel(
+      appVersion = 0,
+      apiVersion = 0,
     ),
   )
 

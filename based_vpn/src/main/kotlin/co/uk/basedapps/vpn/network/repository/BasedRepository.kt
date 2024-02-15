@@ -9,6 +9,7 @@ import co.uk.basedapps.vpn.network.model.DataObj
 import co.uk.basedapps.vpn.network.model.IpModel
 import co.uk.basedapps.vpn.network.model.Protocol
 import co.uk.basedapps.vpn.network.model.TokenModel
+import co.uk.basedapps.vpn.network.model.VersionModel
 
 interface BasedRepository {
 
@@ -18,5 +19,6 @@ interface BasedRepository {
   suspend fun getCities(countryId: Int, protocol: Protocol?): NetResult<DataList<City>>
   suspend fun getCredentials(countryId: Int, cityId: Int, protocol: Protocol?): NetResult<DataObj<Credentials>>
   suspend fun getIp(): NetResult<DataObj<IpModel>>
+  suspend fun getVersion(): NetResult<DataObj<VersionModel>>
   suspend fun resetConnection()
 }

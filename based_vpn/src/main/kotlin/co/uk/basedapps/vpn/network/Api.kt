@@ -7,6 +7,7 @@ import co.uk.basedapps.vpn.network.model.DataList
 import co.uk.basedapps.vpn.network.model.DataObj
 import co.uk.basedapps.vpn.network.model.IpModel
 import co.uk.basedapps.vpn.network.model.TokenModel
+import co.uk.basedapps.vpn.network.model.VersionModel
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -50,4 +51,7 @@ interface Api {
 
   @GET("ip")
   suspend fun getIp(): DataObj<IpModel>
+
+  @GET("versions")
+  suspend fun getVersion(): DataObj<VersionModel>
 }

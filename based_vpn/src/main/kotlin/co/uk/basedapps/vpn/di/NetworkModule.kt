@@ -24,8 +24,9 @@ class NetworkModule {
   @Provides
   @Singleton
   fun provideHeadersInterceptor(
+    provider: AppDetailsProvider,
     prefs: SharedPreferences,
-  ): HeadersInterceptor = HeadersInterceptor(prefs)
+  ): HeadersInterceptor = HeadersInterceptor(provider, prefs)
 
   @Provides
   @Singleton

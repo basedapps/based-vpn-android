@@ -28,4 +28,9 @@
     <string name="settings_dns_google">Google DNS</string>
     <string name="settings_dns_handshake">Handshake DNS</string>
     <string name="settings_dns_change_title">Choose type</string>
+
+    <string name="error_generic_title">Something went wrong</string>
+    <string name="error_generic_description">Please check your Internet connection and try again later</string>
+    <string name="error_generic_button">Try again</string>
+    <string name="error_banned_title">App has been blocked for violating the terms of use of the service</string>
 </resources>

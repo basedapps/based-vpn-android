@@ -152,8 +152,14 @@ fun DashboardScreenStateless(
   onAlertConfirmClick: () -> Unit,
   onAlertDismissRequest: () -> Unit,
 ) {
-  when (state.status) {
-    is Status.Error -> ErrorScreen(
+  when {
+    state.isBanned -> ErrorScreen(
+      title = null,
+      description = stringResource(R.string.error_banned_title),
+      onButtonClick = null,
+    )
+
+    state.status is Status.Error -> ErrorScreen(
       isLoading = (state.status as Status.Error).isLoading,
       onButtonClick = onTryAgainClick,
     )

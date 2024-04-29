@@ -54,14 +54,12 @@ class BasedStorage
   fun observeSelectedCity(): Flow<SelectedCity?> =
     selectedCityDelegate.observe
       .map(::parseCity)
-      .catch { emit(null) }
 
   private fun parseCity(cityJson: String): SelectedCity? {
-    // make sure that the country json object is valid
-    return if (JSONObject(cityJson).has("countryName")) {
+    return try {
       gson.fromJson(cityJson, SelectedCity::class.java)
-    } else {
-      return null
+    } catch (e: Exception) {
+      null
     }
   }
 

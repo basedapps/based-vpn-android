@@ -1,20 +1,23 @@
 package co.uk.basedapps.vpn.vpn
 
-import co.uk.basedapps.domain.functional.Either
-import co.uk.basedapps.domain_wireguard.core.repo.WireguardRepository
+import co.sentinel.vpn.v2ray.repo.V2RayRepository
+import co.sentinel.vpn.wireguard.repo.WireguardRepository
 import javax.inject.Inject
 
 class DdsConfigurator @Inject constructor(
-    private val wireguardRepository: WireguardRepository,
+  private val wireguardRepository: WireguardRepository,
+  private val v2RayRepository: V2RayRepository,
 ) {
 
   suspend fun getDefaultDns(): Dns {
     val currentDns = wireguardRepository.getDefaultDns()
-    return Dns.values().first { it.address == currentDns }
+    return Dns.entries.first { it.address == currentDns }
   }
 
-  suspend fun setDns(dns: Dns): Either<Unit, Unit> =
+  suspend fun setDns(dns: Dns) {
     wireguardRepository.updateDns(dns.address)
+    v2RayRepository.updateDns(dns.address)
+  }
 
   enum class Dns(
     val address: String,

@@ -1,8 +1,8 @@
 package co.uk.basedapps.vpn.vpn
 
 import android.content.Context
-import co.uk.basedapps.domain_wireguard.core.init.WireguardInitializer
-import com.v2ray.ang.V2RayInitializer
+import co.sentinel.vpn.v2ray.control.V2RayInitializer
+import co.sentinel.vpn.wireguard.control.WireguardInitializer
 import javax.inject.Inject
 
 class VpnInitializer @Inject constructor(

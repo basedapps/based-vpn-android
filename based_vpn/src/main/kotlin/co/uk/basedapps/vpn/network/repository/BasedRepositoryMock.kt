@@ -1,8 +1,7 @@
 package co.uk.basedapps.vpn.network.repository
 
-import co.uk.basedapps.domain.functional.Either
+import arrow.core.Either
 import co.uk.basedapps.vpn.common.flags.CountryFlag
-import co.uk.basedapps.vpn.network.NetResult
 import co.uk.basedapps.vpn.network.model.City
 import co.uk.basedapps.vpn.network.model.Country
 import co.uk.basedapps.vpn.network.model.Credentials

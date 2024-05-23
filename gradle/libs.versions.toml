@@ -77,8 +77,11 @@ mmkv = { module = "com.tencent:mmkv-static", version = "1.2.15" }
 # Other
 accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanist" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
-datastore = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
-wireguard = { module = "com.wireguard.android:tunnel", version.ref = "wireguard" }
+play-ads = { module = "com.google.android.gms:play-services-ads", version = "22.6.0" }
+arrow-core = { module = "io.arrow-kt:arrow-core", version = "1.2.0" }
+# VPN
+vpn-v2ray = { module = "co.sentinel.vpn:v2ray", version = "0.0.2" }
+vpn-wireguard = { module = "co.sentinel.vpn:wireguard", version = "0.0.1" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

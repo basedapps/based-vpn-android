@@ -1,9 +1,8 @@
 package co.uk.basedapps.vpn.vpn
 
 import android.util.Base64
-import co.uk.basedapps.domain.extension.bytesToUnsignedShort
-import co.uk.basedapps.domain_v2ray.model.V2RayVpnProfile
-import co.uk.basedapps.domain_wireguard.core.model.WireguardVpnProfile
+import co.sentinel.vpn.v2ray.model.V2RayVpnProfile
+import co.sentinel.vpn.wireguard.model.WireguardVpnProfile
 
 fun decodeWireguardVpnProfile(payload: String): WireguardVpnProfile? {
   return try {
@@ -29,7 +28,10 @@ fun decodeWireguardVpnProfile(payload: String): WireguardVpnProfile? {
   }
 }
 
-fun decodeV2RayVpnProfile(payload: String, uid: String): V2RayVpnProfile? {
+fun decodeV2RayVpnProfile(
+  payload: String,
+  uid: String,
+): V2RayVpnProfile? {
   return try {
     Base64.decode(payload, Base64.DEFAULT).let { bytes ->
       if (bytes.size != 7) return null
@@ -58,4 +60,15 @@ fun decodeV2RayVpnProfile(payload: String, uid: String): V2RayVpnProfile? {
   } catch (e: Exception) {
     null
   }
+}
+
+private fun bytesToUnsignedShort(
+  byte1: Byte,
+  byte2: Byte,
+  bigEndian: Boolean,
+): Int {
+  if (bigEndian) {
+    return (((byte1.toInt() and 255) shl 8) or (byte2.toInt() and 255))
+  }
+  return (((byte2.toInt() and 255) shl 8) or (byte1.toInt() and 255))
 }

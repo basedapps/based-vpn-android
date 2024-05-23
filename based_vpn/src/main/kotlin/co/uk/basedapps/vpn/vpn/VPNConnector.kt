@@ -1,19 +1,17 @@
 package co.uk.basedapps.vpn.vpn
 
-import co.uk.basedapps.domain.functional.Either
-import co.uk.basedapps.domain.functional.getOrNull
-import co.uk.basedapps.domain.functional.requireLeft
-import co.uk.basedapps.domain.functional.requireRight
-import co.uk.basedapps.domain.models.VpnTunnel
-import co.uk.basedapps.domain_v2ray.V2RayRepository
-import co.uk.basedapps.domain_v2ray.model.V2RayVpnProfile
-import co.uk.basedapps.domain_wireguard.core.init.DefaultTunnelName
-import co.uk.basedapps.domain_wireguard.core.model.WireguardVpnProfile
-import co.uk.basedapps.domain_wireguard.core.repo.WireguardRepository
+import arrow.core.Either
+import arrow.core.flatMap
+import co.sentinel.vpn.v2ray.model.V2RayVpnProfile
+import co.sentinel.vpn.v2ray.repo.V2RayRepository
+import co.sentinel.vpn.wireguard.model.VpnTunnel
+import co.sentinel.vpn.wireguard.model.WireguardVpnProfile
+import co.sentinel.vpn.wireguard.repo.WireguardRepository
+import co.sentinel.vpn.wireguard.utils.DefaultTunnelName
 import co.uk.basedapps.vpn.common.BaseError
-import co.uk.basedapps.vpn.network.repository.BasedRepository
 import co.uk.basedapps.vpn.network.model.Credentials
 import co.uk.basedapps.vpn.network.model.Protocol
+import co.uk.basedapps.vpn.network.repository.BasedRepository
 import co.uk.basedapps.vpn.storage.BasedStorage
 import co.uk.basedapps.vpn.storage.LogsStorage
 import co.uk.basedapps.vpn.storage.SelectedCity
@@ -33,11 +31,7 @@ class VPNConnector @Inject constructor(
   suspend fun connect(city: SelectedCity): Either<Error, Unit> {
     return withContext(Dispatchers.IO) {
       getCredentials(city)
-        .also {
-          if (it is Either.Left) {
-            logsStorage.writeToLog(it.requireLeft())
-          }
-        }
+        .onLeft { logsStorage.writeToLog(it) }
     }
   }
 
@@ -50,33 +44,25 @@ class VPNConnector @Inject constructor(
     }
   }
 
-  suspend fun getConnection(): VpnTunnel? {
-    return withContext(Dispatchers.IO) {
-      when {
-        wireguardRepository.isConnected() -> wireguardRepository.getTunnel()
-        v2RayRepository.isConnected() -> v2RayRepository.getTunnel()
-        else -> null
-      }
-    }
+  suspend fun isConnected(): Boolean {
+    return wireguardRepository.isConnected() || v2RayRepository.isConnected()
   }
 
   private suspend fun getCredentials(city: SelectedCity): Either<Error, Unit> {
     val protocol = storage.getVpnProtocol()
       .takeIf { it != Protocol.NONE }
-    val credentialsRes = repository.getCredentials(
+    return repository.getCredentials(
       countryId = city.countryId,
       cityId = city.id,
       protocol = protocol,
     )
-    return credentialsRes.foldSuspend(
-      fnL = { Either.Left(parseError(it)) },
-      fnR = { credentials ->
+      .mapLeft { parseError(it) }
+      .flatMap { credentials ->
         getVPNProfile(
           serverId = city.serverId,
           credentials = credentials.data,
         )
-      },
-    )
+      }
   }
 
   private fun parseError(exception: Exception): Error {
@@ -132,12 +118,12 @@ class VPNConnector @Inject constructor(
       keyPair = keyPair,
       serverId = serverId,
     )
-    createTunnelRes
+    val tunnel = createTunnelRes
       .getOrNull()
       ?: return Either.Left(Error.CreateTunnel)
 
     wireguardRepository.setTunnelState(
-      tunnelName = createTunnelRes.requireRight().name,
+      tunnelName = tunnel.name,
       tunnelState = VpnTunnel.State.UP,
     ).getOrNull()
       ?: return Either.Left(Error.SetTunnelState)
@@ -155,7 +141,6 @@ class VPNConnector @Inject constructor(
     v2RayRepository.startV2Ray(
       profile = profile,
       serverId = serverId,
-      serverName = "BasedVPN server",
     ).getOrNull()
       ?: return Either.Left(Error.StartV2Ray)
 

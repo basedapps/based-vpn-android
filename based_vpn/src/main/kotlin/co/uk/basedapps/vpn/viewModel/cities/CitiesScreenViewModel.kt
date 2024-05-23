@@ -2,7 +2,6 @@ package co.uk.basedapps.vpn.viewModel.cities
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import co.uk.basedapps.domain.functional.getOrNull
 import co.uk.basedapps.vpn.common.state.Status
 import co.uk.basedapps.vpn.network.repository.BasedRepository
 import co.uk.basedapps.vpn.network.model.City

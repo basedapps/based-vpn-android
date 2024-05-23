@@ -12,7 +12,6 @@ import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
-import org.json.JSONObject
 
 class BasedStorage
 @Inject constructor(
@@ -53,15 +52,8 @@ class BasedStorage
 
   fun observeSelectedCity(): Flow<SelectedCity?> =
     selectedCityDelegate.observe
-      .map(::parseCity)
-
-  private fun parseCity(cityJson: String): SelectedCity? {
-    return try {
-      gson.fromJson(cityJson, SelectedCity::class.java)
-    } catch (e: Exception) {
-      null
-    }
-  }
+      .map { cityJson -> gson.fromJson(cityJson, SelectedCity::class.java) }
+      .catch { emit(null) }
 
   fun storeVpnProtocol(protocol: Protocol) {
     protocolPref = protocol.strValue

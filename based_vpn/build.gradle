@@ -46,11 +46,9 @@ dependencies {
     implementation libs.http.logger
     implementation libs.gson
     implementation libs.gson.converter
+    implementation libs.arrow.core
+    implementation libs.vpn.v2ray
+    implementation libs.vpn.wireguard
 
     kapt libs.hilt.compiler
-
-    implementation project(path: ':domain')
-    implementation project(path: ':v2ray')
-    implementation project(path: ':domain_v2ray')
-    implementation project(path: ':domain_wireguard')
 }

@@ -10,7 +10,6 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        flatDir { dirs 'v2ray/libs' }
         maven {
             url 'https://api.mapbox.com/downloads/v2/releases/maven'
             authentication {
@@ -24,12 +23,17 @@ dependencyResolutionManagement {
                 password = System.getenv("MAP_BOX_PRIVATE_KEY")
             }
         }
+        flatDir { dirs 'app/libs' }
+        maven {
+            url "http://nexus.basedapps.co.uk/repository/maven-releases/"
+            allowInsecureProtocol true
+            credentials {
+                username "${System.getenv("SENTINEL_NEXUS_LOGIN")}"
+                password "${System.getenv("SENTINEL_NEXUS_PASSWORD")}"
+            }
+        }
     }
 }
 rootProject.name = "BasedVPN"
 include ':app',
-        ':domain',
-        ':v2ray',
-        ':domain_v2ray',
-        ':domain_wireguard',
         ':based_vpn'

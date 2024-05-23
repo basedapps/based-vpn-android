@@ -60,6 +60,9 @@ android {
         // This fix aab issue
         jniLibs.useLegacyPackaging = true
     }
+    sourceSets {
+        main { jniLibs.srcDirs = ['libs'] }
+    }
     buildFeatures {
         buildConfig = true
     }
@@ -86,4 +89,5 @@ dependencies {
     kapt libs.hilt.compiler
 
     implementation project(path: ':based_vpn')
+    implementation(name: "libv2ray", ext: "aar")
 }

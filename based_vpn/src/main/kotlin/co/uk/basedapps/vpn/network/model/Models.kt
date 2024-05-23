@@ -84,6 +84,6 @@ enum class Protocol(
 
   companion object {
     fun fromString(strValue: String) =
-      values().firstOrNull { it.strValue == strValue } ?: NONE
+      entries.firstOrNull { it.strValue == strValue } ?: NONE
   }
 }

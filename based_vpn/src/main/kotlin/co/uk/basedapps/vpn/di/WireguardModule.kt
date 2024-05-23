@@ -1,15 +1,15 @@
 package co.uk.basedapps.vpn.di
 
 import android.content.Context
-import co.uk.basedapps.domain_wireguard.core.repo.WireguardRepositoryImpl
-import co.uk.basedapps.domain_wireguard.core.init.WireguardInitializer
-import co.uk.basedapps.domain_wireguard.core.repo.WireguardRepository
-import co.uk.basedapps.domain_wireguard.core.store.ConfigStore
-import co.uk.basedapps.domain_wireguard.core.store.FileConfigStore
-import co.uk.basedapps.domain_wireguard.core.store.TunnelCacheStore
-import co.uk.basedapps.domain_wireguard.core.store.TunnelCacheStoreImpl
-import co.uk.basedapps.domain_wireguard.core.store.WireguardUserPreferenceStore
-import co.uk.basedapps.domain_wireguard.core.store.WireguardUserPreferenceStoreImpl
+import co.sentinel.vpn.wireguard.control.WireguardInitializer
+import co.sentinel.vpn.wireguard.repo.WireguardRepository
+import co.sentinel.vpn.wireguard.repo.WireguardRepositoryImpl
+import co.sentinel.vpn.wireguard.store.ConfigStore
+import co.sentinel.vpn.wireguard.store.FileConfigStore
+import co.sentinel.vpn.wireguard.store.TunnelCacheStore
+import co.sentinel.vpn.wireguard.store.TunnelCacheStoreImpl
+import co.sentinel.vpn.wireguard.store.WireguardUserPreferenceStore
+import co.sentinel.vpn.wireguard.store.WireguardUserPreferenceStoreImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -49,6 +49,6 @@ class WireguardModule {
   @Provides
   @Singleton
   fun provideWireguardInitializer(
-      repository: WireguardRepository,
+    repository: WireguardRepository,
   ) = WireguardInitializer(repository)
 }

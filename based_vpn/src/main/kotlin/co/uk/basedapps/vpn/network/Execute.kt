@@ -1,6 +1,6 @@
 package co.uk.basedapps.vpn.network
 
-import co.uk.basedapps.domain.functional.Either
+import arrow.core.Either
 import timber.log.Timber
 
 typealias NetResult<T> = Either<Exception, T>

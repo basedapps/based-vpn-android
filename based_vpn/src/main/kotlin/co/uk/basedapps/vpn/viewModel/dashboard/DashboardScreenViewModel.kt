@@ -2,10 +2,6 @@ package co.uk.basedapps.vpn.viewModel.dashboard
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import co.uk.basedapps.domain.extension.isNotNullOrEmpty
-import co.uk.basedapps.domain.functional.getOrNull
-import co.uk.basedapps.domain.functional.requireLeft
-import co.uk.basedapps.domain.functional.requireRight
 import co.uk.basedapps.vpn.common.provider.AppDetailsProvider
 import co.uk.basedapps.vpn.common.state.Status
 import co.uk.basedapps.vpn.network.model.IpModel
@@ -57,7 +53,7 @@ class DashboardScreenViewModel
         storage.clearToken()
       }
       val hasToken = if (storage.getToken().isEmpty()) {
-        getToken().isNotNullOrEmpty()
+        !getToken().isNullOrEmpty()
       } else {
         true
       }
@@ -95,9 +91,9 @@ class DashboardScreenViewModel
   }
 
   private suspend fun isUpdateRequired(): Boolean {
-    val response = repository.getVersion()
-    return if (response.isRight) {
-      val versions = response.requireRight().data
+    val response = repository.getVersion().getOrNull()
+    return if (response != null) {
+      val versions = response.data
       versions.appVersion > provider.getBasedAppVersion() ||
         versions.apiVersion > provider.getBasedApiVersion()
     } else {
@@ -118,16 +114,18 @@ class DashboardScreenViewModel
   private suspend fun waitUserEnrollment(): EnrollmentStatus {
     val maxAttempts = 20
     repeat(maxAttempts) { attempt ->
-      val sessionRes = repository.getSession()
-      if (sessionRes.isLeft) {
-        val code = (sessionRes.requireLeft() as? HttpException)?.response()?.code()
-        if (code == 401) return EnrollmentStatus.TokenExpired
-      }
-      val session = sessionRes.getOrNull()?.data
-      when {
-        session?.isBanned == true -> return EnrollmentStatus.Banned
-        session?.isEnrolled == true -> return EnrollmentStatus.Enrolled
-      }
+      repository.getSession()
+        .onLeft { exception ->
+          val code = (exception as? HttpException)?.response()?.code()
+          if (code == 401) return EnrollmentStatus.TokenExpired
+        }
+        .onRight { sessionRes ->
+          val session = sessionRes.data
+          when {
+            session.isBanned -> return EnrollmentStatus.Banned
+            session.isEnrolled -> return EnrollmentStatus.Enrolled
+          }
+        }
       if (attempt < maxAttempts - 1) delay(5.seconds)
     }
     return EnrollmentStatus.NotEnrolled
@@ -167,12 +165,12 @@ class DashboardScreenViewModel
 
   private fun checkConnection() {
     viewModelScope.launch {
-      val tunnel = vpnConnector.getConnection() ?: return@launch
-      Timber.tag(Tag).d("Active tunnel was found: ${tunnel::class}")
-      if (tunnel.serverId == state.selectedCity?.serverId) {
+      val isConnected = vpnConnector.isConnected()
+      Timber.tag(Tag).d("Tunnel state: $isConnected")
+      if (isConnected) {
         setConnectedState()
       } else {
-        disconnect()
+        setDisconnectedState()
       }
     }
   }
@@ -247,10 +245,8 @@ class DashboardScreenViewModel
     }
     viewModelScope.launch {
       vpnConnector.connect(city)
-        .foldSuspend(
-          fnR = { setConnectedState() },
-          fnL = ::handleConnectionError,
-        )
+        .onRight { setConnectedState() }
+        .onLeft(::handleConnectionError)
     }
   }
 
@@ -298,8 +294,12 @@ class DashboardScreenViewModel
     viewModelScope.launch {
       vpnConnector.disconnect()
       refreshIp()
-      stateHolder.updateState { copy(vpnStatus = VpnStatus.Disconnected) }
+      setDisconnectedState()
     }
+  }
+
+  private fun setDisconnectedState() {
+    stateHolder.updateState { copy(vpnStatus = VpnStatus.Disconnected) }
   }
 
   fun onAlertConfirmClick() {

@@ -1,10 +1,9 @@
 package co.uk.basedapps.vpn.di
 
 import android.content.Context
-import co.uk.basedapps.domain_v2ray.V2RayRepository
-import co.uk.basedapps.domain_v2ray.V2RayRepositoryImpl
-import co.uk.basedapps.domain_v2ray.core.V2RayUserPreferenceStore
-import co.uk.basedapps.domain_v2ray.core.V2RayUserPreferenceStoreImpl
+import co.sentinel.vpn.v2ray.repo.V2RayRepository
+import co.sentinel.vpn.v2ray.repo.V2RayRepositoryImpl
+import co.sentinel.vpn.v2ray.store.V2RayUserPreferenceStore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -20,7 +19,7 @@ class V2RayModule {
   @Singleton
   fun provideWireguardUserPreferenceStore(
     @ApplicationContext context: Context,
-  ): V2RayUserPreferenceStore = V2RayUserPreferenceStoreImpl(context)
+  ): V2RayUserPreferenceStore = V2RayUserPreferenceStore(context)
 
   @Provides
   @Singleton

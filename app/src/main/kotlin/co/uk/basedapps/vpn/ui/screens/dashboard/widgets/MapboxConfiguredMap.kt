@@ -23,7 +23,6 @@ fun MapboxConfiguredMap(
     mapInitOptionsFactory = { context ->
       MapInitOptions(
         context = context,
-        styleUri = MapBoxStyleUrl,
       )
     },
     gesturesSettings = GesturesSettings {
@@ -37,5 +36,3 @@ fun MapboxConfiguredMap(
     scaleBarSettings = ScaleBarSettings { enabled = false },
   )
 }
-
-private const val MapBoxStyleUrl = "mapbox://styles/basedapps/clorsfs9200gr01qo3214065k"

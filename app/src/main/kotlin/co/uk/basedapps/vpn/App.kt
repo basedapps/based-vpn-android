@@ -1,7 +1,7 @@
 package co.uk.basedapps.vpn
 
 import android.app.Application
-import co.uk.basedapps.vpn.vpn.VpnInitializer
+import co.sentinel.vpn.based.vpn.VpnInitializer
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 import timber.log.Timber

@@ -32,16 +32,16 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import co.sentinel.vpn.based.common.state.Status
+import co.sentinel.vpn.based.network.model.Country
+import co.sentinel.vpn.based.viewModel.countries.CountriesScreenEffect as Effect
+import co.sentinel.vpn.based.viewModel.countries.CountriesScreenState as State
+import co.sentinel.vpn.based.viewModel.countries.CountriesScreenViewModel
 import co.uk.basedapps.vpn.R
 import co.uk.basedapps.vpn.common.EffectHandler
-import co.uk.basedapps.vpn.common.state.Status
-import co.uk.basedapps.vpn.network.model.Country
 import co.uk.basedapps.vpn.ui.theme.BasedAppColor
 import co.uk.basedapps.vpn.ui.widget.ErrorScreen
 import co.uk.basedapps.vpn.ui.widget.TopBar
-import co.uk.basedapps.vpn.viewModel.countries.CountriesScreenEffect as Effect
-import co.uk.basedapps.vpn.viewModel.countries.CountriesScreenState as State
-import co.uk.basedapps.vpn.viewModel.countries.CountriesScreenViewModel
 
 @Composable
 fun CountriesScreen(

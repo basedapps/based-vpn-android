@@ -43,8 +43,8 @@ fun BasedButton(
     colors = colors,
     shape = RoundedCornerShape(8.dp),
     modifier = modifier
-      .heightIn(min = size.minHeight)
-      .widthIn(min = size.minWidth),
+        .heightIn(min = size.minHeight)
+        .widthIn(min = size.minWidth),
   ) {
     if (isLoading) {
       CircularProgressIndicator(

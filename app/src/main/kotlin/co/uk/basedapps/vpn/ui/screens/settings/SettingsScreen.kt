@@ -14,7 +14,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -23,20 +22,18 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import co.sentinel.vpn.based.network.model.Protocol
+import co.sentinel.vpn.based.viewModel.settings.SettingsScreenState as State
+import co.sentinel.vpn.based.viewModel.settings.SettingsScreenViewModel
+import co.sentinel.vpn.based.vpn.DdsConfigurator
 import co.uk.basedapps.vpn.R
-import co.uk.basedapps.vpn.network.model.Protocol
 import co.uk.basedapps.vpn.ui.screens.settings.widgets.DnsDialog
 import co.uk.basedapps.vpn.ui.screens.settings.widgets.ProtocolDialog
 import co.uk.basedapps.vpn.ui.theme.BasedAppColor
 import co.uk.basedapps.vpn.ui.widget.TopBar
-import co.uk.basedapps.vpn.viewModel.settings.SettingsScreenState as State
-import co.uk.basedapps.vpn.viewModel.settings.SettingsScreenViewModel
-import co.uk.basedapps.vpn.vpn.DdsConfigurator
 
 @Composable
-fun SettingsScreen(
-  navigateBack: () -> Unit,
-) {
+fun SettingsScreen(navigateBack: () -> Unit) {
 
   val viewModel = hiltViewModel<SettingsScreenViewModel>()
   val state by viewModel.stateHolder.state.collectAsState()
@@ -175,9 +172,8 @@ private fun SettingsRow(
   }
 }
 
-fun DdsConfigurator.Dns.getLabelRes() =
-  when (this) {
-    DdsConfigurator.Dns.Cloudflare -> R.string.settings_dns_cloudflare
-    DdsConfigurator.Dns.Google -> R.string.settings_dns_google
-    DdsConfigurator.Dns.Handshake -> R.string.settings_dns_handshake
-  }
+fun DdsConfigurator.Dns.getLabelRes() = when (this) {
+  DdsConfigurator.Dns.Cloudflare -> R.string.settings_dns_cloudflare
+  DdsConfigurator.Dns.Google -> R.string.settings_dns_google
+  DdsConfigurator.Dns.Handshake -> R.string.settings_dns_handshake
+}

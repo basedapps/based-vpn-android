@@ -20,10 +20,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import co.sentinel.vpn.based.viewModel.settings.SettingsScreenState
+import co.sentinel.vpn.based.vpn.DdsConfigurator
 import co.uk.basedapps.vpn.R
 import co.uk.basedapps.vpn.ui.screens.settings.getLabelRes
-import co.uk.basedapps.vpn.viewModel.settings.SettingsScreenState
-import co.uk.basedapps.vpn.vpn.DdsConfigurator
 
 @Composable
 fun DnsDialog(
@@ -42,13 +42,13 @@ fun DnsDialog(
           Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
-              .fillMaxWidth()
-              .selectable(
-                selected = dns == radioState,
-                onClick = { radioState = dns },
-                role = Role.RadioButton,
-              )
-              .padding(vertical = 8.dp),
+                .fillMaxWidth()
+                .selectable(
+                    selected = dns == radioState,
+                    onClick = { radioState = dns },
+                    role = Role.RadioButton,
+                )
+                .padding(vertical = 8.dp),
           ) {
             RadioButton(
               selected = dns == radioState,

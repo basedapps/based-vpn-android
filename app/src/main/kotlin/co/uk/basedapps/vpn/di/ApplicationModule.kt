@@ -1,7 +1,7 @@
 package co.uk.basedapps.vpn.di
 
+import co.sentinel.vpn.based.common.provider.AppDetailsProvider
 import co.uk.basedapps.vpn.BuildConfig
-import co.uk.basedapps.vpn.common.provider.AppDetailsProvider
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -14,14 +14,13 @@ class ApplicationModule {
 
   @Provides
   @Singleton
-  fun provideAppDetailsProvider(): AppDetailsProvider =
-    object : AppDetailsProvider {
-      override fun getAppVersion() = BuildConfig.VERSION_NAME
-      override fun getPackage() = "co.uk.basedapps.vpn"
-      override fun getBaseUrl() = BuildConfig.API_URL
-      override fun getBasedAppVersion(): Long = 1
-      override fun getBasedApiVersion(): Long = 2
-      override fun getAppToken(): String =
-        "PyAouXBv113edAawcaZURFlbr97gIS2UPJRvBOdbjerY3KPVtE8EXyvNNXjX2VMT2U8YvPqvv8f4jog3GQCrqTC0qoVPVPenkr2fJy1PVahMojKJbvUKEqLo3hqt7wW8"
-    }
+  fun provideAppDetailsProvider(): AppDetailsProvider = object : AppDetailsProvider {
+    override fun getAppVersion() = BuildConfig.VERSION_NAME
+    override fun getPackage() = "co.uk.basedapps.vpn"
+    override fun getBaseUrl() = BuildConfig.API_URL
+    override fun getBasedAppVersion(): Long = 1
+    override fun getBasedApiVersion(): Long = 2
+    override fun getAppToken(): String =
+      "PyAouXBv113edAawcaZURFlbr97gIS2UPJRvBOdbjerY3KPVtE8EXyvNNXjX2VMT2U8YvPqvv8f4jog3GQCrqTC0qoVPVPenkr2fJy1PVahMojKJbvUKEqLo3hqt7wW8"
+  }
 }

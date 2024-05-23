@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace 'co.uk.basedapps.vpn'
+    namespace 'co.sentinel.vpn_based'
 
     defaultConfig {
         minSdk libs.versions.minSdk.get().toInteger()

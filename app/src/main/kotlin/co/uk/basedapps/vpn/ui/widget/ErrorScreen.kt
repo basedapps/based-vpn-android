@@ -37,8 +37,8 @@ fun ErrorScreen(
     verticalArrangement = Arrangement.Center,
     horizontalAlignment = Alignment.CenterHorizontally,
     modifier = Modifier
-      .padding(paddingValues)
-      .fillMaxSize(),
+        .padding(paddingValues)
+        .fillMaxSize(),
   ) {
     Icon(
       painter = painterResource(imageResId),
@@ -54,8 +54,8 @@ fun ErrorScreen(
         textAlign = TextAlign.Center,
         color = BasedAppColor.TextPrimary,
         modifier = Modifier
-          .fillMaxWidth()
-          .padding(horizontal = 32.dp),
+            .fillMaxWidth()
+            .padding(horizontal = 32.dp),
       )
     }
     if (description != null) {
@@ -66,8 +66,8 @@ fun ErrorScreen(
         textAlign = TextAlign.Center,
         color = BasedAppColor.TextSecondary,
         modifier = Modifier
-          .fillMaxWidth()
-          .padding(horizontal = 48.dp),
+            .fillMaxWidth()
+            .padding(horizontal = 48.dp),
       )
     }
     if (onButtonClick != null) {

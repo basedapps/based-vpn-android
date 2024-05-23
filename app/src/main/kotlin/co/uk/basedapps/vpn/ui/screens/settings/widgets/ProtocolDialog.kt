@@ -21,10 +21,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import co.sentinel.vpn.based.network.model.Protocol
+import co.sentinel.vpn.based.viewModel.settings.SettingsScreenState
 import co.uk.basedapps.vpn.R
-import co.uk.basedapps.vpn.network.model.Protocol
 import co.uk.basedapps.vpn.ui.theme.BasedAppColor
-import co.uk.basedapps.vpn.viewModel.settings.SettingsScreenState
 
 @Composable
 fun ProtocolDialog(

@@ -32,6 +32,7 @@ dependencyResolutionManagement {
                 password "${System.getenv("SENTINEL_NEXUS_PASSWORD")}"
             }
         }
+        mavenLocal()
     }
 }
 rootProject.name = "BasedVPN"

@@ -49,4 +49,10 @@ For more detailed explanation check out [Set evrionmental variable in ZSH](https
 </p>
 </details>
 
+## Publishing
 
+### Maven Local
+./gradlew :based_vpn:publishToMavenLocal
+
+### Maven Global
+./gradlew :based_vpn:publish

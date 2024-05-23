@@ -13,8 +13,8 @@
 -keep,allowobfuscation @interface com.google.gson.annotations.SerializedName
 
 # Application
--keep class co.uk.basedapps.vpn.network.model.** { *; }
--keep class co.uk.basedapps.vpn.common.flags.** { *; }
+-keep class co.sentinel.vpn.based.network.model.** { *; }
+-keep class co.sentinel.vpn.based.common.flags.** { *; }
 -keep class com.v2ray.ang.dto.** { *; }
 
 # Please add these rules to your existing keep rules in order to suppress warnings.

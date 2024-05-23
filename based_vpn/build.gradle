@@ -3,10 +3,11 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias libs.plugins.kotlin.kapt
     alias libs.plugins.dagger.hilt
+    id 'maven-publish'
 }
 
 android {
-    namespace 'co.sentinel.vpn_based'
+    namespace 'co.sentinel.based_vpn'
 
     defaultConfig {
         minSdk libs.versions.minSdk.get().toInteger()
@@ -33,6 +34,31 @@ android {
     sourceSets.main.res.srcDirs += 'src/main/res-flags'
 }
 
+publishing {
+    publications {
+        release(MavenPublication) {
+            groupId = 'co.sentinel.vpn'
+            artifactId = 'based'
+            version = '0.0.1'
+
+            afterEvaluate {
+                from components.release
+            }
+        }
+    }
+    repositories {
+        maven {
+            name = 'Nexus'
+            url = 'http://nexus.basedapps.co.uk/repository/maven-releases/'
+            allowInsecureProtocol true
+            credentials {
+                username "${System.getenv("SENTINEL_NEXUS_LOGIN")}"
+                password "${System.getenv("SENTINEL_NEXUS_PASSWORD")}"
+            }
+        }
+    }
+}
+
 dependencies {
 
     implementation libs.android.core.ktx
@@ -41,7 +67,7 @@ dependencies {
     implementation libs.timber
     implementation libs.dagger.hilt
     implementation libs.lifecycle.runtime
-    implementation libs.navigation
+    implementation libs.lifecycle.viewmodel
     implementation libs.retrofit
     implementation libs.http.logger
     implementation libs.gson

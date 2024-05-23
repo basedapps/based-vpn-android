@@ -1,7 +1,7 @@
 package co.sentinel.vpn.based.common.flags
 
 import androidx.annotation.DrawableRes
-import co.sentinel.vpn_based.R
+import co.sentinel.based_vpn.R
 
 @Suppress("unused")
 enum class CountryFlag(

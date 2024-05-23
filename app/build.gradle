@@ -88,6 +88,8 @@ dependencies {
 
     kapt libs.hilt.compiler
 
-    implementation project(path: ':based_vpn')
     implementation(name: "libv2ray", ext: "aar")
+
+    implementation project(path: ':based_vpn')
+//    implementation "co.sentinel.vpn:based:0.0.1"
 }

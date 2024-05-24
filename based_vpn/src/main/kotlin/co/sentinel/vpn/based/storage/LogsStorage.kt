@@ -1,6 +1,6 @@
 package co.sentinel.vpn.based.storage
 
-import co.sentinel.vpn.based.common.BaseError
+import co.sentinel.vpn.based.error.BaseError
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale

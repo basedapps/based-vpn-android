@@ -1,6 +1,6 @@
 package co.uk.basedapps.vpn.di
 
-import co.sentinel.vpn.based.common.provider.AppDetailsProvider
+import co.sentinel.vpn.based.app_config.AppConfig
 import co.uk.basedapps.vpn.BuildConfig
 import dagger.Module
 import dagger.Provides
@@ -14,7 +14,7 @@ class ApplicationModule {
 
   @Provides
   @Singleton
-  fun provideAppDetailsProvider(): AppDetailsProvider = object : AppDetailsProvider {
+  fun provideAppConfig(): AppConfig = object : AppConfig {
     override fun getAppVersion() = BuildConfig.VERSION_NAME
     override fun getPackage() = "co.uk.basedapps.vpn"
     override fun getBaseUrl() = BuildConfig.API_URL

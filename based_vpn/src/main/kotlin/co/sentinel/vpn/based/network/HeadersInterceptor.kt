@@ -1,14 +1,14 @@
 package co.sentinel.vpn.based.network
 
 import android.content.SharedPreferences
-import co.sentinel.vpn.based.common.provider.AppDetailsProvider
-import co.sentinel.vpn.based.prefs.delegate
-import co.sentinel.vpn.based.prefs.getValue
+import co.sentinel.vpn.based.app_config.AppConfig
+import co.sentinel.vpn.based.shared_preferences.delegate
+import co.sentinel.vpn.based.shared_preferences.getValue
 import okhttp3.Interceptor
 import okhttp3.Response
 
 class HeadersInterceptor(
-  private val provider: AppDetailsProvider,
+  private val config: AppConfig,
   prefs: SharedPreferences,
 ) : Interceptor {
 
@@ -19,7 +19,7 @@ class HeadersInterceptor(
       request()
         .newBuilder()
         .apply {
-          addHeader("X-App-Token", provider.getAppToken())
+          addHeader("X-App-Token", config.getAppToken())
           if (token.isNotEmpty()) {
             addHeader("X-Device-Token", token)
           }

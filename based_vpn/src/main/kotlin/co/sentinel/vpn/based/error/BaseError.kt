@@ -1,4 +1,4 @@
-package co.sentinel.vpn.based.common
+package co.sentinel.vpn.based.error
 
 interface BaseError {
 

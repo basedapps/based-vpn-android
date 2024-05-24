@@ -2,7 +2,7 @@ package co.sentinel.vpn.based.vpn
 
 import arrow.core.Either
 import arrow.core.flatMap
-import co.sentinel.vpn.based.common.BaseError
+import co.sentinel.vpn.based.error.BaseError
 import co.sentinel.vpn.based.network.model.Credentials
 import co.sentinel.vpn.based.network.model.Protocol
 import co.sentinel.vpn.based.network.repository.BasedRepository

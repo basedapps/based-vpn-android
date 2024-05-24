@@ -1,4 +1,4 @@
-package co.sentinel.vpn.based.common.state
+package co.sentinel.vpn.based.state
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

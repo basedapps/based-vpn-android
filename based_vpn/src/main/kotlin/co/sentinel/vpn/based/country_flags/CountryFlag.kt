@@ -1,4 +1,4 @@
-package co.sentinel.vpn.based.common.flags
+package co.sentinel.vpn.based.country_flags
 
 import androidx.annotation.DrawableRes
 import co.sentinel.based_vpn.R

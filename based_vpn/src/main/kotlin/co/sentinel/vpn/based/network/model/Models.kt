@@ -2,7 +2,7 @@ package co.sentinel.vpn.based.network.model
 
 import androidx.annotation.StringRes
 import co.sentinel.based_vpn.R
-import co.sentinel.vpn.based.common.flags.CountryFlag
+import co.sentinel.vpn.based.country_flags.CountryFlag
 import com.google.gson.annotations.SerializedName
 
 data class DataObj<T>(

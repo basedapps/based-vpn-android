@@ -2,10 +2,10 @@ package co.sentinel.vpn.based.viewModel.dashboard
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import co.sentinel.vpn.based.common.provider.AppDetailsProvider
-import co.sentinel.vpn.based.common.state.Status
+import co.sentinel.vpn.based.app_config.AppConfig
 import co.sentinel.vpn.based.network.model.IpModel
 import co.sentinel.vpn.based.network.repository.BasedRepository
+import co.sentinel.vpn.based.state.Status
 import co.sentinel.vpn.based.storage.BasedStorage
 import co.sentinel.vpn.based.storage.SelectedCity
 import co.sentinel.vpn.based.viewModel.dashboard.DashboardScreenEffect as Effect
@@ -25,7 +25,7 @@ class DashboardScreenViewModel
   private val repository: BasedRepository,
   private val storage: BasedStorage,
   private val vpnConnector: VPNConnector,
-  private val provider: AppDetailsProvider,
+  private val config: AppConfig,
 ) : ViewModel() {
 
   private val state: DashboardScreenState
@@ -94,8 +94,8 @@ class DashboardScreenViewModel
     val response = repository.getVersion().getOrNull()
     return if (response != null) {
       val versions = response.data
-      versions.appVersion > provider.getBasedAppVersion() ||
-        versions.apiVersion > provider.getBasedApiVersion()
+      versions.appVersion > config.getBasedAppVersion() ||
+        versions.apiVersion > config.getBasedApiVersion()
     } else {
       false
     }

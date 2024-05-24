@@ -1,18 +1,18 @@
 package co.sentinel.vpn.based.viewModel.settings
 
-import co.sentinel.vpn.based.common.provider.AppDetailsProvider
-import co.sentinel.vpn.based.common.state.ViewStateHolder
+import co.sentinel.vpn.based.app_config.AppConfig
 import co.sentinel.vpn.based.network.model.Protocol
+import co.sentinel.vpn.based.state.ViewStateHolder
 import co.sentinel.vpn.based.vpn.DdsConfigurator
 import javax.inject.Inject
 
 class SettingsScreenStateHolder
 @Inject
 constructor(
-  provider: AppDetailsProvider,
+  config: AppConfig,
 ) : ViewStateHolder<SettingsScreenState, SettingsScreenEffect>(
   SettingsScreenState(
-    appVersion = provider.getAppVersion(),
+    appVersion = config.getAppVersion(),
   ),
 )
 

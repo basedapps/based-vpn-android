@@ -1,6 +1,6 @@
-package co.sentinel.vpn.based.common.provider
+package co.sentinel.vpn.based.app_config
 
-interface AppDetailsProvider {
+interface AppConfig {
   fun getAppVersion(): String
   fun getPackage(): String
   fun getBaseUrl(): String

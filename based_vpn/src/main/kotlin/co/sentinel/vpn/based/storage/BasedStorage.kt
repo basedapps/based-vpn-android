@@ -4,9 +4,9 @@ import android.content.SharedPreferences
 import co.sentinel.vpn.based.network.model.City
 import co.sentinel.vpn.based.network.model.Country
 import co.sentinel.vpn.based.network.model.Protocol
-import co.sentinel.vpn.based.prefs.delegate
-import co.sentinel.vpn.based.prefs.getValue
-import co.sentinel.vpn.based.prefs.setValue
+import co.sentinel.vpn.based.shared_preferences.delegate
+import co.sentinel.vpn.based.shared_preferences.getValue
+import co.sentinel.vpn.based.shared_preferences.setValue
 import com.google.gson.Gson
 import javax.inject.Inject
 import kotlinx.coroutines.flow.Flow

@@ -1,7 +1,7 @@
 package co.sentinel.vpn.based.di
 
 import android.content.SharedPreferences
-import co.sentinel.vpn.based.common.provider.AppDetailsProvider
+import co.sentinel.vpn.based.app_config.AppConfig
 import co.sentinel.vpn.based.network.Api
 import co.sentinel.vpn.based.network.HeadersInterceptor
 import co.sentinel.vpn.based.network.repository.BasedRepository
@@ -24,9 +24,9 @@ class NetworkModule {
   @Provides
   @Singleton
   fun provideHeadersInterceptor(
-    provider: AppDetailsProvider,
+    config: AppConfig,
     prefs: SharedPreferences,
-  ): HeadersInterceptor = HeadersInterceptor(provider, prefs)
+  ): HeadersInterceptor = HeadersInterceptor(config, prefs)
 
   @Provides
   @Singleton
@@ -45,9 +45,9 @@ class NetworkModule {
   @Singleton
   fun provideRetrofit(
     client: OkHttpClient,
-    provider: AppDetailsProvider,
+    config: AppConfig,
   ): Retrofit = Retrofit.Builder()
-    .baseUrl(provider.getBaseUrl())
+    .baseUrl(config.getBaseUrl())
     .addConverterFactory(GsonConverterFactory.create())
     .client(client)
     .build()

@@ -1,4 +1,4 @@
-package co.sentinel.vpn.based.prefs
+package co.sentinel.vpn.based.shared_preferences
 
 import android.content.SharedPreferences
 import kotlin.reflect.KProperty

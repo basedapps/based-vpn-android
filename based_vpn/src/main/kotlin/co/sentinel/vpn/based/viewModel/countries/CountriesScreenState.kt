@@ -1,8 +1,8 @@
 package co.sentinel.vpn.based.viewModel.countries
 
-import co.sentinel.vpn.based.common.state.Status
-import co.sentinel.vpn.based.common.state.ViewStateHolder
 import co.sentinel.vpn.based.network.model.Country
+import co.sentinel.vpn.based.state.Status
+import co.sentinel.vpn.based.state.ViewStateHolder
 import javax.inject.Inject
 
 class CountriesScreenStateHolder

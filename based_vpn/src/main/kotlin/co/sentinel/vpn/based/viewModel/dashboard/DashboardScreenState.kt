@@ -1,7 +1,7 @@
 package co.sentinel.vpn.based.viewModel.dashboard
 
-import co.sentinel.vpn.based.common.state.Status
-import co.sentinel.vpn.based.common.state.ViewStateHolder
+import co.sentinel.vpn.based.state.Status
+import co.sentinel.vpn.based.state.ViewStateHolder
 import co.sentinel.vpn.based.storage.SelectedCity
 import javax.inject.Inject
 

@@ -1,6 +1,6 @@
 package co.sentinel.vpn.based.storage
 
-import co.sentinel.vpn.based.common.flags.CountryFlag
+import co.sentinel.vpn.based.country_flags.CountryFlag
 import com.google.gson.annotations.SerializedName
 
 data class SelectedCity(

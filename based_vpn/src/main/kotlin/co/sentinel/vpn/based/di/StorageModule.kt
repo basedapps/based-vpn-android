@@ -2,7 +2,7 @@ package co.sentinel.vpn.based.di
 
 import android.content.Context
 import android.content.SharedPreferences
-import co.sentinel.vpn.based.common.provider.AppDetailsProvider
+import co.sentinel.vpn.based.app_config.AppConfig
 import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
@@ -19,8 +19,8 @@ class StorageModule {
   @Singleton
   fun provideSharedPreferences(
     @ApplicationContext context: Context,
-    provider: AppDetailsProvider,
-  ): SharedPreferences = context.getSharedPreferences(provider.getPackage(), Context.MODE_PRIVATE)
+    config: AppConfig,
+  ): SharedPreferences = context.getSharedPreferences(config.getPackage(), Context.MODE_PRIVATE)
 
   @Provides
   @Singleton

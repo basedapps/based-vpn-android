@@ -70,8 +70,6 @@ navigation = { module = "androidx.navigation:navigation-compose", version.ref = 
 # Maps
 map-box-android = { module = "com.mapbox.maps:android", version.ref = "mapBox" }
 map-box-compose = { module = "com.mapbox.extension:maps-compose", version.ref = "mapBoxCompose" }
-# Storage
-mmkv = { module = "com.tencent:mmkv-static", version = "1.2.15" }
 
 # Other
 accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanist" }

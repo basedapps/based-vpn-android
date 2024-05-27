@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import co.sentinel.vpn.based.network.model.City
 import co.sentinel.vpn.based.network.model.Protocol
 import co.sentinel.vpn.based.network.repository.BasedRepository
+import co.sentinel.vpn.based.network.repository.CitiesRequest
 import co.sentinel.vpn.based.state.Status
 import co.sentinel.vpn.based.storage.BasedStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -37,8 +38,8 @@ class CitiesScreenViewModel
   private fun getCities(countryId: Int) {
     viewModelScope.launch {
       val protocol = storage.getVpnProtocol().takeIf { it != Protocol.NONE }
-      val countries = repository.getCountries(protocol).getOrNull()?.data // todo: replace with cache
-      val cities = repository.getCities(countryId, protocol).getOrNull()?.data
+      val countries = repository.getCountries(protocol).getOrNull()?.data
+      val cities = repository.getCities(CitiesRequest(countryId, protocol)).getOrNull()?.data
       if (countries != null && cities != null) {
         stateHolder.updateState {
           copy(

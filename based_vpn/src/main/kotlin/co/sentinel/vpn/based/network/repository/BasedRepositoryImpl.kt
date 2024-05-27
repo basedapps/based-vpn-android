@@ -2,6 +2,7 @@ package co.sentinel.vpn.based.network.repository
 
 import co.sentinel.vpn.based.network.Api
 import co.sentinel.vpn.based.network.NetResult
+import co.sentinel.vpn.based.network.cache.CacheUnit
 import co.sentinel.vpn.based.network.execute
 import co.sentinel.vpn.based.network.model.City
 import co.sentinel.vpn.based.network.model.Country
@@ -21,25 +22,27 @@ class BasedRepositoryImpl(
   private val client: OkHttpClient,
 ) : BasedRepository {
 
+  private val countriesCache = CacheUnit<Protocol?, DataList<Country>> { protocol ->
+    api.getCountries(protocol?.strValue)
+  }
+
+  private val citiesCache = CacheUnit<CitiesRequest, DataList<City>> { request ->
+    api.getCities(request.countryId, request.protocol?.strValue)
+  }
+
   override suspend fun registerDevice(): NetResult<DataObj<TokenModel>> = execute(api::registerDevice)
 
   override suspend fun getSession(): NetResult<DataObj<TokenModel>> = execute(api::getSession)
 
-  override suspend fun getCountries(protocol: Protocol?): NetResult<DataList<Country>> = execute {
-    api.getCountries(
-      protocol = protocol?.strValue,
-    )
-  }
+  override suspend fun getCountries(
+    protocol: Protocol?,
+    isFresh: Boolean,
+  ): NetResult<DataList<Country>> = execute { countriesCache.get(protocol, isFresh) }
 
   override suspend fun getCities(
-    countryId: Int,
-    protocol: Protocol?,
-  ): NetResult<DataList<City>> = execute {
-    api.getCities(
-      countryId = countryId,
-      protocol = protocol?.strValue,
-    )
-  }
+    request: CitiesRequest,
+    isFresh: Boolean,
+  ): NetResult<DataList<City>> = execute { citiesCache.get(request, isFresh) }
 
   override suspend fun getCredentials(
     countryId: Int,
@@ -63,3 +66,8 @@ class BasedRepositoryImpl(
     }
   }
 }
+
+data class CitiesRequest(
+  val countryId: Int,
+  val protocol: Protocol?,
+)

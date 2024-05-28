@@ -2,9 +2,13 @@ package co.sentinel.vpn.based.viewModel.dashboard
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import arrow.core.flatMap
 import co.sentinel.vpn.based.app_config.AppConfig
+import co.sentinel.vpn.based.network.model.Country
 import co.sentinel.vpn.based.network.model.IpModel
+import co.sentinel.vpn.based.network.model.Protocol
 import co.sentinel.vpn.based.network.repository.BasedRepository
+import co.sentinel.vpn.based.network.repository.CitiesRequest
 import co.sentinel.vpn.based.state.Status
 import co.sentinel.vpn.based.storage.BasedStorage
 import co.sentinel.vpn.based.storage.SelectedCity
@@ -189,22 +193,26 @@ class DashboardScreenViewModel
   fun onConnectClick() {
     if (state.selectedCity != null) {
       when (state.vpnStatus) {
-        VpnStatus.Connecting -> disconnect()
-        VpnStatus.Connected -> disconnect()
-        VpnStatus.Disconnecting -> Unit
-        VpnStatus.Disconnected -> checkVpnPermission()
+        is VpnStatus.Connecting -> disconnect()
+        is VpnStatus.Connected -> disconnect()
+        is VpnStatus.Disconnecting -> Unit
+        is VpnStatus.Disconnected -> startConnection()
       }
     } else {
       onSelectServerClick()
     }
   }
 
+  fun onQuickConnectClick() {
+    startConnection(isQuick = true)
+  }
+
   fun onSelectServerClick() {
     stateHolder.sendEffect(Effect.ShowSelectServer)
   }
 
-  private fun checkVpnPermission() {
-    stateHolder.updateState { copy(vpnStatus = VpnStatus.Connecting) }
+  private fun startConnection(isQuick: Boolean = false) {
+    stateHolder.updateState { copy(vpnStatus = VpnStatus.Connecting(isQuick)) }
     stateHolder.sendEffect(Effect.CheckVpnPermission)
   }
 
@@ -238,16 +246,46 @@ class DashboardScreenViewModel
   }
 
   private fun establishConnection() {
+    if ((state.vpnStatus as? VpnStatus.Connecting)?.isQuick == true) {
+      establishQuickConnection()
+    } else {
+      establishBasicConnection()
+    }
+  }
+
+  private fun establishBasicConnection() {
     val city = state.selectedCity
     if (city == null) {
       stateHolder.updateState { copy(vpnStatus = VpnStatus.Disconnected) }
       return
     }
     viewModelScope.launch {
-      vpnConnector.connect(city)
-        .onRight { setConnectedState() }
-        .onLeft(::handleConnectionError)
+      connectToCity(city)
     }
+  }
+
+  private fun establishQuickConnection() {
+    viewModelScope.launch {
+      val protocol = storage.getVpnProtocol().takeIf { it != Protocol.NONE }
+      var country: Country? = null
+      repository.getCountries(protocol)
+        .flatMap { countries ->
+          country = countries.data.random()
+          repository.getCities(CitiesRequest(country!!.id, protocol))
+        }
+        .onRight { cities ->
+          val city = cities.data.random()
+          val selectedCity = storage.storeSelectedCity(country!!, city)
+          connectToCity(selectedCity)
+        }
+        .onLeft { handleConnectionError(VPNConnector.Error.QuickConnection) }
+    }
+  }
+
+  private suspend fun connectToCity(city: SelectedCity) {
+    vpnConnector.connect(city)
+      .onRight { setConnectedState() }
+      .onLeft(::handleConnectionError)
   }
 
   private suspend fun setConnectedState() {

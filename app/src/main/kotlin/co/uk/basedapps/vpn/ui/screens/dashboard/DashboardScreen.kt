@@ -139,6 +139,7 @@ fun DashboardScreen(
     state = state,
     mapViewportState = mapViewportState,
     onConnectClick = viewModel::onConnectClick,
+    onQuickConnectClick = viewModel::onQuickConnectClick,
     onSelectServerClick = viewModel::onSelectServerClick,
     onSettingsClick = viewModel::onSettingsClick,
     onTryAgainClick = viewModel::onTryAgainClick,
@@ -153,6 +154,7 @@ fun DashboardScreenStateless(
   state: State,
   mapViewportState: MapViewportState,
   onConnectClick: () -> Unit,
+  onQuickConnectClick: () -> Unit,
   onSelectServerClick: () -> Unit,
   onSettingsClick: () -> Unit,
   onTryAgainClick: () -> Unit,
@@ -184,6 +186,7 @@ fun DashboardScreenStateless(
       state = state,
       mapViewportState = mapViewportState,
       onConnectClick = onConnectClick,
+      onQuickConnectClick = onQuickConnectClick,
       onSelectServerClick = onSelectServerClick,
       onSettingsClick = onSettingsClick,
       onAlertConfirmClick = onAlertConfirmClick,
@@ -197,6 +200,7 @@ private fun Content(
   state: State,
   mapViewportState: MapViewportState,
   onConnectClick: () -> Unit,
+  onQuickConnectClick: () -> Unit,
   onSelectServerClick: () -> Unit,
   onSettingsClick: () -> Unit,
   onAlertConfirmClick: () -> Unit,
@@ -217,6 +221,7 @@ private fun Content(
     BottomBar(
       state = state,
       onConnectClick = onConnectClick,
+      onQuickConnectClick = onQuickConnectClick,
       onSelectServerClick = onSelectServerClick,
     )
     if (state.status is Status.Loading) {
@@ -334,6 +339,7 @@ private fun TopBar(
 fun BoxScope.BottomBar(
   state: State,
   onConnectClick: () -> Unit,
+  onQuickConnectClick: () -> Unit,
   onSelectServerClick: () -> Unit,
 ) {
   Card(
@@ -360,25 +366,51 @@ fun BoxScope.BottomBar(
         )
         Spacer(modifier = Modifier.size(16.dp))
       }
-      BasedButton(
-        text = stringResource(
-          when (state.vpnStatus) {
-            VpnStatus.Connected -> R.string.dashboard_disconnect_from_vpn
-            else -> R.string.dashboard_connect_to_vpn
+      Row {
+        BasedButton(
+          text = stringResource(
+            when (state.vpnStatus) {
+              VpnStatus.Connected -> R.string.dashboard_disconnect_from_vpn
+              else -> R.string.dashboard_connect_to_vpn
+            },
+          ),
+          style = when (state.vpnStatus) {
+            VpnStatus.Connected -> ButtonStyle.Secondary
+            else -> ButtonStyle.Primary
           },
-        ),
-        style = when (state.vpnStatus) {
-          VpnStatus.Connected -> ButtonStyle.Secondary
-          else -> ButtonStyle.Primary
-        },
-        isLoading = when (state.vpnStatus) {
-          VpnStatus.Connecting, VpnStatus.Disconnecting -> true
-          else -> false
-        },
-        onClick = onConnectClick,
-        modifier = Modifier.fillMaxWidth(),
-      )
+          isLoading = when (state.vpnStatus) {
+            is VpnStatus.Connecting, VpnStatus.Disconnecting -> true
+            else -> false
+          },
+          onClick = onConnectClick,
+          modifier = Modifier.weight(1f),
+        )
+        Spacer(modifier = Modifier.size(8.dp))
+        if (state.vpnStatus == VpnStatus.Disconnected) {
+          QuickConnectButton(onQuickConnectClick)
+        }
+      }
     }
+  }
+}
+
+@Composable
+private fun QuickConnectButton(onClick: () -> Unit) {
+  Button(
+    onClick = onClick,
+    colors = ButtonDefaults.buttonColors(
+      containerColor = BasedAppColor.ButtonPrimary,
+      contentColor = BasedAppColor.ButtonPrimaryText,
+    ),
+    shape = RoundedCornerShape(8.dp),
+    contentPadding = PaddingValues(),
+    modifier = Modifier.size(60.dp),
+  ) {
+    Icon(
+      painter = painterResource(R.drawable.ic_flash),
+      contentDescription = null,
+      modifier = Modifier.size(32.dp),
+    )
   }
 }
 
@@ -449,6 +481,7 @@ fun DashboardScreenPreview() {
       ),
       mapViewportState = rememberMapViewportState(),
       onConnectClick = {},
+      onQuickConnectClick = {},
       onSelectServerClick = {},
       onSettingsClick = {},
       onTryAgainClick = {},

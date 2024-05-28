@@ -195,5 +195,9 @@ class VPNConnector @Inject constructor(
     data object StartV2Ray : Error {
       override val message: String = "Start V2Ray error"
     }
+
+    data object QuickConnection : Error {
+      override val message: String = "Quick Connection failed"
+    }
   }
 }

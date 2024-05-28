@@ -41,7 +41,7 @@ class BasedStorage
   fun storeSelectedCity(
     country: Country,
     city: City,
-  ) {
+  ): SelectedCity {
     val selectedCity = SelectedCity(
       id = city.id,
       name = city.name,
@@ -51,6 +51,7 @@ class BasedStorage
     )
     val selectedCityJson = gson.toJson(selectedCity)
     selectedCityPref = selectedCityJson
+    return selectedCity
   }
 
   fun observeSelectedCity(): Flow<SelectedCity?> = selectedCityDelegate.observe

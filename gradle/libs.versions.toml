@@ -3,28 +3,26 @@
 minSdk = "26"
 compileSdk = "34"
 targetJvm = "VERSION_17"
-kotlin = "1.9.10"
-agp = "8.1.1"
+kotlin = "1.9.23"
+agp = "8.3.2"
 
 # Libs
-androidCore = "1.12.0"
+androidCore = "1.13.1"
 preference = "1.2.1"
-compose = "1.5.1"
-composeFoundation = "1.5.1"
-composeMaterial3 = "1.1.1"
-accompanist = "0.32.0"
-composeCompiler = "1.5.3"
-coroutines = "1.7.2"
-dagger = "2.48"
-okhttp = "4.11.0"
+compose = "1.6.7"
+composeCompiler = "1.5.11"
+composeMaterial3 = "1.2.1"
+accompanist = "0.34.0"
+coroutines = "1.8.0"
+dagger = "2.49"
+okhttp = "4.12.0"
 retrofit = "2.9.0"
 gson = "2.10.1"
-lifecycle = "2.6.2"
+lifecycle = "2.8.1"
 timber = "5.0.1"
-navigation = "2.7.2"
-hiltNavigation = "1.0.0"
-mapBox = "11.0.0-beta.1"
-mapBoxCompose = "0.1.0"
+navigation = "2.7.7"
+hiltNavigation = "1.2.0"
+mapBox = "11.4.0"
 
 [libraries]
 # Android
@@ -38,8 +36,8 @@ compose-ui = { module = "androidx.compose.ui:ui", version.ref = "compose" }
 compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose" }
 compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose" }
 compose-ui-util = { module = "androidx.compose.ui:ui-util", version.ref = "compose" }
-compose-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "composeFoundation" }
-compose-layout = { module = "androidx.compose.foundation:foundation-layout", version.ref = "composeFoundation" }
+compose-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "compose" }
+compose-layout = { module = "androidx.compose.foundation:foundation-layout", version.ref = "compose" }
 compose-material3 = { module = "androidx.compose.material3:material3", version.ref = "composeMaterial3" }
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist" }
 # DI
@@ -69,7 +67,7 @@ gson-converter = { module = "com.squareup.retrofit2:converter-gson", version.ref
 navigation = { module = "androidx.navigation:navigation-compose", version.ref = "navigation" }
 # Maps
 map-box-android = { module = "com.mapbox.maps:android", version.ref = "mapBox" }
-map-box-compose = { module = "com.mapbox.extension:maps-compose", version.ref = "mapBoxCompose" }
+map-box-compose = { module = "com.mapbox.extension:maps-compose", version.ref = "mapBox" }
 
 # Other
 accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanist" }

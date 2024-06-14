@@ -2,7 +2,6 @@ package co.sentinel.vpn.based.di
 
 import android.content.Context
 import co.sentinel.vpn.v2ray.repo.V2RayRepository
-import co.sentinel.vpn.v2ray.repo.V2RayRepositoryImpl
 import co.sentinel.vpn.v2ray.store.V2RayUserPreferenceStore
 import dagger.Module
 import dagger.Provides
@@ -25,5 +24,5 @@ class V2RayModule {
   fun provideV2RayRepository(
     @ApplicationContext context: Context,
     userPreferenceStore: V2RayUserPreferenceStore,
-  ): V2RayRepository = V2RayRepositoryImpl(context, userPreferenceStore)
+  ): V2RayRepository = V2RayRepository(context, userPreferenceStore)
 }

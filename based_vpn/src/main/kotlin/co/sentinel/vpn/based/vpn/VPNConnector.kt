@@ -9,12 +9,8 @@ import co.sentinel.vpn.based.network.repository.BasedRepository
 import co.sentinel.vpn.based.storage.BasedStorage
 import co.sentinel.vpn.based.storage.LogsStorage
 import co.sentinel.vpn.based.storage.SelectedCity
-import co.sentinel.vpn.v2ray.model.V2RayVpnProfile
+import co.sentinel.vpn.v2ray.model.VpnProfile
 import co.sentinel.vpn.v2ray.repo.V2RayRepository
-import co.sentinel.vpn.wireguard.model.VpnTunnel
-import co.sentinel.vpn.wireguard.model.WireguardVpnProfile
-import co.sentinel.vpn.wireguard.repo.WireguardRepository
-import co.sentinel.vpn.wireguard.utils.DefaultTunnelName
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -22,7 +18,6 @@ import retrofit2.HttpException
 
 class VPNConnector @Inject constructor(
   private val repository: BasedRepository,
-  private val wireguardRepository: WireguardRepository,
   private val v2RayRepository: V2RayRepository,
   private val storage: BasedStorage,
   private val logsStorage: LogsStorage,
@@ -36,16 +31,13 @@ class VPNConnector @Inject constructor(
   }
 
   suspend fun disconnect() {
-    return withContext(Dispatchers.Main) {
-      when {
-        wireguardRepository.isConnected() -> disconnectWireguard()
-        v2RayRepository.isConnected() -> disconnectV2Ray()
-      }
+    if (v2RayRepository.isConnected()) {
+      v2RayRepository.stopV2ray()
     }
   }
 
-  suspend fun isConnected(): Boolean {
-    return wireguardRepository.isConnected() || v2RayRepository.isConnected()
+  fun isConnected(): Boolean {
+    return v2RayRepository.isConnected()
   }
 
   private suspend fun getCredentials(city: SelectedCity): Either<Error, Unit> {
@@ -87,55 +79,25 @@ class VPNConnector @Inject constructor(
     serverId: String,
     credentials: Credentials,
   ): Either<Error, Unit> {
-    return when (credentials.protocol) {
-      Protocol.WIREGUARD -> connectWireguard(
-        serverId = serverId,
+    val profile = when (credentials.protocol) {
+      Protocol.WIREGUARD -> ProfileDecoder.decodeWireguard(
         privateKey = credentials.privateKey,
-        profile = decodeWireguardVpnProfile(credentials.payload),
+        payload = credentials.payload,
       )
 
-      Protocol.V2RAY -> connectV2Ray(
-        serverId = serverId,
-        profile = decodeV2RayVpnProfile(
-          payload = credentials.payload,
-          uid = credentials.privateKey,
-        ),
+      Protocol.V2RAY -> ProfileDecoder.decodeVmess(
+        payload = credentials.payload,
+        uid = credentials.privateKey,
       )
 
       else -> throw Exception("Unknown protocol")
     }
-  }
-
-  private suspend fun connectWireguard(
-    serverId: String,
-    privateKey: String,
-    profile: WireguardVpnProfile?,
-  ): Either<Error, Unit> {
-    profile ?: return Either.Left(Error.ParseProfile)
-    val keyPair = wireguardRepository.generateKeyPair(privateKey)
-    val createTunnelRes = wireguardRepository.createOrUpdate(
-      vpnProfile = profile,
-      keyPair = keyPair,
-      serverId = serverId,
-    )
-    val tunnel = createTunnelRes
-      .getOrNull()
-      ?: return Either.Left(Error.CreateTunnel)
-
-    wireguardRepository.setTunnelState(
-      tunnelName = tunnel.name,
-      tunnelState = VpnTunnel.State.UP,
-    ).getOrNull()
-      ?: return Either.Left(Error.SetTunnelState)
-
-    repository.resetConnection()
-
-    return Either.Right(Unit)
+    return connectV2Ray(serverId, profile)
   }
 
   private suspend fun connectV2Ray(
     serverId: String,
-    profile: V2RayVpnProfile?,
+    profile: VpnProfile?,
   ): Either<Error, Unit> {
     profile ?: return Either.Left(Error.ParseProfile)
     v2RayRepository.startV2Ray(
@@ -147,20 +109,6 @@ class VPNConnector @Inject constructor(
     repository.resetConnection()
 
     return Either.Right(Unit)
-  }
-
-  private suspend fun disconnectV2Ray() {
-    v2RayRepository.stopV2ray()
-  }
-
-  private suspend fun disconnectWireguard() {
-    val tunnel = wireguardRepository
-      .getTunnel(DefaultTunnelName)
-      ?: return
-    wireguardRepository.setTunnelState(
-      tunnelName = tunnel.name,
-      tunnelState = VpnTunnel.State.DOWN,
-    )
   }
 
   sealed interface Error : BaseError {

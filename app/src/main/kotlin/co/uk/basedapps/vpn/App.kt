@@ -3,19 +3,15 @@ package co.uk.basedapps.vpn
 import android.app.Application
 import co.sentinel.vpn.based.vpn.VpnInitializer
 import dagger.hilt.android.HiltAndroidApp
-import javax.inject.Inject
 import timber.log.Timber
 
 @HiltAndroidApp
 class App : Application() {
 
-  @Inject
-  lateinit var vpnInitializer: VpnInitializer
-
   override fun onCreate() {
     super.onCreate()
     setupTimber()
-    vpnInitializer.setupVPN(this)
+    VpnInitializer.setupVPN(this)
   }
 
   private fun setupTimber() {

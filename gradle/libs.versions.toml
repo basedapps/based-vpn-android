@@ -23,6 +23,7 @@ timber = "5.0.1"
 navigation = "2.7.7"
 hiltNavigation = "1.2.0"
 mapBox = "11.4.0"
+v2ray = "0.0.5"
 
 [libraries]
 # Android
@@ -75,8 +76,7 @@ timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 play-ads = { module = "com.google.android.gms:play-services-ads", version = "22.6.0" }
 arrow-core = { module = "io.arrow-kt:arrow-core", version = "1.2.0" }
 # VPN
-vpn-v2ray = { module = "co.sentinel.vpn:v2ray", version = "0.0.2" }
-vpn-wireguard = { module = "co.sentinel.vpn:wireguard", version = "0.0.1" }
+vpn-v2ray = { module = "co.sentinel.vpn:v2ray", version.ref = "v2ray" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -17,6 +17,7 @@ import co.sentinel.vpn.based.vpn.VPNConnector
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
@@ -34,6 +35,8 @@ class DashboardScreenViewModel
 
   private val state: DashboardScreenState
     get() = stateHolder.state.value
+
+  private var startConnectionJob: Job? = null
 
   init {
     initialize()
@@ -195,7 +198,6 @@ class DashboardScreenViewModel
       when (state.vpnStatus) {
         is VpnStatus.Connecting -> disconnect()
         is VpnStatus.Connected -> disconnect()
-        is VpnStatus.Disconnecting -> Unit
         is VpnStatus.Disconnected -> startConnection()
       }
     } else {
@@ -259,13 +261,13 @@ class DashboardScreenViewModel
       stateHolder.updateState { copy(vpnStatus = VpnStatus.Disconnected) }
       return
     }
-    viewModelScope.launch {
+    startConnectionJob = viewModelScope.launch {
       connectToCity(city)
     }
   }
 
   private fun establishQuickConnection() {
-    viewModelScope.launch {
+    startConnectionJob = viewModelScope.launch {
       val protocol = storage.getVpnProtocol().takeIf { it != Protocol.NONE }
       var country: Country? = null
       repository.getCountries(protocol)
@@ -327,12 +329,12 @@ class DashboardScreenViewModel
   }
 
   private fun disconnect() {
-    stateHolder.updateState { copy(vpnStatus = VpnStatus.Disconnecting) }
     Timber.tag(Tag).d("Disconnect")
+    startConnectionJob?.cancel()
+    setDisconnectedState()
     viewModelScope.launch {
       vpnConnector.disconnect()
       refreshIp()
-      setDisconnectedState()
     }
   }
 

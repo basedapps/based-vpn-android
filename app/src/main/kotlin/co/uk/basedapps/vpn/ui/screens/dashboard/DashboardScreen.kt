@@ -379,7 +379,7 @@ fun BoxScope.BottomBar(
             else -> ButtonStyle.Primary
           },
           isLoading = when (state.vpnStatus) {
-            is VpnStatus.Connecting, VpnStatus.Disconnecting -> true
+            is VpnStatus.Connecting -> true
             else -> false
           },
           onClick = onConnectClick,

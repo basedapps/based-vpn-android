@@ -36,5 +36,5 @@ sealed interface DashboardScreenEffect {
 sealed interface VpnStatus {
   data object Disconnected : VpnStatus
   data class Connecting(val isQuick: Boolean) : VpnStatus
-  data object Connected : VpnStatus
+  data class Connected(val isQuick: Boolean) : VpnStatus
 }

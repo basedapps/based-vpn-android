@@ -184,7 +184,7 @@ class DashboardScreenViewModel
 
   private fun onCityChanged(city: SelectedCity?) {
     Timber.tag(Tag).d("City changed to ${city?.name} (prev: ${state.selectedCity?.name})")
-    val isConnected = state.vpnStatus == VpnStatus.Connected
+    val isConnected = state.vpnStatus is VpnStatus.Connected
     if (state.selectedCity != null && isConnected) {
       disconnect()
     }
@@ -297,7 +297,10 @@ class DashboardScreenViewModel
   private suspend fun setConnectedState() {
     Timber.tag(Tag).d("Connected!")
     refreshIp()
-    stateHolder.updateState { copy(vpnStatus = VpnStatus.Connected) }
+    val isQuick = (state.vpnStatus as? VpnStatus.Connecting)?.isQuick ?: false
+    stateHolder.updateState {
+      copy(vpnStatus = VpnStatus.Connected(isQuick))
+    }
   }
 
   private fun handleConnectionError(error: VPNConnector.Error) {

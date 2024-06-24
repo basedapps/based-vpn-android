@@ -376,12 +376,12 @@ fun BoxScope.BottomBar(
         BasedButton(
           text = stringResource(
             when (state.vpnStatus) {
-              VpnStatus.Connected -> R.string.dashboard_disconnect_from_vpn
+              is VpnStatus.Connected -> R.string.dashboard_disconnect_from_vpn
               else -> R.string.dashboard_connect_to_vpn
             },
           ),
           style = when (state.vpnStatus) {
-            VpnStatus.Connected -> ButtonStyle.Secondary
+            is VpnStatus.Connected -> ButtonStyle.Secondary
             else -> ButtonStyle.Primary
           },
           isLoading = when (state.vpnStatus) {

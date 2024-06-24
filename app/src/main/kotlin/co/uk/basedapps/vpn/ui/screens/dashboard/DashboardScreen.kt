@@ -139,6 +139,7 @@ fun DashboardScreen(
     state = state,
     mapViewportState = mapViewportState,
     onConnectClick = viewModel::onConnectClick,
+    onDisconnectClick = viewModel::onDisconnectClick,
     onQuickConnectClick = viewModel::onQuickConnectClick,
     onSelectServerClick = viewModel::onSelectServerClick,
     onSettingsClick = viewModel::onSettingsClick,
@@ -154,6 +155,7 @@ fun DashboardScreenStateless(
   state: State,
   mapViewportState: MapViewportState,
   onConnectClick: () -> Unit,
+  onDisconnectClick: () -> Unit,
   onQuickConnectClick: () -> Unit,
   onSelectServerClick: () -> Unit,
   onSettingsClick: () -> Unit,
@@ -186,6 +188,7 @@ fun DashboardScreenStateless(
       state = state,
       mapViewportState = mapViewportState,
       onConnectClick = onConnectClick,
+      onDisconnectClick = onDisconnectClick,
       onQuickConnectClick = onQuickConnectClick,
       onSelectServerClick = onSelectServerClick,
       onSettingsClick = onSettingsClick,
@@ -200,6 +203,7 @@ private fun Content(
   state: State,
   mapViewportState: MapViewportState,
   onConnectClick: () -> Unit,
+  onDisconnectClick: () -> Unit,
   onQuickConnectClick: () -> Unit,
   onSelectServerClick: () -> Unit,
   onSettingsClick: () -> Unit,
@@ -221,6 +225,7 @@ private fun Content(
     BottomBar(
       state = state,
       onConnectClick = onConnectClick,
+      onDisconnectClick = onDisconnectClick,
       onQuickConnectClick = onQuickConnectClick,
       onSelectServerClick = onSelectServerClick,
     )
@@ -339,6 +344,7 @@ private fun TopBar(
 fun BoxScope.BottomBar(
   state: State,
   onConnectClick: () -> Unit,
+  onDisconnectClick: () -> Unit,
   onQuickConnectClick: () -> Unit,
   onSelectServerClick: () -> Unit,
 ) {
@@ -382,7 +388,13 @@ fun BoxScope.BottomBar(
             is VpnStatus.Connecting -> true
             else -> false
           },
-          onClick = onConnectClick,
+          onClick = {
+            if (state.vpnStatus is VpnStatus.Disconnected) {
+              onConnectClick()
+            } else {
+              onDisconnectClick()
+            }
+          },
           modifier = Modifier.weight(1f),
         )
         Spacer(modifier = Modifier.size(8.dp))
@@ -481,6 +493,7 @@ fun DashboardScreenPreview() {
       ),
       mapViewportState = rememberMapViewportState(),
       onConnectClick = {},
+      onDisconnectClick = {},
       onQuickConnectClick = {},
       onSelectServerClick = {},
       onSettingsClick = {},

@@ -195,13 +195,17 @@ class DashboardScreenViewModel
 
   fun onConnectClick() {
     if (state.selectedCity != null) {
-      when (state.vpnStatus) {
-        is VpnStatus.Connecting -> disconnect()
-        is VpnStatus.Connected -> disconnect()
-        is VpnStatus.Disconnected -> startConnection()
+      if (state.vpnStatus is VpnStatus.Disconnected) {
+        startConnection()
       }
     } else {
       onSelectServerClick()
+    }
+  }
+
+  fun onDisconnectClick() {
+    if (state.vpnStatus !is VpnStatus.Disconnected) {
+      disconnect()
     }
   }
 

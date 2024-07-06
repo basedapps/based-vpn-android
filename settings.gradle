@@ -25,11 +25,10 @@ dependencyResolutionManagement {
         }
         flatDir { dirs 'app/libs' }
         maven {
-            url "http://nexus.basedapps.co.uk/repository/maven-releases/"
-            allowInsecureProtocol true
+            url "https://nexus.norselabs.dev/repository/maven-releases/"
             credentials {
-                username "${System.getenv("SENTINEL_NEXUS_LOGIN")}"
-                password "${System.getenv("SENTINEL_NEXUS_PASSWORD")}"
+                username "${System.getenv("NORSELABS_REPO_LOGIN")}"
+                password "${System.getenv("NORSELABS_REPO_PASSWORD")}"
             }
         }
         mavenLocal()

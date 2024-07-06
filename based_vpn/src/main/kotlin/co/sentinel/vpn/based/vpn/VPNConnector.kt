@@ -9,8 +9,8 @@ import co.sentinel.vpn.based.network.repository.BasedRepository
 import co.sentinel.vpn.based.storage.BasedStorage
 import co.sentinel.vpn.based.storage.LogsStorage
 import co.sentinel.vpn.based.storage.SelectedCity
-import co.sentinel.vpn.v2ray.model.VpnProfile
-import co.sentinel.vpn.v2ray.repo.V2RayRepository
+import io.norselabs.vpn.v2ray.model.VpnProfile
+import io.norselabs.vpn.v2ray.repo.V2RayRepository
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

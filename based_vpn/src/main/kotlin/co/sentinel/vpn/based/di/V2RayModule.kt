@@ -1,13 +1,13 @@
 package co.sentinel.vpn.based.di
 
 import android.content.Context
-import co.sentinel.vpn.v2ray.repo.V2RayRepository
-import co.sentinel.vpn.v2ray.store.V2RayUserPreferenceStore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import io.norselabs.vpn.v2ray.repo.V2RayRepository
+import io.norselabs.vpn.v2ray.store.V2RayUserPreferenceStore
 import javax.inject.Singleton
 
 @Module

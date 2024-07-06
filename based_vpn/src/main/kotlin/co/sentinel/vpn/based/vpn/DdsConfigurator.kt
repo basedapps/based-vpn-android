@@ -1,6 +1,6 @@
 package co.sentinel.vpn.based.vpn
 
-import co.sentinel.vpn.v2ray.repo.V2RayRepository
+import io.norselabs.vpn.v2ray.repo.V2RayRepository
 import javax.inject.Inject
 
 class DdsConfigurator @Inject constructor(

@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.sentinel.vpn.based.network.model.Protocol
 import co.sentinel.vpn.based.storage.BasedStorage
-import co.sentinel.vpn.based.storage.LogsStorage
 import co.sentinel.vpn.based.vpn.DdsConfigurator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -16,7 +15,6 @@ class SettingsScreenViewModel
   val stateHolder: SettingsScreenStateHolder,
   private val dnsConfigurator: DdsConfigurator,
   private val storage: BasedStorage,
-  private val logsStorage: LogsStorage,
 ) : ViewModel() {
 
   private val state: SettingsScreenState
@@ -80,9 +78,6 @@ class SettingsScreenViewModel
   }
 
   fun onLogsRowClick() {
-    val logs = logsStorage.getLogs()
-    stateHolder.sendEffect(
-      SettingsScreenEffect.CopyLogsToClipboard(logs),
-    )
+    stateHolder.sendEffect(SettingsScreenEffect.ShareLogs)
   }
 }

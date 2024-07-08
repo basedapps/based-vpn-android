@@ -7,7 +7,6 @@ import co.sentinel.vpn.based.network.model.Credentials
 import co.sentinel.vpn.based.network.model.Protocol
 import co.sentinel.vpn.based.network.repository.BasedRepository
 import co.sentinel.vpn.based.storage.BasedStorage
-import co.sentinel.vpn.based.storage.LogsStorage
 import co.sentinel.vpn.based.storage.SelectedCity
 import io.norselabs.vpn.v2ray.model.VpnProfile
 import io.norselabs.vpn.v2ray.repo.V2RayRepository
@@ -15,22 +14,22 @@ import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
+import timber.log.Timber
 
 class VPNConnector @Inject constructor(
   private val repository: BasedRepository,
   private val v2RayRepository: V2RayRepository,
   private val storage: BasedStorage,
-  private val logsStorage: LogsStorage,
 ) {
 
   suspend fun connect(city: SelectedCity): Either<Error, Unit> {
     return withContext(Dispatchers.IO) {
       getCredentials(city)
-        .onLeft { logsStorage.writeToLog(it) }
+        .onLeft { Timber.d("Failed to connect: $it") }
     }
   }
 
-  suspend fun disconnect() {
+  fun disconnect() {
     if (v2RayRepository.isConnected()) {
       v2RayRepository.stopV2ray()
     }

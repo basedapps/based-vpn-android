@@ -3,10 +3,19 @@ package co.uk.basedapps.vpn
 import android.app.Application
 import co.sentinel.vpn.based.vpn.VpnInitializer
 import dagger.hilt.android.HiltAndroidApp
+import io.norselabs.logging.logger.FileLogTree
+import io.norselabs.logging.logger.NonFatalReportTree
+import javax.inject.Inject
 import timber.log.Timber
 
 @HiltAndroidApp
 class App : Application() {
+
+  @Inject
+  lateinit var fileLogTree: FileLogTree
+
+  @Inject
+  lateinit var nonFatalReportTree: NonFatalReportTree
 
   override fun onCreate() {
     super.onCreate()
@@ -15,8 +24,10 @@ class App : Application() {
   }
 
   private fun setupTimber() {
-    if (BuildConfig.DEBUG) {
-      Timber.plant(Timber.DebugTree())
-    }
+    Timber.plant(
+      Timber.DebugTree(),
+      fileLogTree,
+      nonFatalReportTree,
+    )
   }
 }

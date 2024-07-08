@@ -21,6 +21,7 @@
     <string name="settings_title">@string/common_settings</string>
     <string name="settings_row_dns">DNS Server</string>
     <string name="settings_row_protocol">VPN protocol</string>
+    <string name="settings_row_logs">Share logs</string>
 
     <string name="settings_protocol_change_title">Choose protocol</string>
 

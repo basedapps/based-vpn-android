@@ -25,6 +25,14 @@ dependencyResolutionManagement {
         }
         flatDir { dirs 'app/libs' }
         maven {
+            url "http://nexus.basedapps.co.uk/repository/maven-releases/"
+            allowInsecureProtocol true
+            credentials {
+                username "${System.getenv("SENTINEL_NEXUS_LOGIN")}"
+                password "${System.getenv("SENTINEL_NEXUS_PASSWORD")}"
+            }
+        }
+        maven {
             url "https://nexus.norselabs.dev/repository/maven-releases/"
             credentials {
                 username "${System.getenv("NORSELABS_REPO_LOGIN")}"
@@ -36,4 +44,5 @@ dependencyResolutionManagement {
 }
 rootProject.name = "BasedVPN"
 include ':app',
-        ':based_vpn'
+        ':based_vpn',
+        ':logging'

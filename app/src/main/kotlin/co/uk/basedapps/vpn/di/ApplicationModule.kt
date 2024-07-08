@@ -1,11 +1,15 @@
 package co.uk.basedapps.vpn.di
 
+import android.content.Context
 import co.sentinel.vpn.based.app_config.AppConfig
 import co.uk.basedapps.vpn.BuildConfig
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import io.norselabs.logging.logger.FileLogTree
+import io.norselabs.logging.logger.NonFatalReportTree
 import javax.inject.Singleton
 
 @Module
@@ -22,5 +26,17 @@ class ApplicationModule {
     override fun getBasedApiVersion(): Long = 2
     override fun getAppToken(): String =
       "PyAouXBv113edAawcaZURFlbr97gIS2UPJRvBOdbjerY3KPVtE8EXyvNNXjX2VMT2U8YvPqvv8f4jog3GQCrqTC0qoVPVPenkr2fJy1PVahMojKJbvUKEqLo3hqt7wW8"
+  }
+
+  @Provides
+  @Singleton
+  fun provideFileLogTree(@ApplicationContext context: Context): FileLogTree {
+    return FileLogTree(context)
+  }
+
+  @Provides
+  @Singleton
+  fun provideNonFatalReportTree(@ApplicationContext context: Context): NonFatalReportTree {
+    return NonFatalReportTree(context)
   }
 }

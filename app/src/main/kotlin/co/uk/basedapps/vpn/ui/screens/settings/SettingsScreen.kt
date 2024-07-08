@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,7 +22,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import co.sentinel.vpn.based.compose.EffectHandler
 import co.sentinel.vpn.based.network.model.Protocol
+import co.sentinel.vpn.based.viewModel.settings.SettingsScreenEffect
 import co.sentinel.vpn.based.viewModel.settings.SettingsScreenState as State
 import co.sentinel.vpn.based.viewModel.settings.SettingsScreenViewModel
 import co.sentinel.vpn.based.vpn.DdsConfigurator
@@ -33,10 +35,21 @@ import co.uk.basedapps.vpn.ui.theme.BasedAppColor
 import co.uk.basedapps.vpn.ui.widget.TopBar
 
 @Composable
-fun SettingsScreen(navigateBack: () -> Unit) {
+fun SettingsScreen(
+  navigateBack: () -> Unit,
+  shareLogs: () -> Unit,
+) {
 
   val viewModel = hiltViewModel<SettingsScreenViewModel>()
   val state by viewModel.stateHolder.state.collectAsState()
+
+  EffectHandler(viewModel.stateHolder.effects) { effect ->
+    when (effect) {
+      is SettingsScreenEffect.OpenTelegram -> Unit
+
+      is SettingsScreenEffect.ShareLogs -> shareLogs()
+    }
+  }
 
   SettingsScreenStateless(
     state = state,
@@ -47,6 +60,7 @@ fun SettingsScreen(navigateBack: () -> Unit) {
     onProtocolRowClick = viewModel::onProtocolRowClick,
     onProtocolDialogConfirmClick = viewModel::onProtocolSelected,
     onProtocolDialogDismissClick = viewModel::onProtocolDialogDismissClick,
+    onLogsRowClick = viewModel::onLogsRowClick,
   )
 }
 
@@ -60,6 +74,7 @@ fun SettingsScreenStateless(
   onProtocolRowClick: () -> Unit,
   onProtocolDialogConfirmClick: (Protocol) -> Unit,
   onProtocolDialogDismissClick: () -> Unit,
+  onLogsRowClick: () -> Unit,
 ) {
   Scaffold(
     containerColor = BasedAppColor.Background,
@@ -79,6 +94,7 @@ fun SettingsScreenStateless(
         onProtocolRowClick = onProtocolRowClick,
         onProtocolDialogConfirmClick = onProtocolDialogConfirmClick,
         onProtocolDialogDismissClick = onProtocolDialogDismissClick,
+        onLogsRowClick = onLogsRowClick,
       )
     },
   )
@@ -94,6 +110,7 @@ fun Content(
   onProtocolRowClick: () -> Unit,
   onProtocolDialogConfirmClick: (Protocol) -> Unit,
   onProtocolDialogDismissClick: () -> Unit,
+  onLogsRowClick: () -> Unit,
 ) {
   Box {
     Column(
@@ -107,7 +124,7 @@ fun Content(
         modifier = Modifier
           .clickable(onClick = onDnsRowClick),
       )
-      Divider(color = BasedAppColor.Divider)
+      HorizontalDivider(color = BasedAppColor.Divider)
       SettingsRow(
         title = stringResource(R.string.settings_row_protocol),
         value = state.currentProtocol?.labelRes
@@ -115,7 +132,14 @@ fun Content(
         modifier = Modifier
           .clickable(onClick = onProtocolRowClick),
       )
-      Divider(color = BasedAppColor.Divider)
+      HorizontalDivider(color = BasedAppColor.Divider)
+      SettingsRow(
+        title = stringResource(R.string.settings_row_logs),
+        value = "",
+        modifier = Modifier
+          .clickable(onClick = onLogsRowClick),
+      )
+      HorizontalDivider(color = BasedAppColor.Divider)
     }
     if (state.isDnsSelectorVisible) {
       DnsDialog(

@@ -38,5 +38,5 @@ data class SettingsScreenState(
 
 sealed interface SettingsScreenEffect {
   data object OpenTelegram : SettingsScreenEffect
-  data class CopyLogsToClipboard(val logs: String) : SettingsScreenEffect
+  data object ShareLogs : SettingsScreenEffect
 }

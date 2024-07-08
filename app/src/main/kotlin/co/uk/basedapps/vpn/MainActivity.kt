@@ -17,9 +17,15 @@ import co.uk.basedapps.vpn.ui.screens.dashboard.DashboardScreen
 import co.uk.basedapps.vpn.ui.screens.settings.SettingsScreen
 import co.uk.basedapps.vpn.ui.theme.BasedVPNTheme
 import dagger.hilt.android.AndroidEntryPoint
+import io.norselabs.logging.logger.FileLogTree
+import io.norselabs.logging.share.ChooserIntent
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+  @Inject
+  lateinit var fileLogTree: FileLogTree
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -65,11 +71,17 @@ class MainActivity : ComponentActivity() {
           composable(Destination.Settings) {
             SettingsScreen(
               navigateBack = { navController.popBackStack() },
+              shareLogs = ::shareLogs,
             )
           }
         }
       }
     }
+  }
+
+  private fun shareLogs() {
+    val file = fileLogTree.getLogsFile() ?: return
+    ChooserIntent.start(this, BuildConfig.APPLICATION_ID, file)
   }
 }
 

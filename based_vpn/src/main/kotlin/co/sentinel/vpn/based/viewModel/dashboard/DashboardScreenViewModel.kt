@@ -14,11 +14,13 @@ import co.sentinel.vpn.based.storage.BasedStorage
 import co.sentinel.vpn.based.storage.SelectedCity
 import co.sentinel.vpn.based.viewModel.dashboard.DashboardScreenEffect as Effect
 import co.sentinel.vpn.based.vpn.VPNConnector
+import co.sentinel.vpn.based.vpn.VpnInitializer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import timber.log.Timber
@@ -30,6 +32,7 @@ class DashboardScreenViewModel
   private val repository: BasedRepository,
   private val storage: BasedStorage,
   private val vpnConnector: VPNConnector,
+  private val vpnInitializer: VpnInitializer,
   private val config: AppConfig,
 ) : ViewModel() {
 
@@ -51,6 +54,11 @@ class DashboardScreenViewModel
 
   private fun enrollUser(shouldRefreshToken: Boolean = false) {
     viewModelScope.launch {
+      if (isDeviceNotSupported()) {
+        handleEnrolmentStatus(EnrollmentStatus.DeviceNotSupported)
+        return@launch
+      }
+
       if (isUpdateRequired()) {
         handleEnrolmentStatus(EnrollmentStatus.VersionOutdated)
         return@launch
@@ -75,25 +83,35 @@ class DashboardScreenViewModel
   }
 
   private fun handleEnrolmentStatus(status: EnrollmentStatus) {
+    stateHolder.updateState {
+      copy(enrolmentStatus = status)
+    }
+
     when (status) {
-      EnrollmentStatus.Enrolled ->
-        stateHolder.updateState { copy(status = Status.Data) }
+      EnrollmentStatus.None -> Unit
 
-      EnrollmentStatus.NotEnrolled ->
-        stateHolder.updateState { copy(status = Status.Error(false)) }
+      EnrollmentStatus.Enrolled -> stateHolder.updateState {
+        copy(status = Status.Data)
+      }
 
-      EnrollmentStatus.Banned ->
-        stateHolder.updateState {
-          copy(status = Status.Error(false), isBanned = true)
-        }
+      EnrollmentStatus.NotEnrolled -> stateHolder.updateState {
+        copy(status = Status.Error(false))
+      }
+
+      EnrollmentStatus.Banned -> stateHolder.updateState {
+        copy(status = Status.Error(false), isBanned = true)
+      }
 
       EnrollmentStatus.TokenExpired ->
         enrollUser(shouldRefreshToken = true)
 
-      EnrollmentStatus.VersionOutdated ->
-        stateHolder.updateState {
-          copy(status = Status.Error(false), isOutdated = true)
-        }
+      EnrollmentStatus.VersionOutdated -> stateHolder.updateState {
+        copy(status = Status.Error(false), isOutdated = true)
+      }
+
+      EnrollmentStatus.DeviceNotSupported -> stateHolder.updateState {
+        copy(status = Status.Error(false))
+      }
     }
   }
 
@@ -106,6 +124,12 @@ class DashboardScreenViewModel
     } else {
       false
     }
+  }
+
+  private suspend fun isDeviceNotSupported(): Boolean {
+    val initStatus = vpnInitializer.status
+      .firstOrNull { it != VpnInitializer.Status.None }
+    return initStatus == VpnInitializer.Status.NotSupported
   }
 
   private suspend fun getToken(): String? {
@@ -359,13 +383,5 @@ class DashboardScreenViewModel
 
   companion object {
     const val Tag = "DashboardTag"
-  }
-
-  enum class EnrollmentStatus {
-    Enrolled,
-    NotEnrolled,
-    Banned,
-    TokenExpired,
-    VersionOutdated,
   }
 }

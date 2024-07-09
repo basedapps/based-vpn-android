@@ -12,6 +12,9 @@ import timber.log.Timber
 class App : Application() {
 
   @Inject
+  lateinit var vpnInitializer: VpnInitializer
+
+  @Inject
   lateinit var fileLogTree: FileLogTree
 
   @Inject
@@ -20,7 +23,7 @@ class App : Application() {
   override fun onCreate() {
     super.onCreate()
     setupTimber()
-    VpnInitializer.setupVPN(this)
+    vpnInitializer.setupVPN()
   }
 
   private fun setupTimber() {

@@ -13,6 +13,7 @@ constructor() : ViewStateHolder<DashboardScreenState, DashboardScreenEffect>(
 
 data class DashboardScreenState(
   val status: Status = Status.Data,
+  val enrolmentStatus: EnrollmentStatus = EnrollmentStatus.None,
   val vpnStatus: VpnStatus = VpnStatus.Disconnected,
   val isBanned: Boolean = false,
   val isOutdated: Boolean = false,
@@ -37,4 +38,14 @@ sealed interface VpnStatus {
   data object Disconnected : VpnStatus
   data class Connecting(val isQuick: Boolean) : VpnStatus
   data class Connected(val isQuick: Boolean) : VpnStatus
+}
+
+enum class EnrollmentStatus {
+  None,
+  Enrolled,
+  NotEnrolled,
+  Banned,
+  TokenExpired,
+  VersionOutdated,
+  DeviceNotSupported,
 }

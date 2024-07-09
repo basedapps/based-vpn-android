@@ -83,34 +83,22 @@ class DashboardScreenViewModel
   }
 
   private fun handleEnrolmentStatus(status: EnrollmentStatus) {
-    stateHolder.updateState {
-      copy(enrolmentStatus = status)
-    }
-
     when (status) {
       EnrollmentStatus.None -> Unit
 
       EnrollmentStatus.Enrolled -> stateHolder.updateState {
-        copy(status = Status.Data)
-      }
-
-      EnrollmentStatus.NotEnrolled -> stateHolder.updateState {
-        copy(status = Status.Error(false))
-      }
-
-      EnrollmentStatus.Banned -> stateHolder.updateState {
-        copy(status = Status.Error(false), isBanned = true)
+        copy(status = Status.Data, enrolmentStatus = status)
       }
 
       EnrollmentStatus.TokenExpired ->
         enrollUser(shouldRefreshToken = true)
 
-      EnrollmentStatus.VersionOutdated -> stateHolder.updateState {
-        copy(status = Status.Error(false), isOutdated = true)
-      }
-
-      EnrollmentStatus.DeviceNotSupported -> stateHolder.updateState {
-        copy(status = Status.Error(false))
+      EnrollmentStatus.NotEnrolled,
+      EnrollmentStatus.Banned,
+      EnrollmentStatus.VersionOutdated,
+      EnrollmentStatus.DeviceNotSupported,
+      -> stateHolder.updateState {
+        copy(status = Status.Error(false), enrolmentStatus = status)
       }
     }
   }
@@ -344,8 +332,11 @@ class DashboardScreenViewModel
         )
       }
 
-      is VPNConnector.Error.Banned -> {
-        stateHolder.updateState { copy(isBanned = true) }
+      is VPNConnector.Error.Banned -> stateHolder.updateState {
+        copy(
+          status = Status.Error(false),
+          enrolmentStatus = EnrollmentStatus.Banned,
+        )
       }
 
       else -> {

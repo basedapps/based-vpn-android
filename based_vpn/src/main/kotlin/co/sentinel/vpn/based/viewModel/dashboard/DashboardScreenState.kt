@@ -15,8 +15,6 @@ data class DashboardScreenState(
   val status: Status = Status.Data,
   val enrolmentStatus: EnrollmentStatus = EnrollmentStatus.None,
   val vpnStatus: VpnStatus = VpnStatus.Disconnected,
-  val isBanned: Boolean = false,
-  val isOutdated: Boolean = false,
   val selectedCity: SelectedCity? = null,
   val ipAddress: String = "",
   val isErrorAlertVisible: Boolean = false,

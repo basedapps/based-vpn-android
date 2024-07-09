@@ -62,6 +62,7 @@ import co.sentinel.vpn.based.viewModel.dashboard.DashboardScreenEffect
 import co.sentinel.vpn.based.viewModel.dashboard.DashboardScreenEffect as Effect
 import co.sentinel.vpn.based.viewModel.dashboard.DashboardScreenState as State
 import co.sentinel.vpn.based.viewModel.dashboard.DashboardScreenViewModel
+import co.sentinel.vpn.based.viewModel.dashboard.EnrollmentStatus
 import co.sentinel.vpn.based.viewModel.dashboard.VpnStatus
 import co.sentinel.vpn.based.vpn.getVpnPermissionRequest
 import co.uk.basedapps.vpn.R
@@ -164,25 +165,35 @@ fun DashboardScreenStateless(
   onAlertConfirmClick: () -> Unit,
   onAlertDismissRequest: () -> Unit,
 ) {
-  when {
-    state.isOutdated -> ErrorScreen(
-      title = stringResource(R.string.update_required_title),
-      description = stringResource(R.string.update_required_description),
-      buttonLabel = stringResource(R.string.update_required_button),
-      imageResId = R.drawable.ic_update,
-      onButtonClick = onUpdateClick,
-    )
+  when (state.status) {
+    is Status.Error -> {
+      when (state.enrolmentStatus) {
+        EnrollmentStatus.VersionOutdated -> {
+          ErrorScreen(
+            title = stringResource(R.string.update_required_title),
+            description = stringResource(R.string.update_required_description),
+            buttonLabel = stringResource(R.string.update_required_button),
+            imageResId = R.drawable.ic_update,
+            onButtonClick = onUpdateClick,
+          )
+        }
 
-    state.isBanned -> ErrorScreen(
-      title = null,
-      description = stringResource(R.string.error_banned_title),
-      onButtonClick = null,
-    )
+        EnrollmentStatus.Banned -> {
+          ErrorScreen(
+            title = null,
+            description = stringResource(R.string.error_banned_title),
+            onButtonClick = null,
+          )
+        }
 
-    state.status is Status.Error -> ErrorScreen(
-      isLoading = (state.status as Status.Error).isLoading,
-      onButtonClick = onTryAgainClick,
-    )
+        else -> {
+          ErrorScreen(
+            isLoading = (state.status as Status.Error).isLoading,
+            onButtonClick = onTryAgainClick,
+          )
+        }
+      }
+    }
 
     else -> Content(
       state = state,

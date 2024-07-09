@@ -3,6 +3,8 @@ package co.uk.basedapps.vpn.di
 import android.content.Context
 import co.sentinel.vpn.based.app_config.AppConfig
 import co.uk.basedapps.vpn.BuildConfig
+import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.google.firebase.crashlytics.setCustomKeys
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -37,6 +39,18 @@ class ApplicationModule {
   @Provides
   @Singleton
   fun provideNonFatalReportTree(@ApplicationContext context: Context): NonFatalReportTree {
-    return NonFatalReportTree(context)
+
+    val crashlytics by lazy { FirebaseCrashlytics.getInstance() }
+
+    return NonFatalReportTree(
+      context = context,
+      log = { crashlytics.log(it) },
+      recordException = { crashlytics.recordException(it) },
+      setCustomKeys = {
+        crashlytics.setCustomKeys {
+          it.forEach { (key, value) -> key(key, value) }
+        }
+      },
+    )
   }
 }

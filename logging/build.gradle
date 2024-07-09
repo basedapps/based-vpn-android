@@ -36,7 +36,7 @@ publishing {
         release(MavenPublication) {
             groupId = 'io.norselabs.logging'
             artifactId = 'logging'
-            version = '0.0.1'
+            version = '0.0.2'
 
             afterEvaluate {
                 from components.release
@@ -57,6 +57,5 @@ publishing {
 
 dependencies {
     implementation libs.timber
-    implementation(platform(libs.google.firebase.bom))
-    implementation libs.google.firebase.crashlytics
+    implementation libs.android.core.ktx
 }

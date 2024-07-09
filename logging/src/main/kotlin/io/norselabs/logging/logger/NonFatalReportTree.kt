@@ -4,21 +4,25 @@ import android.app.ActivityManager
 import android.content.Context
 import android.os.Process
 import android.util.Log
-import com.google.firebase.crashlytics.FirebaseCrashlytics
-import com.google.firebase.crashlytics.setCustomKeys
 import io.norselabs.logging.NonFatalException
 import timber.log.Timber
 
-class NonFatalReportTree(context: Context) : Timber.Tree() {
+class NonFatalReportTree(
+  context: Context,
+  private val log: (String) -> Unit,
+  private val recordException: (Throwable) -> Unit,
+  setCustomKeys: (Map<String, String>) -> Unit,
+) : Timber.Tree() {
 
   private val isMainProcess = context.isMainProcess()
-  private val crashlytics by lazy { FirebaseCrashlytics.getInstance() }
 
   init {
     if (isMainProcess) {
-      crashlytics.setCustomKeys {
-        key("processor-arch", System.getProperty("os.arch").orEmpty())
-      }
+      setCustomKeys(
+        mapOf(
+          "processor-arch" to System.getProperty("os.arch").orEmpty(),
+        ),
+      )
     }
   }
 
@@ -32,9 +36,9 @@ class NonFatalReportTree(context: Context) : Timber.Tree() {
     if (priority != Log.ERROR) return
     val nonFatalException = t as? NonFatalException ?: return
 
-    nonFatalException.message?.takeIfNotBlank()?.let { crashlytics.log(it) }
+    nonFatalException.message?.takeIfNotBlank()?.let { log(it) }
     val actualException = nonFatalException.cause ?: nonFatalException
-    crashlytics.recordException(actualException)
+    recordException(actualException)
   }
 
   private fun String.takeIfNotBlank(): String? = takeIf { it.isNotBlank() }

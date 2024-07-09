@@ -80,6 +80,7 @@ dependencies {
     implementation libs.gson.converter
     implementation libs.arrow.core
     implementation libs.vpn.v2ray
+    implementation libs.logging
     implementation libs.compose.runtime
 
     kapt libs.hilt.compiler

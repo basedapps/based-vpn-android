@@ -24,6 +24,7 @@ navigation = "2.7.7"
 hiltNavigation = "1.2.0"
 mapBox = "11.4.0"
 v2ray = "0.0.7"
+logging = "0.0.2"
 
 [libraries]
 # Android
@@ -69,10 +70,11 @@ navigation = { module = "androidx.navigation:navigation-compose", version.ref = 
 # Maps
 map-box-android = { module = "com.mapbox.maps:android", version.ref = "mapBox" }
 map-box-compose = { module = "com.mapbox.extension:maps-compose", version.ref = "mapBox" }
-
+#Logs
+timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
+logging = { module = "io.norselabs.logging:logging", version.ref = "logging" }
 # Other
 accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanist" }
-timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 play-ads = { module = "com.google.android.gms:play-services-ads", version = "22.6.0" }
 arrow-core = { module = "io.arrow-kt:arrow-core", version = "1.2.0" }
 # VPN

@@ -1,6 +1,7 @@
 package co.sentinel.vpn.based.network.repository
 
 import co.sentinel.vpn.based.network.Api
+import co.sentinel.vpn.based.network.ConnectApi
 import co.sentinel.vpn.based.network.NetResult
 import co.sentinel.vpn.based.network.cache.CacheUnit
 import co.sentinel.vpn.based.network.execute
@@ -19,6 +20,7 @@ import okhttp3.OkHttpClient
 
 class BasedRepositoryImpl(
   private val api: Api,
+  private val connectApi: ConnectApi,
   private val client: OkHttpClient,
 ) : BasedRepository {
 
@@ -49,7 +51,7 @@ class BasedRepositoryImpl(
     cityId: Int,
     protocol: Protocol?,
   ): NetResult<DataObj<Credentials>> = execute {
-    api.getCredentials(
+    connectApi.getCredentials(
       countryId = countryId,
       cityId = cityId,
       protocol = protocol?.strValue ?: "",

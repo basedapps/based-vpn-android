@@ -2,7 +2,6 @@ package co.sentinel.vpn.based.network
 
 import co.sentinel.vpn.based.network.model.City
 import co.sentinel.vpn.based.network.model.Country
-import co.sentinel.vpn.based.network.model.Credentials
 import co.sentinel.vpn.based.network.model.DataList
 import co.sentinel.vpn.based.network.model.DataObj
 import co.sentinel.vpn.based.network.model.IpModel
@@ -30,20 +29,6 @@ interface Api {
     @Path("countryId") countryId: Int,
     @Query("protocol") protocol: String?,
   ): DataList<City>
-
-  /**
-   * 400 — некорректный запрос
-   * 500 — внутренняя ошибка сервера
-   * 401 — не авторизован (нет токена или он неверный)
-   * 410 — сервер, к которому попытались подключиться, умер и не отвечает
-   * 425 – deviceNotEnrolled (кошелек создается)
-   */
-  @POST("countries/{countryId}/cities/{cityId}/credentials/{protocol}")
-  suspend fun getCredentials(
-    @Path("countryId") countryId: Int,
-    @Path("cityId") cityId: Int,
-    @Path("protocol") protocol: String,
-  ): DataObj<Credentials>
 
   @GET("ip")
   suspend fun getIp(): DataObj<IpModel>

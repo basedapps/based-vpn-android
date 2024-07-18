@@ -3,6 +3,7 @@ package co.sentinel.vpn.based.di
 import android.content.SharedPreferences
 import co.sentinel.vpn.based.app_config.AppConfig
 import co.sentinel.vpn.based.network.Api
+import co.sentinel.vpn.based.network.ConnectApi
 import co.sentinel.vpn.based.network.HeadersInterceptor
 import co.sentinel.vpn.based.network.repository.BasedRepository
 import co.sentinel.vpn.based.network.repository.BasedRepositoryImpl
@@ -30,14 +31,21 @@ class NetworkModule {
 
   @Provides
   @Singleton
-  fun provideOkHttp(headersInterceptor: HeadersInterceptor): OkHttpClient {
-    val interceptor = HttpLoggingInterceptor()
-    interceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
+  fun provideHttpLoggingInterceptor(): HttpLoggingInterceptor {
+    return HttpLoggingInterceptor().apply {
+      setLevel(HttpLoggingInterceptor.Level.BODY)
+    }
+  }
+
+  @Provides
+  @Singleton
+  fun provideOkHttp(
+    headersInterceptor: HeadersInterceptor,
+    loggingInterceptor: HttpLoggingInterceptor,
+  ): OkHttpClient {
     return OkHttpClient.Builder()
-      .connectTimeout(60, TimeUnit.SECONDS)
-      .readTimeout(60, TimeUnit.SECONDS)
       .addInterceptor(headersInterceptor)
-      .addInterceptor(interceptor)
+      .addInterceptor(loggingInterceptor)
       .build()
   }
 
@@ -58,8 +66,33 @@ class NetworkModule {
 
   @Provides
   @Singleton
+  fun provideConnectApi(
+    config: AppConfig,
+    headersInterceptor: HeadersInterceptor,
+    loggingInterceptor: HttpLoggingInterceptor,
+  ): ConnectApi {
+
+    val client = OkHttpClient.Builder()
+      .connectTimeout(60, TimeUnit.SECONDS)
+      .readTimeout(60, TimeUnit.SECONDS)
+      .addInterceptor(headersInterceptor)
+      .addInterceptor(loggingInterceptor)
+      .build()
+
+    val retrofit = Retrofit.Builder()
+      .baseUrl(config.getBaseUrl())
+      .addConverterFactory(GsonConverterFactory.create())
+      .client(client)
+      .build()
+
+    return retrofit.create(ConnectApi::class.java)
+  }
+
+  @Provides
+  @Singleton
   fun provideRepository(
     api: Api,
+    connectApi: ConnectApi,
     client: OkHttpClient,
-  ): BasedRepository = BasedRepositoryImpl(api, client)
+  ): BasedRepository = BasedRepositoryImpl(api, connectApi, client)
 }

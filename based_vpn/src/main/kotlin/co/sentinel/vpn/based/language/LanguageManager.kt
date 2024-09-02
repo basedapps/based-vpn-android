@@ -9,4 +9,8 @@ object LanguageManager {
     val appLocale: LocaleListCompat = LocaleListCompat.forLanguageTags(lang)
     AppCompatDelegate.setApplicationLocales(appLocale)
   }
+
+  fun getLanguage(): String {
+    return AppCompatDelegate.getApplicationLocales().toLanguageTags()
+  }
 }

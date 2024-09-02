@@ -36,6 +36,7 @@ data class SettingsScreenState(
   ),
   val isProtocolSelectorVisible: Boolean = false,
 
+  val currentLang: AppLang? = null,
   val langOptions: ImmutableList<AppLang> = persistentListOf(),
 
   val appVersion: String = "",

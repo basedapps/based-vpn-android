@@ -85,12 +85,19 @@ class SettingsScreenViewModel
   }
 
   fun setSupportedLanguages(languages: List<AppLang>) {
+    val appLang = LanguageManager.getLanguage()
     stateHolder.updateState {
-      copy(langOptions = languages.toPersistentList())
+      copy(
+        currentLang = languages.firstOrNull { it.code == appLang },
+        langOptions = languages.toPersistentList(),
+      )
     }
   }
 
   fun onLanguageSelected(lang: AppLang) {
     LanguageManager.setLanguage(lang.code)
+    stateHolder.updateState {
+      copy(currentLang = lang)
+    }
   }
 }

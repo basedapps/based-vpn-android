@@ -45,7 +45,7 @@ publishing {
         release(MavenPublication) {
             groupId = 'co.sentinel.vpn'
             artifactId = 'based'
-            version = '0.0.12'
+            version = '0.0.13'
 
             afterEvaluate {
                 from components.release
@@ -82,6 +82,7 @@ dependencies {
     implementation libs.vpn.v2ray
     implementation libs.logging
     implementation libs.compose.runtime
+    implementation libs.android.appcompat
 
     kapt libs.hilt.compiler
 }

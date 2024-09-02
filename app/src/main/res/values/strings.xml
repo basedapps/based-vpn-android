@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">BasedVPN</string>
+    <string name="app_name" translatable="false">BasedVPN</string>
 
     <string name="common_settings">Settings</string>
     <string name="common_ok">OK</string>

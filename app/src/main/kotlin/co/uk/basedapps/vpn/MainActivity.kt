@@ -3,6 +3,7 @@ package co.uk.basedapps.vpn
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.core.view.WindowCompat
@@ -22,7 +23,7 @@ import io.norselabs.logging.share.ChooserIntent
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
 
   @Inject
   lateinit var fileLogTree: FileLogTree

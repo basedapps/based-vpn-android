@@ -3,8 +3,11 @@ package co.sentinel.vpn.based.viewModel.settings
 import co.sentinel.vpn.based.app_config.AppConfig
 import co.sentinel.vpn.based.network.model.Protocol
 import co.sentinel.vpn.based.state.ViewStateHolder
+import co.sentinel.vpn.based.viewModel.settings.dto.AppLang
 import co.sentinel.vpn.based.vpn.DdsConfigurator
 import javax.inject.Inject
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 
 class SettingsScreenStateHolder
 @Inject
@@ -18,7 +21,7 @@ constructor(
 
 data class SettingsScreenState(
   val currentDns: DdsConfigurator.Dns? = null,
-  val dnsOptions: List<DdsConfigurator.Dns> = listOf(
+  val dnsOptions: ImmutableList<DdsConfigurator.Dns> = persistentListOf(
     DdsConfigurator.Dns.Cloudflare,
     DdsConfigurator.Dns.Google,
     DdsConfigurator.Dns.Handshake,
@@ -26,12 +29,14 @@ data class SettingsScreenState(
   val isDnsSelectorVisible: Boolean = false,
 
   val currentProtocol: Protocol? = null,
-  val protocolOptions: List<Protocol> = listOf(
+  val protocolOptions: ImmutableList<Protocol> = persistentListOf(
     Protocol.WIREGUARD,
     Protocol.V2RAY,
     Protocol.NONE,
   ),
   val isProtocolSelectorVisible: Boolean = false,
+
+  val langOptions: ImmutableList<AppLang> = persistentListOf(),
 
   val appVersion: String = "",
 )

@@ -86,6 +86,7 @@ dependencies {
     implementation libs.google.firebase.crashlytics
     implementation libs.google.firebase.analytics
     implementation libs.android.appcompat
+    implementation libs.kotlin.collection.immutable
 
     kapt libs.hilt.compiler
 

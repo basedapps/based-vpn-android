@@ -56,6 +56,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import co.sentinel.vpn.based.compose.EffectHandler
 import co.sentinel.vpn.based.country_flags.CountryFlag
 import co.sentinel.vpn.based.ext.goToGooglePlay
+import co.sentinel.vpn.based.ext.mailTo
 import co.sentinel.vpn.based.state.Status
 import co.sentinel.vpn.based.storage.SelectedCity
 import co.sentinel.vpn.based.viewModel.dashboard.DashboardScreenEffect as Effect
@@ -135,9 +136,7 @@ fun DashboardScreen(
         }
       }
 
-      is Effect.EmailToSupport -> {
-        Timber.tag("DashboardScreenEffect").d("EmailToSupport")
-      }
+      is Effect.EmailToSupport -> context.mailTo("hello@world.com")
 
       is Effect.ShowRating -> {
         Timber.tag("DashboardScreenEffect").d("ShowRating")

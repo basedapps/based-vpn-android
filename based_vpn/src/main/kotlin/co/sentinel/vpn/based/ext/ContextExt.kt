@@ -16,5 +16,26 @@ fun Context.goToGooglePlay() {
 fun Context.openWeb(url: String) {
   val uri = url.parseUrl() ?: return
   val intent = Intent(Intent.ACTION_VIEW, uri)
-  startActivity(intent)
+  startActivitySafe(intent)
+}
+
+fun Context.mailTo(email: String) {
+  val uri = "mailto:".parseUrl() ?: return
+  val intent = Intent(Intent.ACTION_SENDTO)
+  intent.setData(uri)
+  intent.putExtra(Intent.EXTRA_EMAIL, arrayOf(email))
+  startActivitySafe(intent)
+}
+
+fun Context.startActivitySafe(
+  intent: Intent,
+  onActivityNotStarted: ((Intent, Exception) -> Unit)? = null,
+) {
+  try {
+    startActivity(intent)
+  } catch (ex: ActivityNotFoundException) {
+    onActivityNotStarted?.invoke(intent, ex)
+  } catch (ex: SecurityException) {
+    onActivityNotStarted?.invoke(intent, ex)
+  }
 }

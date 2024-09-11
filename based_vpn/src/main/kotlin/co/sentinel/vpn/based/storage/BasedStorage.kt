@@ -28,6 +28,8 @@ class BasedStorage
 
   private var onboardingPref by prefs.delegate("onboarding_shown", false)
 
+  private var ratingPref by prefs.delegate("rating_status", RatingStatus.New.name)
+
   fun storeToken(token: String) {
     tokenPref = token
   }
@@ -68,5 +70,17 @@ class BasedStorage
 
   fun onOnboardingShown() {
     onboardingPref = true
+  }
+
+  fun setRatingStatus(status: RatingStatus) {
+    ratingPref = status.name
+  }
+
+  fun getRatingStatus(): RatingStatus {
+    return try {
+      RatingStatus.valueOf(ratingPref)
+    } catch (e: IllegalArgumentException) {
+      RatingStatus.New
+    }
   }
 }

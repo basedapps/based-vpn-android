@@ -19,7 +19,13 @@ data class SelectedCity(
   val serverId: String = "$countryId:$id"
 }
 
-data class LogEntity(
-  val time: Long,
-  val message: String,
-)
+enum class RatingStatus {
+  @SerializedName("New")
+  New,
+
+  @SerializedName("RequestOnNext")
+  RequestOnNext,
+
+  @SerializedName("Requested")
+  Requested,
+}

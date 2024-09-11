@@ -11,6 +11,7 @@ import co.sentinel.vpn.based.network.repository.BasedRepository
 import co.sentinel.vpn.based.network.repository.CitiesRequest
 import co.sentinel.vpn.based.state.Status
 import co.sentinel.vpn.based.storage.BasedStorage
+import co.sentinel.vpn.based.storage.RatingStatus
 import co.sentinel.vpn.based.storage.SelectedCity
 import co.sentinel.vpn.based.viewModel.dashboard.DashboardScreenEffect as Effect
 import co.sentinel.vpn.based.vpn.VPNConnector
@@ -313,6 +314,7 @@ class DashboardScreenViewModel
     stateHolder.updateState {
       copy(vpnStatus = VpnStatus.Connected(isQuick))
     }
+    checkAppRatingRequest()
   }
 
   private fun handleConnectionError(error: VPNConnector.Error) {
@@ -370,6 +372,40 @@ class DashboardScreenViewModel
 
   fun onAlertDismissRequest() {
     stateHolder.updateState { copy(isErrorAlertVisible = false) }
+  }
+
+  private fun checkAppRatingRequest() {
+    val rating = storage.getRatingStatus()
+    when (rating) {
+      RatingStatus.New -> {
+        storage.setRatingStatus(RatingStatus.RequestOnNext)
+      }
+
+      RatingStatus.RequestOnNext -> {
+        stateHolder.updateState { copy(isRatingAlertVisible = true) }
+      }
+
+      RatingStatus.Requested -> Unit
+    }
+  }
+
+  fun onRatingClick(click: RatingClick) {
+    when (click) {
+      RatingClick.Positive -> {
+        stateHolder.sendEffect(Effect.ShowRating)
+        storage.setRatingStatus(RatingStatus.Requested)
+      }
+
+      RatingClick.Negative -> {
+        stateHolder.sendEffect(Effect.EmailToSupport)
+        storage.setRatingStatus(RatingStatus.Requested)
+      }
+
+      RatingClick.Dismiss -> {
+        storage.setRatingStatus(RatingStatus.New)
+      }
+    }
+    stateHolder.updateState { copy(isRatingAlertVisible = false) }
   }
 
   companion object {

@@ -9,7 +9,7 @@ import androidx.compose.ui.tooling.preview.Preview
 @Composable
 fun BasedAlertDialog(
   title: String,
-  description: String,
+  description: String? = null,
   onConfirmClick: () -> Unit,
   onDismissClick: (() -> Unit)? = null,
   onDismissRequest: () -> Unit = {},
@@ -17,7 +17,7 @@ fun BasedAlertDialog(
   AlertDialog(
     onDismissRequest = onDismissRequest,
     title = { Text(title) },
-    text = { Text(description) },
+    text = description?.let { { Text(description) } },
     confirmButton = {
       Button(
         onClick = onConfirmClick,

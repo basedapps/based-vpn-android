@@ -12,6 +12,7 @@
     <string name="dashboard_error_connection_title">Unable to connect to the server</string>
     <string name="dashboard_error_connection_description">Please choose another server or try again later</string>
     <string name="dashboard_menu_settings">@string/common_settings</string>
+    <string name="dashboard_rating">Do you like our app?</string>
 
     <string name="countries_title">Choose country</string>
 

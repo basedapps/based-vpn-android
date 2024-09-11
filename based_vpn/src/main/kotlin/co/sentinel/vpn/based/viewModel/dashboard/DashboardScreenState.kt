@@ -18,6 +18,7 @@ data class DashboardScreenState(
   val selectedCity: SelectedCity? = null,
   val ipAddress: String = "",
   val isErrorAlertVisible: Boolean = false,
+  val isRatingAlertVisible: Boolean = false,
 )
 
 sealed interface DashboardScreenEffect {
@@ -26,6 +27,8 @@ sealed interface DashboardScreenEffect {
   data object ShowSelectServer : DashboardScreenEffect
   data object ShowSettings : DashboardScreenEffect
   data object ShowGooglePlay : DashboardScreenEffect
+  data object ShowRating : DashboardScreenEffect
+  data object EmailToSupport : DashboardScreenEffect
   data class ChangeMapPosition(
     val latitude: Double,
     val longitude: Double,
@@ -46,4 +49,10 @@ enum class EnrollmentStatus {
   TokenExpired,
   VersionOutdated,
   DeviceNotSupported,
+}
+
+enum class RatingClick {
+  Positive,
+  Negative,
+  Dismiss,
 }

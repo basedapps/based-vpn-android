@@ -58,11 +58,11 @@ import co.sentinel.vpn.based.country_flags.CountryFlag
 import co.sentinel.vpn.based.ext.goToGooglePlay
 import co.sentinel.vpn.based.state.Status
 import co.sentinel.vpn.based.storage.SelectedCity
-import co.sentinel.vpn.based.viewModel.dashboard.DashboardScreenEffect
 import co.sentinel.vpn.based.viewModel.dashboard.DashboardScreenEffect as Effect
 import co.sentinel.vpn.based.viewModel.dashboard.DashboardScreenState as State
 import co.sentinel.vpn.based.viewModel.dashboard.DashboardScreenViewModel
 import co.sentinel.vpn.based.viewModel.dashboard.EnrollmentStatus
+import co.sentinel.vpn.based.viewModel.dashboard.RatingClick
 import co.sentinel.vpn.based.viewModel.dashboard.VpnStatus
 import co.sentinel.vpn.based.vpn.getVpnPermissionRequest
 import co.uk.basedapps.vpn.R
@@ -81,6 +81,7 @@ import com.mapbox.maps.extension.compose.animation.viewport.rememberMapViewportS
 import com.mapbox.maps.plugin.animation.MapAnimationOptions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @Composable
 fun DashboardScreen(
@@ -103,7 +104,7 @@ fun DashboardScreen(
 
   EffectHandler(viewModel.stateHolder.effects) { effect ->
     when (effect) {
-      is DashboardScreenEffect.ShowAd -> viewModel.onAdShown()
+      is Effect.ShowAd -> viewModel.onAdShown()
 
       is Effect.ShowSelectServer -> navigateToCountries()
 
@@ -133,6 +134,14 @@ fun DashboardScreen(
           )
         }
       }
+
+      is Effect.EmailToSupport -> {
+        Timber.tag("DashboardScreenEffect").d("EmailToSupport")
+      }
+
+      is Effect.ShowRating -> {
+        Timber.tag("DashboardScreenEffect").d("ShowRating")
+      }
     }
   }
 
@@ -148,6 +157,7 @@ fun DashboardScreen(
     onUpdateClick = viewModel::onUpdateClick,
     onAlertConfirmClick = viewModel::onAlertConfirmClick,
     onAlertDismissRequest = viewModel::onAlertDismissRequest,
+    onRatingClick = viewModel::onRatingClick,
   )
 }
 
@@ -164,6 +174,7 @@ fun DashboardScreenStateless(
   onUpdateClick: () -> Unit,
   onAlertConfirmClick: () -> Unit,
   onAlertDismissRequest: () -> Unit,
+  onRatingClick: (RatingClick) -> Unit,
 ) {
   when (state.status) {
     is Status.Error -> {
@@ -205,6 +216,7 @@ fun DashboardScreenStateless(
       onSettingsClick = onSettingsClick,
       onAlertConfirmClick = onAlertConfirmClick,
       onAlertDismissRequest = onAlertDismissRequest,
+      onRatingClick = onRatingClick,
     )
   }
 }
@@ -219,7 +231,8 @@ private fun Content(
   onSelectServerClick: () -> Unit,
   onSettingsClick: () -> Unit,
   onAlertConfirmClick: () -> Unit,
-  onAlertDismissRequest: () -> Unit = {},
+  onAlertDismissRequest: () -> Unit,
+  onRatingClick: (RatingClick) -> Unit,
 ) {
   Box(
     modifier = Modifier
@@ -249,6 +262,14 @@ private fun Content(
         description = stringResource(R.string.dashboard_error_connection_description),
         onConfirmClick = onAlertConfirmClick,
         onDismissRequest = onAlertDismissRequest,
+      )
+    }
+    if (state.isRatingAlertVisible) {
+      BasedAlertDialog(
+        title = stringResource(R.string.dashboard_rating),
+        onConfirmClick = { onRatingClick(RatingClick.Positive) },
+        onDismissClick = { onRatingClick(RatingClick.Negative) },
+        onDismissRequest = { onRatingClick(RatingClick.Dismiss) },
       )
     }
   }
@@ -512,6 +533,7 @@ fun DashboardScreenPreview() {
       onUpdateClick = {},
       onAlertConfirmClick = {},
       onAlertDismissRequest = {},
+      onRatingClick = {},
     )
   }
 }

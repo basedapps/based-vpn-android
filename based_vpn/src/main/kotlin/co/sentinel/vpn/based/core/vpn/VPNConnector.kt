@@ -1,25 +1,16 @@
-package co.sentinel.vpn.based.vpn
+package co.sentinel.vpn.based.core.vpn
 
 import arrow.core.Either
 import arrow.core.flatMap
 import co.sentinel.vpn.based.error.BaseError
-import co.sentinel.vpn.based.network.model.Credentials
-import co.sentinel.vpn.based.network.model.Protocol
-import co.sentinel.vpn.based.network.repository.BasedRepository
-import co.sentinel.vpn.based.storage.BasedStorage
 import co.sentinel.vpn.based.storage.SelectedCity
-import io.norselabs.vpn.v2ray.model.VpnProfile
-import io.norselabs.vpn.v2ray.repo.V2RayRepository
-import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import timber.log.Timber
 
-class VPNConnector @Inject constructor(
-  private val repository: BasedRepository,
-  private val v2RayRepository: V2RayRepository,
-  private val storage: BasedStorage,
+class VPNConnector(
+  private val interactor: VPNConnectorInteractor,
 ) {
 
   suspend fun connect(city: SelectedCity): Either<Error, Unit> {
@@ -30,28 +21,28 @@ class VPNConnector @Inject constructor(
   }
 
   fun disconnect() {
-    if (v2RayRepository.isConnected()) {
-      v2RayRepository.stopV2ray()
+    if (interactor.isVpnConnected()) {
+      interactor.stopVpn()
     }
   }
 
   fun isConnected(): Boolean {
-    return v2RayRepository.isConnected()
+    return interactor.isVpnConnected()
   }
 
   private suspend fun getCredentials(city: SelectedCity): Either<Error, Unit> {
-    val protocol = storage.getVpnProtocol()
+    val protocol = interactor.getVpnProtocol()
       .takeIf { it != Protocol.NONE }
-    return repository.getCredentials(
+    return interactor.getCredentials(
       countryId = city.countryId,
       cityId = city.id,
       protocol = protocol,
     )
       .mapLeft { parseError(it) }
       .flatMap { credentials ->
-        getVPNProfile(
+        connectVpn(
           serverId = city.serverId,
-          credentials = credentials.data,
+          credentials = credentials,
         )
       }
   }
@@ -72,38 +63,17 @@ class VPNConnector @Inject constructor(
     }
   }
 
-  private suspend fun getVPNProfile(
+  private suspend fun connectVpn(
     serverId: String,
     credentials: Credentials,
   ): Either<Error, Unit> {
-    val profile = when (credentials.protocol) {
-      Protocol.WIREGUARD -> ProfileDecoder.decodeWireguard(
-        privateKey = credentials.privateKey,
-        payload = credentials.payload,
-      )
-
-      Protocol.V2RAY -> ProfileDecoder.decodeVmess(
-        payload = credentials.payload,
-        uid = credentials.privateKey,
-      )
-
-      else -> throw Exception("Unknown protocol")
-    }
-    return connectV2Ray(serverId, profile)
-  }
-
-  private suspend fun connectV2Ray(
-    serverId: String,
-    profile: VpnProfile?,
-  ): Either<Error, Unit> {
-    profile ?: return Either.Left(Error.ParseProfile)
-    v2RayRepository.startV2Ray(
-      profile = profile,
+    interactor.startVpn(
       serverId = serverId,
+      credentials = credentials,
     ).getOrNull()
       ?: return Either.Left(Error.StartV2Ray)
 
-    repository.resetConnection()
+    interactor.resetConnection()
 
     return Either.Right(Unit)
   }

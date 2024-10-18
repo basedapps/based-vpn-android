@@ -1,7 +1,6 @@
 package co.sentinel.vpn.based.network.model
 
-import androidx.annotation.StringRes
-import co.sentinel.based_vpn.R
+import co.sentinel.vpn.based.core.vpn.Protocol
 import co.sentinel.vpn.based.country_flags.CountryFlag
 import com.google.gson.annotations.SerializedName
 
@@ -72,17 +71,3 @@ data class VersionModel(
   @SerializedName("API")
   val apiVersion: Long,
 )
-
-enum class Protocol(
-  val strValue: String,
-  @StringRes val labelRes: Int,
-) {
-  WIREGUARD("WIREGUARD", R.string.settings_protocol_wireguard),
-  V2RAY("V2RAY", R.string.settings_protocol_v2ray),
-  NONE("NONE", R.string.settings_protocol_any),
-  ;
-
-  companion object {
-    fun fromString(strValue: String) = entries.firstOrNull { it.strValue == strValue } ?: NONE
-  }
-}

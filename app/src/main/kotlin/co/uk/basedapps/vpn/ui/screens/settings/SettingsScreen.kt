@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import co.sentinel.vpn.based.compose.EffectHandler
-import co.sentinel.vpn.based.network.model.Protocol
+import co.sentinel.vpn.based.core.vpn.Protocol
 import co.sentinel.vpn.based.viewModel.settings.SettingsScreenEffect
 import co.sentinel.vpn.based.viewModel.settings.SettingsScreenState as State
 import co.sentinel.vpn.based.viewModel.settings.SettingsScreenViewModel

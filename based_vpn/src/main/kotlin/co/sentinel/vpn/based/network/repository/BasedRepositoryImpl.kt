@@ -1,5 +1,6 @@
 package co.sentinel.vpn.based.network.repository
 
+import co.sentinel.vpn.based.core.vpn.Protocol
 import co.sentinel.vpn.based.network.Api
 import co.sentinel.vpn.based.network.ConnectApi
 import co.sentinel.vpn.based.network.NetResult
@@ -11,7 +12,6 @@ import co.sentinel.vpn.based.network.model.Credentials
 import co.sentinel.vpn.based.network.model.DataList
 import co.sentinel.vpn.based.network.model.DataObj
 import co.sentinel.vpn.based.network.model.IpModel
-import co.sentinel.vpn.based.network.model.Protocol
 import co.sentinel.vpn.based.network.model.TokenModel
 import co.sentinel.vpn.based.network.model.VersionModel
 import kotlinx.coroutines.Dispatchers

@@ -1,7 +1,7 @@
 package co.sentinel.vpn.based.viewModel.settings
 
 import co.sentinel.vpn.based.app_config.AppConfig
-import co.sentinel.vpn.based.network.model.Protocol
+import co.sentinel.vpn.based.core.vpn.Protocol
 import co.sentinel.vpn.based.state.ViewStateHolder
 import co.sentinel.vpn.based.viewModel.settings.dto.AppLang
 import co.sentinel.vpn.based.vpn.DdsConfigurator

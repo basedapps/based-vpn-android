@@ -2,8 +2,8 @@ package co.sentinel.vpn.based.viewModel.countries
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import co.sentinel.vpn.based.core.vpn.Protocol
 import co.sentinel.vpn.based.network.model.Country
-import co.sentinel.vpn.based.network.model.Protocol
 import co.sentinel.vpn.based.network.repository.BasedRepository
 import co.sentinel.vpn.based.state.Status
 import co.sentinel.vpn.based.storage.BasedStorage

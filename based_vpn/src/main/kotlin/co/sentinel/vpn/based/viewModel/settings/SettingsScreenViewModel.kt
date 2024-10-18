@@ -2,8 +2,8 @@ package co.sentinel.vpn.based.viewModel.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import co.sentinel.vpn.based.core.vpn.Protocol
 import co.sentinel.vpn.based.language.LanguageManager
-import co.sentinel.vpn.based.network.model.Protocol
 import co.sentinel.vpn.based.storage.BasedStorage
 import co.sentinel.vpn.based.viewModel.settings.dto.AppLang
 import co.sentinel.vpn.based.vpn.DdsConfigurator

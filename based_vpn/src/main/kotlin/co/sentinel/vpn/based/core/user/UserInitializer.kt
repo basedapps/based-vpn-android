@@ -107,13 +107,3 @@ class UserInitializer(
     const val DELAY_SEC = 5
   }
 }
-
-interface UserInitializerInteractor {
-
-  fun storeToken(token: String)
-  fun getToken(): String
-
-  suspend fun checkVersion(): Either<Exception, Boolean>
-  suspend fun registerDevice(): Either<Exception, Token>
-  suspend fun getSession(): Either<Exception, Token>
-}

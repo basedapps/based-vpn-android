@@ -5,9 +5,10 @@ import androidx.lifecycle.viewModelScope
 import arrow.core.flatMap
 import co.sentinel.vpn.based.core.user.UserInitializer
 import co.sentinel.vpn.based.core.user.UserStatus
+import co.sentinel.vpn.based.core.vpn.Protocol
+import co.sentinel.vpn.based.core.vpn.VPNConnector
 import co.sentinel.vpn.based.network.model.Country
 import co.sentinel.vpn.based.network.model.IpModel
-import co.sentinel.vpn.based.network.model.Protocol
 import co.sentinel.vpn.based.network.repository.BasedRepository
 import co.sentinel.vpn.based.network.repository.CitiesRequest
 import co.sentinel.vpn.based.state.Status
@@ -15,7 +16,6 @@ import co.sentinel.vpn.based.storage.BasedStorage
 import co.sentinel.vpn.based.storage.RatingStatus
 import co.sentinel.vpn.based.storage.SelectedCity
 import co.sentinel.vpn.based.viewModel.dashboard.DashboardScreenEffect as Effect
-import co.sentinel.vpn.based.vpn.VPNConnector
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.Job

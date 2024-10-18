@@ -1,9 +1,9 @@
 package co.sentinel.vpn.based.storage
 
 import android.content.SharedPreferences
+import co.sentinel.vpn.based.core.vpn.Protocol
 import co.sentinel.vpn.based.network.model.City
 import co.sentinel.vpn.based.network.model.Country
-import co.sentinel.vpn.based.network.model.Protocol
 import co.sentinel.vpn.based.shared_preferences.delegate
 import co.sentinel.vpn.based.shared_preferences.getValue
 import co.sentinel.vpn.based.shared_preferences.setValue

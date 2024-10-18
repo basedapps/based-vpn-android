@@ -61,8 +61,8 @@ import co.sentinel.vpn.based.state.Status
 import co.sentinel.vpn.based.storage.SelectedCity
 import co.sentinel.vpn.based.viewModel.dashboard.DashboardScreenEffect as Effect
 import co.sentinel.vpn.based.viewModel.dashboard.DashboardScreenState as State
+import co.sentinel.vpn.based.user.UserStatus
 import co.sentinel.vpn.based.viewModel.dashboard.DashboardScreenViewModel
-import co.sentinel.vpn.based.viewModel.dashboard.EnrollmentStatus
 import co.sentinel.vpn.based.viewModel.dashboard.RatingClick
 import co.sentinel.vpn.based.viewModel.dashboard.VpnStatus
 import co.sentinel.vpn.based.vpn.getVpnPermissionRequest
@@ -178,7 +178,7 @@ fun DashboardScreenStateless(
   when (state.status) {
     is Status.Error -> {
       when (state.enrolmentStatus) {
-        EnrollmentStatus.VersionOutdated -> {
+        UserStatus.VersionOutdated -> {
           ErrorScreen(
             title = stringResource(R.string.update_required_title),
             description = stringResource(R.string.update_required_description),
@@ -188,7 +188,7 @@ fun DashboardScreenStateless(
           )
         }
 
-        EnrollmentStatus.Banned -> {
+        UserStatus.Banned -> {
           ErrorScreen(
             title = null,
             description = stringResource(R.string.error_banned_title),

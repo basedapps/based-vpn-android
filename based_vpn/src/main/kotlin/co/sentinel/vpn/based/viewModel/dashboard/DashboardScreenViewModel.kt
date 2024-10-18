@@ -3,7 +3,6 @@ package co.sentinel.vpn.based.viewModel.dashboard
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import arrow.core.flatMap
-import co.sentinel.vpn.based.app_config.AppConfig
 import co.sentinel.vpn.based.network.model.Country
 import co.sentinel.vpn.based.network.model.IpModel
 import co.sentinel.vpn.based.network.model.Protocol
@@ -13,17 +12,16 @@ import co.sentinel.vpn.based.state.Status
 import co.sentinel.vpn.based.storage.BasedStorage
 import co.sentinel.vpn.based.storage.RatingStatus
 import co.sentinel.vpn.based.storage.SelectedCity
+import co.sentinel.vpn.based.user.UserInitializer
+import co.sentinel.vpn.based.user.UserStatus
 import co.sentinel.vpn.based.viewModel.dashboard.DashboardScreenEffect as Effect
 import co.sentinel.vpn.based.vpn.VPNConnector
-import co.sentinel.vpn.based.vpn.VpnInitializer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
-import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
 import timber.log.Timber
 
 @HiltViewModel
@@ -33,8 +31,7 @@ class DashboardScreenViewModel
   private val repository: BasedRepository,
   private val storage: BasedStorage,
   private val vpnConnector: VPNConnector,
-  private val vpnInitializer: VpnInitializer,
-  private val config: AppConfig,
+  private val userInitializer: UserInitializer,
 ) : ViewModel() {
 
   private val state: DashboardScreenState
@@ -50,120 +47,49 @@ class DashboardScreenViewModel
 
   private fun initialize() {
     stateHolder.updateState { copy(status = Status.Loading) }
-    enrollUser()
-  }
-
-  private fun enrollUser(shouldRefreshToken: Boolean = false) {
     viewModelScope.launch {
-      if (isDeviceNotSupported()) {
-        handleEnrolmentStatus(EnrollmentStatus.DeviceNotSupported)
-        return@launch
-      }
-
-      if (isUpdateRequired()) {
-        handleEnrolmentStatus(EnrollmentStatus.VersionOutdated)
-        return@launch
-      }
-
-      if (shouldRefreshToken) {
-        storage.clearToken()
-      }
-      val hasToken = if (storage.getToken().isEmpty()) {
-        !getToken().isNullOrEmpty()
-      } else {
-        true
-      }
-      val enrollmentStatus = if (hasToken) {
-        refreshIp(isSingle = true)
-        waitUserEnrollment()
-      } else {
-        EnrollmentStatus.NotEnrolled
-      }
-      handleEnrolmentStatus(enrollmentStatus)
+      userInitializer.status
+        .onEach { status ->
+          if (status == UserStatus.Enrolled) {
+            refreshIp(isSingle = true)
+          }
+        }
+        .collect(::handleEnrolmentStatus)
     }
+    userInitializer.enroll()
   }
 
-  private fun handleEnrolmentStatus(status: EnrollmentStatus) {
+  private fun handleEnrolmentStatus(status: UserStatus) {
     when (status) {
-      EnrollmentStatus.None -> Unit
+      UserStatus.Init -> Unit
 
-      EnrollmentStatus.Enrolled -> stateHolder.updateState {
+      UserStatus.Enrolled -> stateHolder.updateState {
         copy(status = Status.Data, enrolmentStatus = status)
       }
 
-      EnrollmentStatus.TokenExpired ->
-        enrollUser(shouldRefreshToken = true)
-
-      EnrollmentStatus.NotEnrolled,
-      EnrollmentStatus.Banned,
-      EnrollmentStatus.VersionOutdated,
-      EnrollmentStatus.DeviceNotSupported,
+      UserStatus.NotEnrolled,
+      UserStatus.Banned,
+      UserStatus.VersionOutdated,
+      UserStatus.Failed,
       -> stateHolder.updateState {
         copy(status = Status.Error(false), enrolmentStatus = status)
       }
     }
   }
 
-  private suspend fun isUpdateRequired(): Boolean {
-    val response = repository.getVersion().getOrNull()
-    return if (response != null) {
-      val versions = response.data
-      versions.appVersion > config.getBasedAppVersion() ||
-        versions.apiVersion > config.getBasedApiVersion()
-    } else {
-      false
-    }
-  }
-
-  private suspend fun isDeviceNotSupported(): Boolean {
-    val initStatus = vpnInitializer.status
-      .firstOrNull { it != VpnInitializer.Status.None }
-    return initStatus == VpnInitializer.Status.NotSupported
-  }
-
-  private suspend fun getToken(): String? {
-    val token = repository.registerDevice()
-      .getOrNull()?.data?.token
-    if (token != null) {
-      Timber.tag(Tag).d("Token has been updated")
-      storage.storeToken(token)
-    }
-    return token
-  }
-
-  private suspend fun waitUserEnrollment(): EnrollmentStatus {
-    val maxAttempts = 20
-    repeat(maxAttempts) { attempt ->
-      repository.getSession()
-        .onLeft { exception ->
-          val code = (exception as? HttpException)?.response()?.code()
-          if (code == 401) return EnrollmentStatus.TokenExpired
-        }
-        .onRight { sessionRes ->
-          val session = sessionRes.data
-          when {
-            session.isBanned -> return EnrollmentStatus.Banned
-            session.isEnrolled -> return EnrollmentStatus.Enrolled
-          }
-        }
-      if (attempt < maxAttempts - 1) delay(5.seconds)
-    }
-    return EnrollmentStatus.NotEnrolled
-  }
-
   private suspend fun refreshIp(isSingle: Boolean = false) {
     val currentIp = state.ipAddress
-    Timber.tag(Tag).d("-> Current IP: $currentIp")
+    Timber.tag(TAG).d("-> Current IP: $currentIp")
     var refreshAttempt = 0
     var ipModel: IpModel
     do {
-      Timber.tag(Tag).d("Reset connection")
+      Timber.tag(TAG).d("Reset connection")
       repository.resetConnection()
       delay(300)
-      Timber.tag(Tag).d("Refresh IP $refreshAttempt")
+      Timber.tag(TAG).d("Refresh IP $refreshAttempt")
       refreshAttempt++
       ipModel = repository.getIp().getOrNull()?.data ?: return
-      Timber.tag(Tag).d("New IP: ${ipModel.ip}")
+      Timber.tag(TAG).d("New IP: ${ipModel.ip}")
       if (isSingle) break
       delay(1000)
     } while (ipModel.ip == currentIp && refreshAttempt <= 3)
@@ -186,7 +112,7 @@ class DashboardScreenViewModel
   private fun checkConnection() {
     viewModelScope.launch {
       val isConnected = vpnConnector.isConnected()
-      Timber.tag(Tag).d("Tunnel state: $isConnected")
+      Timber.tag(TAG).d("Tunnel state: $isConnected")
       if (isConnected) {
         setConnectedState()
       } else {
@@ -196,7 +122,7 @@ class DashboardScreenViewModel
   }
 
   private fun onCityChanged(city: SelectedCity?) {
-    Timber.tag(Tag).d("City changed to ${city?.name} (prev: ${state.selectedCity?.name})")
+    Timber.tag(TAG).d("City changed to ${city?.name} (prev: ${state.selectedCity?.name})")
     val isConnected = state.vpnStatus is VpnStatus.Connected
     if (state.selectedCity != null && isConnected) {
       disconnect()
@@ -257,7 +183,7 @@ class DashboardScreenViewModel
 
   fun onTryAgainClick() {
     stateHolder.updateState { copy(status = Status.Error(true)) }
-    enrollUser()
+    userInitializer.enroll()
   }
 
   fun onUpdateClick() {
@@ -308,7 +234,7 @@ class DashboardScreenViewModel
   }
 
   private suspend fun setConnectedState() {
-    Timber.tag(Tag).d("Connected!")
+    Timber.tag(TAG).d("Connected!")
     refreshIp()
     val isQuick = (state.vpnStatus as? VpnStatus.Connecting)?.isQuick ?: false
     stateHolder.updateState {
@@ -318,27 +244,16 @@ class DashboardScreenViewModel
   }
 
   private fun handleConnectionError(error: VPNConnector.Error) {
-    Timber.tag(Tag).d("Connection failed! reason: $error")
+    Timber.tag(TAG).d("Connection failed! reason: $error")
     when (error) {
-      is VPNConnector.Error.NotEnrolled,
-      is VPNConnector.Error.TokenExpired,
-      -> {
+      is VPNConnector.Error.UserToken -> {
         stateHolder.updateState {
           copy(
             status = Status.Loading,
             vpnStatus = VpnStatus.Disconnected,
           )
         }
-        enrollUser(
-          shouldRefreshToken = error is VPNConnector.Error.TokenExpired,
-        )
-      }
-
-      is VPNConnector.Error.Banned -> stateHolder.updateState {
-        copy(
-          status = Status.Error(false),
-          enrolmentStatus = EnrollmentStatus.Banned,
-        )
+        userInitializer.enroll()
       }
 
       else -> {
@@ -353,7 +268,7 @@ class DashboardScreenViewModel
   }
 
   private fun disconnect() {
-    Timber.tag(Tag).d("Disconnect")
+    Timber.tag(TAG).d("Disconnect")
     startConnectionJob?.cancel()
     setDisconnectedState()
     viewModelScope.launch {
@@ -409,6 +324,6 @@ class DashboardScreenViewModel
   }
 
   companion object {
-    const val Tag = "DashboardTag"
+    const val TAG = "DashboardTag"
   }
 }

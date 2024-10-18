@@ -61,9 +61,7 @@ class VPNConnector @Inject constructor(
       is HttpException -> {
         val response = exception.response()
         when (response?.code()) {
-          401 -> Error.TokenExpired
-          403 -> Error.Banned
-          425 -> Error.NotEnrolled
+          401, 403, 425 -> Error.UserToken
           else -> Error.GetCredentials(
             response?.run { "$this ${errorBody()?.string()}" },
           )
@@ -111,32 +109,17 @@ class VPNConnector @Inject constructor(
   }
 
   sealed interface Error : BaseError {
+
     data class GetCredentials(val error: String?) : Error {
       override val message: String = "Get Credentials error: ${error ?: "Unknown"}"
     }
 
-    data object NotEnrolled : Error {
-      override val message: String = "User not enrolled"
-    }
-
-    data object Banned : Error {
-      override val message: String = "User has been banned"
-    }
-
-    data object TokenExpired : Error {
-      override val message: String = "Token has been expired"
+    data object UserToken : Error {
+      override val message: String = "User token error"
     }
 
     data object ParseProfile : Error {
       override val message: String = "Parse profile error"
-    }
-
-    data object CreateTunnel : Error {
-      override val message: String = "Create Wireguard tunnel error"
-    }
-
-    data object SetTunnelState : Error {
-      override val message: String = "Set Wireguard tunnel state error"
     }
 
     data object StartV2Ray : Error {

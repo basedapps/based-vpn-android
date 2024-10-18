@@ -3,6 +3,7 @@ package co.sentinel.vpn.based.viewModel.dashboard
 import co.sentinel.vpn.based.state.Status
 import co.sentinel.vpn.based.state.ViewStateHolder
 import co.sentinel.vpn.based.storage.SelectedCity
+import co.sentinel.vpn.based.user.UserStatus
 import javax.inject.Inject
 
 class DashboardScreenStateHolder
@@ -13,7 +14,7 @@ constructor() : ViewStateHolder<DashboardScreenState, DashboardScreenEffect>(
 
 data class DashboardScreenState(
   val status: Status = Status.Data,
-  val enrolmentStatus: EnrollmentStatus = EnrollmentStatus.None,
+  val enrolmentStatus: UserStatus = UserStatus.Init,
   val vpnStatus: VpnStatus = VpnStatus.Disconnected,
   val selectedCity: SelectedCity? = null,
   val ipAddress: String = "",
@@ -39,16 +40,6 @@ sealed interface VpnStatus {
   data object Disconnected : VpnStatus
   data class Connecting(val isQuick: Boolean) : VpnStatus
   data class Connected(val isQuick: Boolean) : VpnStatus
-}
-
-enum class EnrollmentStatus {
-  None,
-  Enrolled,
-  NotEnrolled,
-  Banned,
-  TokenExpired,
-  VersionOutdated,
-  DeviceNotSupported,
 }
 
 enum class RatingClick {

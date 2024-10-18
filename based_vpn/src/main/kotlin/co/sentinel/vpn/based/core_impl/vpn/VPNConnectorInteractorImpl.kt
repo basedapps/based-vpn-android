@@ -3,6 +3,7 @@ package co.sentinel.vpn.based.core_impl.vpn
 import arrow.core.Either
 import arrow.core.flatMap
 import co.sentinel.vpn.based.core.vpn.Credentials
+import co.sentinel.vpn.based.core.vpn.Destination
 import co.sentinel.vpn.based.core.vpn.Protocol
 import co.sentinel.vpn.based.core.vpn.VPNConnectorInteractor
 import co.sentinel.vpn.based.network.repository.BasedRepository
@@ -10,6 +11,7 @@ import co.sentinel.vpn.based.storage.BasedStorage
 import co.sentinel.vpn.based.vpn.ProfileDecoder
 import io.norselabs.vpn.v2ray.error.V2RayError
 import io.norselabs.vpn.v2ray.repo.V2RayRepository
+import retrofit2.HttpException
 
 class VPNConnectorInteractorImpl(
   private val repository: BasedRepository,
@@ -18,11 +20,12 @@ class VPNConnectorInteractorImpl(
 ) : VPNConnectorInteractor {
 
   override suspend fun getCredentials(
-    countryId: Int,
-    cityId: Int,
+    destination: Destination,
     protocol: Protocol?,
   ): Either<Exception, Credentials> {
-    return repository.getCredentials(countryId, cityId, protocol)
+    val city = (destination as? Destination.City)
+      ?: return Either.Left(Exception("Destination.Server is not supported yet"))
+    return repository.getCredentials(city.countryId, city.cityId, protocol)
       .flatMap { response ->
         val data = response.data
         when (data.protocol) {
@@ -45,6 +48,10 @@ class VPNConnectorInteractorImpl(
 
   override suspend fun resetConnection() {
     repository.resetConnection()
+  }
+
+  override fun parseHttpCode(exception: Exception): Int? {
+    return (exception as? HttpException)?.response()?.code()
   }
 
   override suspend fun startVpn(

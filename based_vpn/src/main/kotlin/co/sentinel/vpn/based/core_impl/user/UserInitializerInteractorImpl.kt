@@ -8,6 +8,7 @@ import co.sentinel.vpn.based.network.model.DataObj
 import co.sentinel.vpn.based.network.model.TokenModel
 import co.sentinel.vpn.based.network.repository.BasedRepository
 import co.sentinel.vpn.based.storage.BasedStorage
+import retrofit2.HttpException
 
 class UserInitializerInteractorImpl(
   private val repository: BasedRepository,
@@ -48,5 +49,9 @@ class UserInitializerInteractorImpl(
       isBanned = data.isBanned,
       isEnrolled = data.isEnrolled,
     )
+  }
+
+  override fun parseHttpCode(exception: Exception): Int? {
+    return (exception as? HttpException)?.response()?.code()
   }
 }

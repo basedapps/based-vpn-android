@@ -9,7 +9,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
 import timber.log.Timber
 
 class UserInitializer(
@@ -75,7 +74,7 @@ class UserInitializer(
     return interactor.getSession()
       .fold(
         ifLeft = { exception ->
-          val code = (exception as? HttpException)?.response()?.code()
+          val code = interactor.parseHttpCode(exception)
           when (code) {
             401 -> {
               Timber.tag(TAG).d("Token expired")

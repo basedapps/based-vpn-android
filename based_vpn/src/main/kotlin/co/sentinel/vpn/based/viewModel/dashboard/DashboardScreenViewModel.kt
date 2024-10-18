@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import arrow.core.flatMap
 import co.sentinel.vpn.based.core.user.UserInitializer
 import co.sentinel.vpn.based.core.user.UserStatus
+import co.sentinel.vpn.based.core.vpn.Destination
 import co.sentinel.vpn.based.core.vpn.Protocol
 import co.sentinel.vpn.based.core.vpn.VPNConnector
 import co.sentinel.vpn.based.network.model.Country
@@ -228,7 +229,11 @@ class DashboardScreenViewModel
   }
 
   private suspend fun connectToCity(city: SelectedCity) {
-    vpnConnector.connect(city)
+    val destination = Destination.City(
+      cityId = city.id,
+      countryId = city.countryId,
+    )
+    vpnConnector.connect(destination)
       .onRight { setConnectedState() }
       .onLeft(::handleConnectionError)
   }

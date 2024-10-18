@@ -7,12 +7,13 @@ interface VPNConnectorInteractor {
 
   // Repository
   suspend fun getCredentials(
-    countryId: Int,
-    cityId: Int,
+    destination: Destination,
     protocol: Protocol?,
   ): Either<Exception, Credentials>
 
   suspend fun resetConnection()
+
+  fun parseHttpCode(exception: Exception): Int?
 
   // VPN
   suspend fun startVpn(

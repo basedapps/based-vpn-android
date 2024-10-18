@@ -29,3 +29,25 @@ enum class Protocol(
     fun fromString(strValue: String) = entries.firstOrNull { it.strValue == strValue } ?: NONE
   }
 }
+
+sealed interface Destination {
+
+  data class City(
+    val cityId: Int,
+    val countryId: Int,
+  ) : Destination {
+
+    override val id: String = "$countryId:$cityId"
+  }
+
+  data class Server(
+    val serverId: Int,
+    val cityId: Int,
+    val countryId: Int,
+  ) : Destination {
+
+    override val id: String = "$countryId:$cityId:$serverId"
+  }
+
+  val id: String
+}

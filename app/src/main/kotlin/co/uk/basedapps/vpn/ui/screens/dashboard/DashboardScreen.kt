@@ -54,6 +54,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import co.sentinel.vpn.based.compose.EffectHandler
+import co.sentinel.vpn.based.core.user.UserStatus
 import co.sentinel.vpn.based.country_flags.CountryFlag
 import co.sentinel.vpn.based.ext.goToGooglePlay
 import co.sentinel.vpn.based.ext.mailTo
@@ -61,7 +62,6 @@ import co.sentinel.vpn.based.state.Status
 import co.sentinel.vpn.based.storage.SelectedCity
 import co.sentinel.vpn.based.viewModel.dashboard.DashboardScreenEffect as Effect
 import co.sentinel.vpn.based.viewModel.dashboard.DashboardScreenState as State
-import co.sentinel.vpn.based.user.UserStatus
 import co.sentinel.vpn.based.viewModel.dashboard.DashboardScreenViewModel
 import co.sentinel.vpn.based.viewModel.dashboard.RatingClick
 import co.sentinel.vpn.based.viewModel.dashboard.VpnStatus

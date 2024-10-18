@@ -1,4 +1,4 @@
-package co.sentinel.vpn.based.user
+package co.sentinel.vpn.based.core.user
 
 import arrow.core.Either
 import arrow.core.flatMap
@@ -117,19 +117,3 @@ interface UserInitializerInteractor {
   suspend fun registerDevice(): Either<Exception, Token>
   suspend fun getSession(): Either<Exception, Token>
 }
-
-enum class UserStatus {
-  Init,
-  Enrolled,
-  NotEnrolled,
-  Banned,
-  VersionOutdated,
-  Failed,
-}
-
-data class Token(
-  val id: Int,
-  val token: String,
-  val isBanned: Boolean,
-  val isEnrolled: Boolean,
-)

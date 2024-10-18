@@ -1,11 +1,11 @@
 package co.sentinel.vpn.based.di
 
 import co.sentinel.vpn.based.app_config.AppConfig
+import co.sentinel.vpn.based.core.user.UserInitializer
+import co.sentinel.vpn.based.core.user.UserInitializerInteractor
+import co.sentinel.vpn.based.core_impl.user.UserInitializerInteractorImpl
 import co.sentinel.vpn.based.network.repository.BasedRepository
 import co.sentinel.vpn.based.storage.BasedStorage
-import co.sentinel.vpn.based.user.UserInitializer
-import co.sentinel.vpn.based.user.UserInitializerInteractor
-import co.sentinel.vpn.based.user.UserInitializerInteractorImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

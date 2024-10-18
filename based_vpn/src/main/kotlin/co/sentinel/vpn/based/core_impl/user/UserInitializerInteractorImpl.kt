@@ -1,7 +1,9 @@
-package co.sentinel.vpn.based.user
+package co.sentinel.vpn.based.core_impl.user
 
 import arrow.core.Either
 import co.sentinel.vpn.based.app_config.AppConfig
+import co.sentinel.vpn.based.core.user.Token
+import co.sentinel.vpn.based.core.user.UserInitializerInteractor
 import co.sentinel.vpn.based.network.model.DataObj
 import co.sentinel.vpn.based.network.model.TokenModel
 import co.sentinel.vpn.based.network.repository.BasedRepository

@@ -1,9 +1,9 @@
 package co.sentinel.vpn.based.viewModel.dashboard
 
+import co.sentinel.vpn.based.core.user.UserStatus
 import co.sentinel.vpn.based.state.Status
 import co.sentinel.vpn.based.state.ViewStateHolder
 import co.sentinel.vpn.based.storage.SelectedCity
-import co.sentinel.vpn.based.user.UserStatus
 import javax.inject.Inject
 
 class DashboardScreenStateHolder

@@ -80,6 +80,9 @@ dependencies {
     implementation libs.gson.converter
     implementation libs.arrow.core
     implementation libs.vpn.v2ray
+    implementation libs.common
+    implementation libs.common.flags
+    implementation libs.core.vpn
     implementation libs.logging
     implementation libs.compose.runtime
     implementation libs.android.appcompat

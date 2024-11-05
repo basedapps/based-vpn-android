@@ -1,18 +1,21 @@
 package co.sentinel.vpn.based.di
 
+import android.content.SharedPreferences
 import co.sentinel.vpn.based.app_config.AppConfig
-import co.sentinel.vpn.based.core.user.UserInitializer
-import co.sentinel.vpn.based.core.user.UserInitializerInteractor
-import co.sentinel.vpn.based.core.vpn.VPNConnector
-import co.sentinel.vpn.based.core.vpn.VPNConnectorInteractor
 import co.sentinel.vpn.based.core_impl.user.UserInitializerInteractorImpl
 import co.sentinel.vpn.based.core_impl.vpn.VPNConnectorInteractorImpl
-import co.sentinel.vpn.based.network.repository.BasedRepository
-import co.sentinel.vpn.based.storage.BasedStorage
+import co.sentinel.vpn.based.network.repository.AppRepository
+import co.sentinel.vpn.based.storage.AppStorage
+import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import io.norselabs.vpn.core_vpn.user.UserInitializer
+import io.norselabs.vpn.core_vpn.user.UserInitializerInteractor
+import io.norselabs.vpn.core_vpn.vpn.connector.VPNConnector
+import io.norselabs.vpn.core_vpn.vpn.connector.VPNConnectorInteractor
+import io.norselabs.vpn.core_vpn.vpn.destination.DestinationStorage
 import io.norselabs.vpn.v2ray.repo.V2RayRepository
 import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineScope
@@ -26,8 +29,8 @@ class AppModule {
   @Provides
   @Singleton
   fun provideUserInitializerInteractor(
-    repository: BasedRepository,
-    storage: BasedStorage,
+    repository: AppRepository,
+    storage: AppStorage,
     config: AppConfig,
   ): UserInitializerInteractor {
     return UserInitializerInteractorImpl(repository, storage, config)
@@ -45,9 +48,9 @@ class AppModule {
   @Provides
   @Singleton
   fun provideVPNConnectorInteractor(
-    repository: BasedRepository,
+    repository: AppRepository,
     v2RayRepository: V2RayRepository,
-    storage: BasedStorage,
+    storage: AppStorage,
   ): VPNConnectorInteractor {
     return VPNConnectorInteractorImpl(
       repository = repository,
@@ -59,8 +62,18 @@ class AppModule {
   @Provides
   @Singleton
   fun provideVPNConnector(
+    gson: Gson,
     interactor: VPNConnectorInteractor,
   ): VPNConnector {
-    return VPNConnector(interactor)
+    return VPNConnector(gson, interactor)
+  }
+
+  @Provides
+  @Singleton
+  fun provideDestinationKeeper(
+    gson: Gson,
+    prefs: SharedPreferences,
+  ): DestinationStorage {
+    return DestinationStorage(gson, prefs)
   }
 }

@@ -2,8 +2,8 @@ package co.sentinel.vpn.based.viewModel.cities
 
 import co.sentinel.vpn.based.network.model.City
 import co.sentinel.vpn.based.network.model.Country
-import co.sentinel.vpn.based.state.Status
-import co.sentinel.vpn.based.state.ViewStateHolder
+import io.norselabs.vpn.common.state.Status
+import io.norselabs.vpn.common.state.ViewStateHolder
 import javax.inject.Inject
 
 class CitiesScreenStateHolder
@@ -14,11 +14,11 @@ constructor() : ViewStateHolder<CitiesScreenState, CitiesScreenEffect>(
 
 data class CitiesScreenState(
   val status: Status = Status.Loading,
-  val countryId: Int? = null,
+  val countryId: String? = null,
   val country: Country? = null,
   val cities: List<City> = emptyList(),
 )
 
 sealed interface CitiesScreenEffect {
-  object GoBackToRoot : CitiesScreenEffect
+  data object GoBackToRoot : CitiesScreenEffect
 }

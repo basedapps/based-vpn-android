@@ -16,8 +16,8 @@ interface ConnectApi {
    */
   @POST("countries/{countryId}/cities/{cityId}/credentials/{protocol}")
   suspend fun getCredentials(
-    @Path("countryId") countryId: Int,
-    @Path("cityId") cityId: Int,
+    @Path("countryId") countryId: String,
+    @Path("cityId") cityId: String,
     @Path("protocol") protocol: String,
   ): DataObj<Credentials>
 }

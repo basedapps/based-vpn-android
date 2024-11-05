@@ -80,13 +80,15 @@ dependencies {
     implementation libs.bundles.compose
     implementation libs.navigation
     implementation libs.accompanist.systemuicontroller
-    implementation libs.map.box.compose
-    implementation libs.map.box.android
     implementation platform(libs.google.firebase.bom)
     implementation libs.google.firebase.crashlytics
     implementation libs.google.firebase.analytics
     implementation libs.android.appcompat
     implementation libs.kotlin.collection.immutable
+    implementation libs.core.vpn
+    implementation libs.common
+    implementation libs.common.map
+    implementation libs.common.flags
 
     kapt libs.hilt.compiler
 

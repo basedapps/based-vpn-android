@@ -22,8 +22,6 @@ lifecycle = "2.8.1"
 timber = "5.0.1"
 navigation = "2.7.7"
 hiltNavigation = "1.2.0"
-mapBox = "11.4.0"
-v2ray = "0.0.7"
 logging = "0.0.2"
 appcompat = "1.7.0"
 composeActivity = "1.9.1"
@@ -71,9 +69,6 @@ gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 gson-converter = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
 # Navigation
 navigation = { module = "androidx.navigation:navigation-compose", version.ref = "navigation" }
-# Maps
-map-box-android = { module = "com.mapbox.maps:android", version.ref = "mapBox" }
-map-box-compose = { module = "com.mapbox.extension:maps-compose", version.ref = "mapBox" }
 #Logs
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 logging = { module = "io.norselabs.logging:logging", version.ref = "logging" }
@@ -81,8 +76,12 @@ logging = { module = "io.norselabs.logging:logging", version.ref = "logging" }
 accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanist" }
 play-ads = { module = "com.google.android.gms:play-services-ads", version = "22.6.0" }
 arrow-core = { module = "io.arrow-kt:arrow-core", version = "1.2.0" }
-# VPN
-vpn-v2ray = { module = "io.norselabs.vpn:v2ray", version.ref = "v2ray" }
+# Norselabs
+vpn-v2ray = { module = "io.norselabs.vpn:v2ray", version = "0.0.8" }
+core-vpn = { module = "io.norselabs.vpn:core_vpn", version = "0.0.1" }
+common = { module = "io.norselabs.vpn:common", version = "0.0.1" }
+common-map = { module = "io.norselabs.vpn:common_map", version = "0.0.1" }
+common-flags = { module = "io.norselabs.vpn:common_flags", version = "0.0.1" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

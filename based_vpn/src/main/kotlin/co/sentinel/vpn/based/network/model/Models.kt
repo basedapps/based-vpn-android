@@ -1,8 +1,9 @@
 package co.sentinel.vpn.based.network.model
 
-import co.sentinel.vpn.based.core.vpn.Protocol
-import co.sentinel.vpn.based.country_flags.CountryFlag
 import com.google.gson.annotations.SerializedName
+import io.norselabs.vpn.common_flags.CountryFlag
+import io.norselabs.vpn.common_flags.mapToFlag
+import io.norselabs.vpn.core_vpn.vpn.Protocol
 
 data class DataObj<T>(
   @SerializedName("data")
@@ -16,7 +17,7 @@ data class DataList<T>(
 
 data class TokenModel(
   @SerializedName("id")
-  val id: Int,
+  val id: String,
   @SerializedName("token")
   val token: String,
   @SerializedName("is_banned")
@@ -27,20 +28,23 @@ data class TokenModel(
 
 data class Country(
   @SerializedName("id")
-  val id: Int,
+  val id: String,
   @SerializedName("name")
   val name: String,
   @SerializedName("code")
-  val flag: CountryFlag?,
+  val code: String?,
   @SerializedName("servers_available")
   val serversAvailable: Int,
-)
+) {
+  val flag: CountryFlag?
+    get() = mapToFlag(code) // todo: bad solution
+}
 
 data class City(
   @SerializedName("id")
-  val id: Int,
+  val id: String,
   @SerializedName("country_id")
-  val countryId: Int,
+  val countryId: String,
   @SerializedName("name")
   val name: String,
   @SerializedName("servers_available")
@@ -56,7 +60,7 @@ data class Credentials(
   val privateKey: String,
 )
 
-data class IpModel(
+data class IpData(
   @SerializedName("ip")
   val ip: String,
   @SerializedName("latitude")

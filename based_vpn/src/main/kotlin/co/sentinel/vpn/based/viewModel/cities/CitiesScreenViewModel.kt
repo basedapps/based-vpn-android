@@ -2,13 +2,15 @@ package co.sentinel.vpn.based.viewModel.cities
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import co.sentinel.vpn.based.core.vpn.Protocol
 import co.sentinel.vpn.based.network.model.City
-import co.sentinel.vpn.based.network.repository.BasedRepository
+import co.sentinel.vpn.based.network.repository.AppRepository
 import co.sentinel.vpn.based.network.repository.CitiesRequest
-import co.sentinel.vpn.based.state.Status
-import co.sentinel.vpn.based.storage.BasedStorage
+import co.sentinel.vpn.based.storage.AppStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.norselabs.vpn.common.state.Status
+import io.norselabs.vpn.core_vpn.vpn.Destination
+import io.norselabs.vpn.core_vpn.vpn.Protocol
+import io.norselabs.vpn.core_vpn.vpn.destination.DestinationStorage
 import javax.inject.Inject
 import kotlinx.coroutines.launch
 
@@ -16,14 +18,15 @@ import kotlinx.coroutines.launch
 class CitiesScreenViewModel
 @Inject constructor(
   val stateHolder: CitiesScreenStateHolder,
-  private val repository: BasedRepository,
-  private val storage: BasedStorage,
+  private val repository: AppRepository,
+  private val storage: AppStorage,
+  private val destinationStorage: DestinationStorage,
 ) : ViewModel() {
 
   private val state: CitiesScreenState
     get() = stateHolder.state.value
 
-  fun setCountryId(countryId: Int?) {
+  fun setCountryId(countryId: String?) {
     if (countryId != null) {
       stateHolder.updateState {
         copy(
@@ -35,7 +38,7 @@ class CitiesScreenViewModel
     }
   }
 
-  private fun getCities(countryId: Int) {
+  private fun getCities(countryId: String) {
     viewModelScope.launch {
       val protocol = storage.getVpnProtocol().takeIf { it != Protocol.NONE }
       val countries = repository.getCountries(protocol).getOrNull()?.data
@@ -56,7 +59,15 @@ class CitiesScreenViewModel
 
   fun onCityClick(city: City) {
     val country = state.country ?: return
-    storage.storeSelectedCity(country, city)
+    destinationStorage.storeDestination(
+      Destination.City(
+        cityId = city.id,
+        cityName = city.name,
+        countryId = country.id,
+        countryName = country.name,
+        countryCode = country.code,
+      ),
+    )
     stateHolder.sendEffect(CitiesScreenEffect.GoBackToRoot)
   }
 

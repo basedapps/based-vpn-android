@@ -1,5 +1,3 @@
-@file:OptIn(MapboxExperimental::class)
-
 package co.uk.basedapps.vpn.ui.screens.dashboard
 
 import android.app.Activity
@@ -10,7 +8,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -34,7 +31,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -54,12 +50,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import co.sentinel.vpn.based.compose.EffectHandler
-import co.sentinel.vpn.based.core.user.UserStatus
-import co.sentinel.vpn.based.country_flags.CountryFlag
-import co.sentinel.vpn.based.ext.goToGooglePlay
-import co.sentinel.vpn.based.ext.mailTo
-import co.sentinel.vpn.based.state.Status
-import co.sentinel.vpn.based.storage.SelectedCity
+import co.sentinel.vpn.based.network.model.IpData
 import co.sentinel.vpn.based.viewModel.dashboard.DashboardScreenEffect as Effect
 import co.sentinel.vpn.based.viewModel.dashboard.DashboardScreenState as State
 import co.sentinel.vpn.based.viewModel.dashboard.DashboardScreenViewModel
@@ -67,21 +58,19 @@ import co.sentinel.vpn.based.viewModel.dashboard.RatingClick
 import co.sentinel.vpn.based.viewModel.dashboard.VpnStatus
 import co.sentinel.vpn.based.vpn.getVpnPermissionRequest
 import co.uk.basedapps.vpn.R
-import co.uk.basedapps.vpn.ui.screens.dashboard.widgets.MapboxConfiguredMap
 import co.uk.basedapps.vpn.ui.theme.BasedAppColor
 import co.uk.basedapps.vpn.ui.theme.BasedVPNTheme
 import co.uk.basedapps.vpn.ui.widget.BasedAlertDialog
 import co.uk.basedapps.vpn.ui.widget.BasedButton
 import co.uk.basedapps.vpn.ui.widget.ButtonStyle
 import co.uk.basedapps.vpn.ui.widget.ErrorScreen
-import com.mapbox.geojson.Point
-import com.mapbox.maps.CameraOptions
-import com.mapbox.maps.MapboxExperimental
-import com.mapbox.maps.extension.compose.animation.viewport.MapViewportState
-import com.mapbox.maps.extension.compose.animation.viewport.rememberMapViewportState
-import com.mapbox.maps.plugin.animation.MapAnimationOptions
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import io.norselabs.vpn.common.ext.goToGooglePlay
+import io.norselabs.vpn.common.ext.mailTo
+import io.norselabs.vpn.common.state.Status
+import io.norselabs.vpn.common_flags.mapToFlag
+import io.norselabs.vpn.common_map.WorldMap
+import io.norselabs.vpn.core_vpn.user.UserStatus
+import io.norselabs.vpn.core_vpn.vpn.Destination
 import timber.log.Timber
 
 @Composable
@@ -93,9 +82,6 @@ fun DashboardScreen(
   val state by viewModel.stateHolder.state.collectAsState()
 
   val context = LocalContext.current
-
-  val scope = rememberCoroutineScope()
-  val mapViewportState = rememberMapViewportState {}
 
   val vpnPermissionRequest = rememberLauncherForActivityResult(
     ActivityResultContracts.StartActivityForResult(),
@@ -122,20 +108,6 @@ fun DashboardScreen(
 
       is Effect.ShowGooglePlay -> context.goToGooglePlay()
 
-      is Effect.ChangeMapPosition -> {
-        scope.launch(Dispatchers.Main) {
-          mapViewportState.flyTo(
-            animationOptions = MapAnimationOptions.mapAnimationOptions {
-              duration(2000)
-            },
-            cameraOptions = CameraOptions.Builder()
-              .center(Point.fromLngLat(effect.longitude, effect.latitude))
-              .zoom(9.0)
-              .build(),
-          )
-        }
-      }
-
       is Effect.EmailToSupport -> context.mailTo("hello@world.com")
 
       is Effect.ShowRating -> {
@@ -146,7 +118,6 @@ fun DashboardScreen(
 
   DashboardScreenStateless(
     state = state,
-    mapViewportState = mapViewportState,
     onConnectClick = viewModel::onConnectClick,
     onDisconnectClick = viewModel::onDisconnectClick,
     onQuickConnectClick = viewModel::onQuickConnectClick,
@@ -163,7 +134,6 @@ fun DashboardScreen(
 @Composable
 fun DashboardScreenStateless(
   state: State,
-  mapViewportState: MapViewportState,
   onConnectClick: () -> Unit,
   onDisconnectClick: () -> Unit,
   onQuickConnectClick: () -> Unit,
@@ -177,7 +147,7 @@ fun DashboardScreenStateless(
 ) {
   when (state.status) {
     is Status.Error -> {
-      when (state.enrolmentStatus) {
+      when (state.userStatus) {
         UserStatus.VersionOutdated -> {
           ErrorScreen(
             title = stringResource(R.string.update_required_title),
@@ -207,7 +177,6 @@ fun DashboardScreenStateless(
 
     else -> Content(
       state = state,
-      mapViewportState = mapViewportState,
       onConnectClick = onConnectClick,
       onDisconnectClick = onDisconnectClick,
       onQuickConnectClick = onQuickConnectClick,
@@ -223,7 +192,6 @@ fun DashboardScreenStateless(
 @Composable
 private fun Content(
   state: State,
-  mapViewportState: MapViewportState,
   onConnectClick: () -> Unit,
   onDisconnectClick: () -> Unit,
   onQuickConnectClick: () -> Unit,
@@ -237,21 +205,28 @@ private fun Content(
     modifier = Modifier
       .fillMaxSize(),
   ) {
-    MapboxConfiguredMap(
-      modifier = Modifier.fillMaxSize(),
-      mapViewportState = mapViewportState,
-    )
-    TopBar(
-      state = state,
-      onSettingsClick = onSettingsClick,
-    )
-    BottomBar(
-      state = state,
-      onConnectClick = onConnectClick,
-      onDisconnectClick = onDisconnectClick,
-      onQuickConnectClick = onQuickConnectClick,
-      onSelectServerClick = onSelectServerClick,
-    )
+    Column {
+      TopBar(
+        state = state,
+        onSettingsClick = onSettingsClick,
+      )
+      WorldMap(
+        lat = state.ipData?.latitude ?: 0.0,
+        long = state.ipData?.longitude ?: 0.0,
+        color = when (state.vpnStatus) {
+          is VpnStatus.Connected -> Color(0xFF09D1BC)
+          else -> Color(0xFFF0A83E)
+        },
+        modifier = Modifier.weight(1f),
+      )
+      BottomBar(
+        state = state,
+        onConnectClick = onConnectClick,
+        onDisconnectClick = onDisconnectClick,
+        onQuickConnectClick = onQuickConnectClick,
+        onSelectServerClick = onSelectServerClick,
+      )
+    }
     if (state.status is Status.Loading) {
       LoadingOverlay()
     }
@@ -341,7 +316,7 @@ private fun TopBar(
           fontWeight = FontWeight.Bold,
         )
         Text(
-          text = state.ipAddress,
+          text = state.ipData?.ip.orEmpty(),
           color = BasedAppColor.TextPrimary,
           fontSize = 18.sp,
           fontWeight = FontWeight.Bold,
@@ -372,7 +347,7 @@ private fun TopBar(
 }
 
 @Composable
-fun BoxScope.BottomBar(
+fun BottomBar(
   state: State,
   onConnectClick: () -> Unit,
   onDisconnectClick: () -> Unit,
@@ -385,9 +360,7 @@ fun BoxScope.BottomBar(
       topEnd = 16.dp,
     ),
     colors = CardDefaults.cardColors(containerColor = Color.White),
-    modifier = Modifier
-      .align(Alignment.BottomCenter)
-      .fillMaxWidth(),
+    modifier = Modifier.fillMaxWidth(),
   ) {
     Column(
       modifier = Modifier
@@ -395,10 +368,10 @@ fun BoxScope.BottomBar(
         .padding(top = 24.dp, bottom = 16.dp)
         .navigationBarsPadding(),
     ) {
-      val selectedCity = state.selectedCity
-      if (selectedCity != null) {
+      val destination = state.destination as? Destination.City
+      if (destination != null) {
         SelectedCityRow(
-          selectedCity = selectedCity,
+          destination = destination,
           onClick = onSelectServerClick,
         )
         Spacer(modifier = Modifier.size(16.dp))
@@ -459,7 +432,7 @@ private fun QuickConnectButton(onClick: () -> Unit) {
 
 @Composable
 fun SelectedCityRow(
-  selectedCity: SelectedCity,
+  destination: Destination.City,
   onClick: () -> Unit,
 ) {
   Row(
@@ -471,7 +444,7 @@ fun SelectedCityRow(
       .padding(16.dp)
       .fillMaxWidth(),
   ) {
-    val flagRes = selectedCity.countryFlag?.res
+    val flagRes = mapToFlag(destination.countryCode)?.res
     if (flagRes != null) {
       Image(
         painter = painterResource(flagRes),
@@ -493,11 +466,11 @@ fun SelectedCityRow(
     Text(
       text = buildAnnotatedString {
         withStyle(style = SpanStyle(BasedAppColor.TextPrimary)) {
-          append(selectedCity.countryName)
+          append(destination.countryName)
         }
         withStyle(style = SpanStyle(BasedAppColor.TextSecondary)) {
           append(" • ")
-          append(selectedCity.name)
+          append(destination.cityName)
         }
       },
       overflow = TextOverflow.Ellipsis,
@@ -513,16 +486,19 @@ fun DashboardScreenPreview() {
   BasedVPNTheme {
     DashboardScreenStateless(
       state = State(
-        selectedCity = SelectedCity(
-          id = 0,
-          name = "Buenos Aires",
-          countryId = 0,
+        destination = Destination.City(
+          cityId = "",
+          cityName = "Buenos Aires",
+          countryId = "",
           countryName = "Argentina",
-          countryFlag = CountryFlag.AR,
+          countryCode = "AR",
         ),
-        ipAddress = "91.208.132.23",
+        ipData = IpData(
+          ip = "91.208.132.23",
+          latitude = 0.0,
+          longitude = 0.0,
+        ),
       ),
-      mapViewportState = rememberMapViewportState(),
       onConnectClick = {},
       onDisconnectClick = {},
       onQuickConnectClick = {},

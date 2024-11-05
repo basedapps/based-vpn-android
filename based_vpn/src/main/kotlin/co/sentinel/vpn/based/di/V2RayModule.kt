@@ -7,7 +7,6 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import io.norselabs.vpn.v2ray.repo.V2RayRepository
-import io.norselabs.vpn.v2ray.store.V2RayUserPreferenceStore
 import javax.inject.Singleton
 
 @Module
@@ -16,13 +15,7 @@ class V2RayModule {
 
   @Provides
   @Singleton
-  fun provideWireguardUserPreferenceStore(@ApplicationContext context: Context): V2RayUserPreferenceStore =
-    V2RayUserPreferenceStore(context)
-
-  @Provides
-  @Singleton
   fun provideV2RayRepository(
     @ApplicationContext context: Context,
-    userPreferenceStore: V2RayUserPreferenceStore,
-  ): V2RayRepository = V2RayRepository(context, userPreferenceStore)
+  ): V2RayRepository = V2RayRepository(context)
 }

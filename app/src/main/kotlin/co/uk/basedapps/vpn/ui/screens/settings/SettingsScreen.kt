@@ -22,8 +22,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import co.sentinel.based_vpn.R as BasedR
 import co.sentinel.vpn.based.compose.EffectHandler
-import co.sentinel.vpn.based.core.vpn.Protocol
 import co.sentinel.vpn.based.viewModel.settings.SettingsScreenEffect
 import co.sentinel.vpn.based.viewModel.settings.SettingsScreenState as State
 import co.sentinel.vpn.based.viewModel.settings.SettingsScreenViewModel
@@ -33,6 +33,7 @@ import co.uk.basedapps.vpn.ui.screens.settings.widgets.DnsDialog
 import co.uk.basedapps.vpn.ui.screens.settings.widgets.ProtocolDialog
 import co.uk.basedapps.vpn.ui.theme.BasedAppColor
 import co.uk.basedapps.vpn.ui.widget.TopBar
+import io.norselabs.vpn.core_vpn.vpn.Protocol
 
 @Composable
 fun SettingsScreen(
@@ -127,8 +128,7 @@ fun Content(
       HorizontalDivider(color = BasedAppColor.Divider)
       SettingsRow(
         title = stringResource(R.string.settings_row_protocol),
-        value = state.currentProtocol?.labelRes
-          ?.let { stringResource(it) } ?: "",
+        value = stringResource(state.currentProtocol.getLabelRes()),
         modifier = Modifier
           .clickable(onClick = onProtocolRowClick),
       )
@@ -200,4 +200,10 @@ fun DdsConfigurator.Dns.getLabelRes() = when (this) {
   DdsConfigurator.Dns.Cloudflare -> R.string.settings_dns_cloudflare
   DdsConfigurator.Dns.Google -> R.string.settings_dns_google
   DdsConfigurator.Dns.Handshake -> R.string.settings_dns_handshake
+}
+
+fun Protocol?.getLabelRes() = when (this) {
+  Protocol.WIREGUARD -> BasedR.string.settings_protocol_wireguard
+  Protocol.V2RAY -> BasedR.string.settings_protocol_v2ray
+  else -> BasedR.string.settings_protocol_any
 }

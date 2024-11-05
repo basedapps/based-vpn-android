@@ -56,10 +56,10 @@ class MainActivity : AppCompatActivity() {
           }
           composable(
             route = Destination.Cities,
-            arguments = listOf(navArgument(Args.CountryId) { type = NavType.IntType }),
+            arguments = listOf(navArgument(Args.CountryId) { type = NavType.StringType }),
           ) { backStackEntry ->
             CitiesScreen(
-              countryId = backStackEntry.arguments?.getInt(Args.CountryId),
+              countryId = backStackEntry.arguments?.getString(Args.CountryId),
               navigateBack = { navController.popBackStack() },
               navigateBackToRoot = {
                 navController.popBackStack(

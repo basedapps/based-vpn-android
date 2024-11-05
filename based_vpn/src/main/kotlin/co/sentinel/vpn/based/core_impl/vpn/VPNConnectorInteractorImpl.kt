@@ -2,21 +2,21 @@ package co.sentinel.vpn.based.core_impl.vpn
 
 import arrow.core.Either
 import arrow.core.flatMap
-import co.sentinel.vpn.based.core.vpn.Credentials
-import co.sentinel.vpn.based.core.vpn.Destination
-import co.sentinel.vpn.based.core.vpn.Protocol
-import co.sentinel.vpn.based.core.vpn.VPNConnectorInteractor
-import co.sentinel.vpn.based.network.repository.BasedRepository
-import co.sentinel.vpn.based.storage.BasedStorage
+import co.sentinel.vpn.based.network.repository.AppRepository
+import co.sentinel.vpn.based.storage.AppStorage
 import co.sentinel.vpn.based.vpn.ProfileDecoder
+import io.norselabs.vpn.core_vpn.vpn.Credentials
+import io.norselabs.vpn.core_vpn.vpn.Destination
+import io.norselabs.vpn.core_vpn.vpn.Protocol
+import io.norselabs.vpn.core_vpn.vpn.connector.VPNConnectorInteractor
 import io.norselabs.vpn.v2ray.error.V2RayError
 import io.norselabs.vpn.v2ray.repo.V2RayRepository
 import retrofit2.HttpException
 
 class VPNConnectorInteractorImpl(
-  private val repository: BasedRepository,
+  private val repository: AppRepository,
   private val v2RayRepository: V2RayRepository,
-  private val storage: BasedStorage,
+  private val storage: AppStorage,
 ) : VPNConnectorInteractor {
 
   override suspend fun getCredentials(
@@ -54,10 +54,7 @@ class VPNConnectorInteractorImpl(
     return (exception as? HttpException)?.response()?.code()
   }
 
-  override suspend fun startVpn(
-    serverId: String,
-    credentials: Credentials,
-  ): Either<V2RayError, Unit> {
+  override suspend fun startVpn(credentials: Credentials): Either<V2RayError, Unit> {
     val profile = when (credentials) {
       is Credentials.Wireguard -> ProfileDecoder.decodeWireguard(
         privateKey = credentials.privateKey,
@@ -70,7 +67,7 @@ class VPNConnectorInteractorImpl(
       )
     }
     return when {
-      profile != null -> v2RayRepository.startV2Ray(profile, serverId)
+      profile != null -> v2RayRepository.startV2Ray(profile)
       else -> Either.Left(V2RayError.StartV2Ray)
     }
   }

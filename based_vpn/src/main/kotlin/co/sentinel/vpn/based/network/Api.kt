@@ -4,7 +4,7 @@ import co.sentinel.vpn.based.network.model.City
 import co.sentinel.vpn.based.network.model.Country
 import co.sentinel.vpn.based.network.model.DataList
 import co.sentinel.vpn.based.network.model.DataObj
-import co.sentinel.vpn.based.network.model.IpModel
+import co.sentinel.vpn.based.network.model.IpData
 import co.sentinel.vpn.based.network.model.TokenModel
 import co.sentinel.vpn.based.network.model.VersionModel
 import retrofit2.http.Body
@@ -26,12 +26,12 @@ interface Api {
 
   @GET("countries/{countryId}/cities")
   suspend fun getCities(
-    @Path("countryId") countryId: Int,
+    @Path("countryId") countryId: String,
     @Query("protocol") protocol: String?,
   ): DataList<City>
 
   @GET("ip")
-  suspend fun getIp(): DataObj<IpModel>
+  suspend fun getIp(): DataObj<IpData>
 
   @GET("versions")
   suspend fun getVersion(): DataObj<VersionModel>

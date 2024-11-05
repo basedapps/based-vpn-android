@@ -2,17 +2,17 @@ package co.sentinel.vpn.based.core_impl.user
 
 import arrow.core.Either
 import co.sentinel.vpn.based.app_config.AppConfig
-import co.sentinel.vpn.based.core.user.Token
-import co.sentinel.vpn.based.core.user.UserInitializerInteractor
 import co.sentinel.vpn.based.network.model.DataObj
 import co.sentinel.vpn.based.network.model.TokenModel
-import co.sentinel.vpn.based.network.repository.BasedRepository
-import co.sentinel.vpn.based.storage.BasedStorage
+import co.sentinel.vpn.based.network.repository.AppRepository
+import co.sentinel.vpn.based.storage.AppStorage
+import io.norselabs.vpn.core_vpn.user.Token
+import io.norselabs.vpn.core_vpn.user.UserInitializerInteractor
 import retrofit2.HttpException
 
 class UserInitializerInteractorImpl(
-  private val repository: BasedRepository,
-  private val storage: BasedStorage,
+  private val repository: AppRepository,
+  private val storage: AppStorage,
   private val config: AppConfig,
 ) : UserInitializerInteractor {
 

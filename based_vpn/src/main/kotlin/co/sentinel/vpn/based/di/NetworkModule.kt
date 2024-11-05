@@ -5,8 +5,8 @@ import co.sentinel.vpn.based.app_config.AppConfig
 import co.sentinel.vpn.based.network.Api
 import co.sentinel.vpn.based.network.ConnectApi
 import co.sentinel.vpn.based.network.HeadersInterceptor
-import co.sentinel.vpn.based.network.repository.BasedRepository
-import co.sentinel.vpn.based.network.repository.BasedRepositoryImpl
+import co.sentinel.vpn.based.network.repository.AppRepository
+import co.sentinel.vpn.based.network.repository.AppRepositoryImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -94,5 +94,5 @@ class NetworkModule {
     api: Api,
     connectApi: ConnectApi,
     client: OkHttpClient,
-  ): BasedRepository = BasedRepositoryImpl(api, connectApi, client)
+  ): AppRepository = AppRepositoryImpl(api, connectApi, client)
 }

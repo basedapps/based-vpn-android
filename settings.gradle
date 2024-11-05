@@ -45,4 +45,8 @@ dependencyResolutionManagement {
 rootProject.name = "BasedVPN"
 include ':app',
         ':based_vpn',
-        ':logging'
+        ':logging',
+        ':core_vpn',
+        ':common',
+        ':common_flags',
+        ':common_map'

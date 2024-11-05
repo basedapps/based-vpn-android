@@ -5,6 +5,7 @@ import co.sentinel.vpn.based.vpn.VpnInitializer
 import dagger.hilt.android.HiltAndroidApp
 import io.norselabs.logging.logger.FileLogTree
 import io.norselabs.logging.logger.NonFatalReportTree
+import io.norselabs.vpn.core_vpn.user.UserInitializer
 import javax.inject.Inject
 import timber.log.Timber
 
@@ -20,10 +21,14 @@ class App : Application() {
   @Inject
   lateinit var nonFatalReportTree: NonFatalReportTree
 
+  @Inject
+  lateinit var userInitializer: UserInitializer
+
   override fun onCreate() {
     super.onCreate()
     setupTimber()
     vpnInitializer.setupVPN()
+    userInitializer.enroll()
   }
 
   private fun setupTimber() {

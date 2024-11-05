@@ -2,8 +2,8 @@ package co.sentinel.vpn.based.network
 
 import android.content.SharedPreferences
 import co.sentinel.vpn.based.app_config.AppConfig
-import co.sentinel.vpn.based.shared_preferences.delegate
-import co.sentinel.vpn.based.shared_preferences.getValue
+import io.norselabs.vpn.common.preferences.delegate
+import io.norselabs.vpn.common.preferences.getValue
 import okhttp3.Interceptor
 import okhttp3.Response
 

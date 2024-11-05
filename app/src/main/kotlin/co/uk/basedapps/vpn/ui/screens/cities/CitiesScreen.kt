@@ -30,7 +30,6 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import co.sentinel.vpn.based.compose.EffectHandler
 import co.sentinel.vpn.based.network.model.City
-import co.sentinel.vpn.based.state.Status
 import co.sentinel.vpn.based.viewModel.cities.CitiesScreenEffect as Effect
 import co.sentinel.vpn.based.viewModel.cities.CitiesScreenState as State
 import co.sentinel.vpn.based.viewModel.cities.CitiesScreenViewModel
@@ -38,10 +37,11 @@ import co.uk.basedapps.vpn.R
 import co.uk.basedapps.vpn.ui.theme.BasedAppColor
 import co.uk.basedapps.vpn.ui.widget.ErrorScreen
 import co.uk.basedapps.vpn.ui.widget.TopBar
+import io.norselabs.vpn.common.state.Status
 
 @Composable
 fun CitiesScreen(
-  countryId: Int?,
+  countryId: String?,
   navigateBack: () -> Unit,
   navigateBackToRoot: () -> Unit,
 ) {

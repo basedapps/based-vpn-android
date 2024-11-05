@@ -42,13 +42,13 @@ fun DnsDialog(
           Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
-                .fillMaxWidth()
-                .selectable(
-                    selected = dns == radioState,
-                    onClick = { radioState = dns },
-                    role = Role.RadioButton,
-                )
-                .padding(vertical = 8.dp),
+              .fillMaxWidth()
+              .selectable(
+                selected = dns == radioState,
+                onClick = { radioState = dns },
+                role = Role.RadioButton,
+              )
+              .padding(vertical = 8.dp),
           ) {
             RadioButton(
               selected = dns == radioState,

@@ -89,6 +89,7 @@ dependencies {
     implementation libs.common
     implementation libs.common.map
     implementation libs.common.flags
+    implementation libs.common.logger
 
     kapt libs.hilt.compiler
 
@@ -96,7 +97,4 @@ dependencies {
 
     implementation project(path: ':based_vpn')
 //    implementation "co.sentinel.vpn:based:0.0.1"
-
-//    implementation project(path: ':logging')
-    implementation libs.logging
 }

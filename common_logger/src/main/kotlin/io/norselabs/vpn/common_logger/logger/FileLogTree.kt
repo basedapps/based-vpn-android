@@ -1,7 +1,7 @@
-package io.norselabs.logging.logger
+package io.norselabs.vpn.common_logger.logger
 
 import android.content.Context
-import io.norselabs.logging.NonFatalException
+import io.norselabs.vpn.common_logger.NonFatalException
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date

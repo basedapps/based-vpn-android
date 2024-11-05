@@ -82,8 +82,8 @@ dependencies {
     implementation libs.vpn.v2ray
     implementation libs.common
     implementation libs.common.flags
+    implementation libs.common.logger
     implementation libs.core.vpn
-    implementation libs.logging
     implementation libs.compose.runtime
     implementation libs.android.appcompat
     implementation libs.kotlin.collection.immutable

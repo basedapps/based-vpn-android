@@ -18,8 +18,8 @@ import co.uk.basedapps.vpn.ui.screens.dashboard.DashboardScreen
 import co.uk.basedapps.vpn.ui.screens.settings.SettingsScreen
 import co.uk.basedapps.vpn.ui.theme.BasedVPNTheme
 import dagger.hilt.android.AndroidEntryPoint
-import io.norselabs.logging.logger.FileLogTree
-import io.norselabs.logging.share.ChooserIntent
+import io.norselabs.vpn.common_logger.logger.FileLogTree
+import io.norselabs.vpn.common_logger.share.ChooserIntent
 import javax.inject.Inject
 
 @AndroidEntryPoint

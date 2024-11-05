@@ -22,7 +22,6 @@ lifecycle = "2.8.1"
 timber = "5.0.1"
 navigation = "2.7.7"
 hiltNavigation = "1.2.0"
-logging = "0.0.2"
 appcompat = "1.7.0"
 composeActivity = "1.9.1"
 
@@ -71,7 +70,6 @@ gson-converter = { module = "com.squareup.retrofit2:converter-gson", version.ref
 navigation = { module = "androidx.navigation:navigation-compose", version.ref = "navigation" }
 #Logs
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
-logging = { module = "io.norselabs.logging:logging", version.ref = "logging" }
 # Other
 accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanist" }
 play-ads = { module = "com.google.android.gms:play-services-ads", version = "22.6.0" }
@@ -82,6 +80,7 @@ core-vpn = { module = "io.norselabs.vpn:core_vpn", version = "0.0.1" }
 common = { module = "io.norselabs.vpn:common", version = "0.0.1" }
 common-map = { module = "io.norselabs.vpn:common_map", version = "0.0.1" }
 common-flags = { module = "io.norselabs.vpn:common_flags", version = "0.0.1" }
+common-logger = { module = "io.norselabs.vpn:common_logger", version = "0.0.2" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

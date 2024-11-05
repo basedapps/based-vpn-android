@@ -1,4 +1,4 @@
-package io.norselabs.logging
+package io.norselabs.vpn.common_logger
 
 import timber.log.Timber
 

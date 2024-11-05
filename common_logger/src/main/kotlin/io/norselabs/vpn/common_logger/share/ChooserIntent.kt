@@ -1,9 +1,9 @@
-package io.norselabs.logging.share
+package io.norselabs.vpn.common_logger.share
 
 import android.content.Context
 import android.content.Intent
 import androidx.core.content.FileProvider
-import io.norselabs.logging.logNonFatal
+import io.norselabs.vpn.common_logger.logNonFatal
 import java.io.File
 
 object ChooserIntent {

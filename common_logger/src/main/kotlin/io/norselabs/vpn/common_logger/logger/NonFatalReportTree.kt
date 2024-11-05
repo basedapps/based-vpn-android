@@ -1,10 +1,10 @@
-package io.norselabs.logging.logger
+package io.norselabs.vpn.common_logger.logger
 
 import android.app.ActivityManager
 import android.content.Context
 import android.os.Process
 import android.util.Log
-import io.norselabs.logging.NonFatalException
+import io.norselabs.vpn.common_logger.NonFatalException
 import timber.log.Timber
 
 class NonFatalReportTree(

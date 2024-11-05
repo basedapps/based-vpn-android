@@ -10,8 +10,8 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import io.norselabs.logging.logger.FileLogTree
-import io.norselabs.logging.logger.NonFatalReportTree
+import io.norselabs.vpn.common_logger.logger.FileLogTree
+import io.norselabs.vpn.common_logger.logger.NonFatalReportTree
 import javax.inject.Singleton
 
 @Module

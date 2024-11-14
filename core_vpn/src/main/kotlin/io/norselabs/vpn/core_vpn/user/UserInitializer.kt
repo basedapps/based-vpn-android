@@ -70,7 +70,7 @@ class UserInitializer(
     return interactor.registerDevice()
       .onRight { model ->
         Timber.tag(TAG).d("Token has been updated")
-        interactor.storeToken(model.token)
+        interactor.storeUserData(token = model.token, userId = model.id)
       }
       .mapLeft { UserStatus.Failed }
   }

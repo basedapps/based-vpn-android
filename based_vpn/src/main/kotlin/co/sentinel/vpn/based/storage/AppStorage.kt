@@ -12,6 +12,8 @@ class AppStorage
 
   private var tokenPref: String by prefs.delegate("device_token", "")
 
+  private var userIdPref: String by prefs.delegate("user_id", "")
+
   private var protocolPref by prefs.delegate("selected_protocol", "")
 
   private var onboardingPref by prefs.delegate("onboarding_shown", false)
@@ -24,8 +26,15 @@ class AppStorage
 
   fun getToken(): String = tokenPref
 
-  fun clearToken() {
+  fun setUserId(userId: String) {
+    userIdPref = userId
+  }
+
+  fun getUserId(): String = userIdPref
+
+  fun clearUserData() {
     tokenPref = ""
+    userIdPref = ""
   }
 
   fun storeVpnProtocol(protocol: Protocol) {

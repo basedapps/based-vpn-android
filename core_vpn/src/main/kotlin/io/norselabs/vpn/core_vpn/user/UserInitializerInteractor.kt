@@ -4,7 +4,7 @@ import arrow.core.Either
 
 interface UserInitializerInteractor {
 
-  fun storeToken(token: String)
+  fun storeUserData(token: String, userId: String)
   fun getToken(): String
 
   suspend fun checkVersion(): Either<Exception, Boolean>

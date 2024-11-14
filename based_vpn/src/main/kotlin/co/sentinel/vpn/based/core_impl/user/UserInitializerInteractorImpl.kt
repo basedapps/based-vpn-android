@@ -16,8 +16,9 @@ class UserInitializerInteractorImpl(
   private val config: AppConfig,
 ) : UserInitializerInteractor {
 
-  override fun storeToken(token: String) {
+  override fun storeUserData(token: String, userId: String) {
     storage.storeToken(token)
+    storage.setUserId(userId)
   }
 
   override fun getToken(): String {

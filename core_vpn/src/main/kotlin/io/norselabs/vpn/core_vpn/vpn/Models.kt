@@ -26,7 +26,9 @@ enum class Protocol(val strValue: String) {
   ;
 
   companion object {
-    fun fromString(strValue: String) = entries.firstOrNull { it.strValue == strValue } ?: NONE
+    fun fromString(strValue: String) = entries.firstOrNull {
+      it.strValue.equals(other = strValue, ignoreCase = true)
+    } ?: NONE
   }
 }
 

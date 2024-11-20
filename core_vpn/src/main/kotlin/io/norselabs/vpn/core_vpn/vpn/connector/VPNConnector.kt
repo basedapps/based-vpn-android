@@ -26,6 +26,7 @@ class VPNConnector(
 
   fun disconnect() {
     interactor.stopVpn()
+    coreStorage.setCurrentServerId("")
   }
 
   private suspend fun getCredentials(destination: Destination): Either<Error, Credentials> {
@@ -75,7 +76,7 @@ class VPNConnector(
     interactor.startVpn(credentials).getOrNull()
       ?: return Either.Left(Error.StartV2Ray)
 
-    coreStorage.setLastServerId(credentials.serverId)
+    coreStorage.setCurrentServerId(credentials.serverId)
 
     interactor.resetConnection()
 

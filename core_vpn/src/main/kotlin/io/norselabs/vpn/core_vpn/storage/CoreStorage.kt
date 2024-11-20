@@ -5,6 +5,7 @@ import io.norselabs.vpn.common.preferences.delegate
 import io.norselabs.vpn.common.preferences.getValue
 import io.norselabs.vpn.common.preferences.setValue
 import io.norselabs.vpn.core_vpn.vpn.Protocol
+import kotlinx.coroutines.flow.Flow
 
 class CoreStorage(prefs: SharedPreferences) {
 
@@ -14,7 +15,7 @@ class CoreStorage(prefs: SharedPreferences) {
 
   private var protocolPref by prefs.delegate("selected_protocol", "")
 
-  private var lastServerIdPref by prefs.delegate("last_server_id", "")
+  private var currentServerIdPref = prefs.delegate("last_server_id", "")
 
   fun setToken(token: String) {
     tokenPref = token
@@ -34,16 +35,18 @@ class CoreStorage(prefs: SharedPreferences) {
 
   fun getVpnProtocol(): Protocol = Protocol.fromString(protocolPref)
 
-  fun setLastServerId(serverId: String?) {
-    lastServerIdPref = serverId.orEmpty()
+  fun setCurrentServerId(serverId: String?) {
+    currentServerIdPref.value = serverId.orEmpty()
   }
 
-  fun getLastServerId(): String = lastServerIdPref
+  fun getCurrentServerId(): String = currentServerIdPref.value
+
+  fun observeCurrentServerId(): Flow<String> = currentServerIdPref.observe
 
   fun clearUserData() {
     tokenPref = ""
     userIdPref = ""
     protocolPref = ""
-    lastServerIdPref = ""
+    currentServerIdPref.value = ""
   }
 }

@@ -7,12 +7,16 @@ sealed interface Credentials {
   data class V2Ray(
     val payload: String,
     val uid: String,
+    override val serverId: String?,
   ) : Credentials
 
   data class Wireguard(
     val payload: String,
     val privateKey: String,
+    override val serverId: String?,
   ) : Credentials
+
+  val serverId: String?
 }
 
 enum class Protocol(val strValue: String) {

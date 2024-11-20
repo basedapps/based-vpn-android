@@ -3,10 +3,10 @@ package co.sentinel.vpn.based.viewModel.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.sentinel.vpn.based.language.LanguageManager
-import co.sentinel.vpn.based.storage.AppStorage
 import co.sentinel.vpn.based.viewModel.settings.dto.AppLang
 import co.sentinel.vpn.based.vpn.DdsConfigurator
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.norselabs.vpn.core_vpn.storage.CoreStorage
 import io.norselabs.vpn.core_vpn.vpn.Protocol
 import javax.inject.Inject
 import kotlinx.collections.immutable.toPersistentList
@@ -17,7 +17,7 @@ class SettingsScreenViewModel
 @Inject constructor(
   val stateHolder: SettingsScreenStateHolder,
   private val dnsConfigurator: DdsConfigurator,
-  private val storage: AppStorage,
+  private val coreStorage: CoreStorage,
 ) : ViewModel() {
 
   private val state: SettingsScreenState
@@ -26,7 +26,7 @@ class SettingsScreenViewModel
   init {
     viewModelScope.launch {
       val dns = dnsConfigurator.getDefaultDns()
-      val protocol = storage.getVpnProtocol()
+      val protocol = coreStorage.getVpnProtocol()
       stateHolder.updateState {
         copy(
           currentDns = dns,
@@ -68,7 +68,7 @@ class SettingsScreenViewModel
       )
     }
     viewModelScope.launch {
-      storage.storeVpnProtocol(protocol)
+      coreStorage.setVpnProtocol(protocol)
     }
   }
 

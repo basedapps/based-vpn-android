@@ -3,7 +3,6 @@ package co.sentinel.vpn.based.core_impl.vpn
 import arrow.core.Either
 import arrow.core.flatMap
 import co.sentinel.vpn.based.network.repository.AppRepository
-import co.sentinel.vpn.based.storage.AppStorage
 import co.sentinel.vpn.based.vpn.ProfileDecoder
 import io.norselabs.vpn.core_vpn.vpn.Credentials
 import io.norselabs.vpn.core_vpn.vpn.Destination
@@ -16,7 +15,6 @@ import retrofit2.HttpException
 class VPNConnectorInteractorImpl(
   private val repository: AppRepository,
   private val v2RayRepository: V2RayRepository,
-  private val storage: AppStorage,
 ) : VPNConnectorInteractor {
 
   override suspend fun getCredentials(
@@ -32,11 +30,13 @@ class VPNConnectorInteractorImpl(
           Protocol.WIREGUARD -> Credentials.Wireguard(
             payload = data.payload,
             privateKey = data.privateKey,
+            serverId = data.server?.id,
           )
 
           Protocol.V2RAY -> Credentials.V2Ray(
             payload = data.payload,
             uid = data.privateKey,
+            serverId = data.server?.id,
           )
 
           Protocol.NONE -> null
@@ -78,9 +78,5 @@ class VPNConnectorInteractorImpl(
 
   override fun stopVpn() {
     v2RayRepository.stopV2ray()
-  }
-
-  override fun getVpnProtocol(): Protocol {
-    return storage.getVpnProtocol()
   }
 }

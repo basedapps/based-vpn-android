@@ -4,6 +4,7 @@ import android.util.Base64
 import arrow.core.Either
 import arrow.core.flatMap
 import com.google.gson.Gson
+import io.norselabs.vpn.core_vpn.storage.CoreStorage
 import io.norselabs.vpn.core_vpn.vpn.Credentials
 import io.norselabs.vpn.core_vpn.vpn.Destination
 import io.norselabs.vpn.core_vpn.vpn.Protocol
@@ -11,6 +12,7 @@ import timber.log.Timber
 
 class VPNConnector(
   private val gson: Gson,
+  private val coreStorage: CoreStorage,
   private val interactor: VPNConnectorInteractor,
 ) {
 
@@ -27,7 +29,7 @@ class VPNConnector(
   }
 
   private suspend fun getCredentials(destination: Destination): Either<Error, Credentials> {
-    val protocol = interactor.getVpnProtocol()
+    val protocol = coreStorage.getVpnProtocol()
       .takeIf { it != Protocol.NONE }
     return interactor.getCredentials(
       destination = destination,
@@ -72,6 +74,8 @@ class VPNConnector(
   private suspend fun connectVpn(credentials: Credentials): Either<Error, Unit> {
     interactor.startVpn(credentials).getOrNull()
       ?: return Either.Left(Error.StartV2Ray)
+
+    coreStorage.setLastServerId(credentials.serverId)
 
     interactor.resetConnection()
 

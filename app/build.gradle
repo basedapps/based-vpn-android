@@ -85,7 +85,7 @@ dependencies {
     implementation libs.google.firebase.analytics
     implementation libs.android.appcompat
     implementation libs.kotlin.collection.immutable
-    implementation libs.core.vpn
+//    implementation libs.core.vpn
     implementation libs.common
     implementation libs.common.map
     implementation libs.common.flags
@@ -96,5 +96,6 @@ dependencies {
     implementation(name: "libv2ray", ext: "aar")
 
     implementation project(path: ':based_vpn')
+    implementation project(path: ':core_vpn')
 //    implementation "co.sentinel.vpn:based:0.0.1"
 }

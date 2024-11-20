@@ -4,9 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.sentinel.vpn.based.network.model.Country
 import co.sentinel.vpn.based.network.repository.AppRepository
-import co.sentinel.vpn.based.storage.AppStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.norselabs.vpn.common.state.Status
+import io.norselabs.vpn.core_vpn.storage.CoreStorage
 import io.norselabs.vpn.core_vpn.vpn.Protocol
 import javax.inject.Inject
 import kotlinx.coroutines.launch
@@ -16,7 +16,7 @@ class CountriesScreenViewModel
 @Inject constructor(
   val stateHolder: CountriesScreenStateHolder,
   private val repository: AppRepository,
-  private val storage: AppStorage,
+  private val coreStorage: CoreStorage,
 ) : ViewModel() {
 
   private val state: CountriesScreenState
@@ -29,7 +29,7 @@ class CountriesScreenViewModel
 
   private fun getCountries() {
     viewModelScope.launch {
-      val protocol = storage.getVpnProtocol().takeIf { it != Protocol.NONE }
+      val protocol = coreStorage.getVpnProtocol().takeIf { it != Protocol.NONE }
       val countries = repository.getCountries(protocol).getOrNull()?.data
       if (countries != null) {
         stateHolder.updateState {

@@ -5,25 +5,14 @@ import co.sentinel.vpn.based.app_config.AppConfig
 import co.sentinel.vpn.based.network.model.DataObj
 import co.sentinel.vpn.based.network.model.TokenModel
 import co.sentinel.vpn.based.network.repository.AppRepository
-import co.sentinel.vpn.based.storage.AppStorage
 import io.norselabs.vpn.core_vpn.user.Token
 import io.norselabs.vpn.core_vpn.user.UserInitializerInteractor
 import retrofit2.HttpException
 
 class UserInitializerInteractorImpl(
   private val repository: AppRepository,
-  private val storage: AppStorage,
   private val config: AppConfig,
 ) : UserInitializerInteractor {
-
-  override fun storeUserData(token: String, userId: String) {
-    storage.storeToken(token)
-    storage.setUserId(userId)
-  }
-
-  override fun getToken(): String {
-    return storage.getToken()
-  }
 
   override suspend fun checkVersion(): Either<Exception, Boolean> {
     return repository.getVersion()

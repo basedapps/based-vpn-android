@@ -22,7 +22,4 @@ interface VPNConnectorInteractor {
   suspend fun startVpn(credentials: Credentials): Either<V2RayError, Unit>
   fun isVpnConnected(): Boolean
   fun stopVpn()
-
-  // Storage
-  fun getVpnProtocol(): Protocol
 }

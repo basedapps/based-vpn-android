@@ -58,6 +58,8 @@ data class Credentials(
   val payload: String,
   @SerializedName(value = "private_key", alternate = ["uid"])
   val privateKey: String,
+  @SerializedName("server")
+  val server: Server?,
 )
 
 data class IpData(
@@ -74,4 +76,9 @@ data class VersionModel(
   val appVersion: Long,
   @SerializedName("API")
   val apiVersion: Long,
+)
+
+data class Server(
+  @SerializedName("id")
+  val id: String,
 )

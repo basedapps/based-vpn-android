@@ -11,6 +11,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import io.norselabs.vpn.core_vpn.storage.CoreStorage
 import io.norselabs.vpn.core_vpn.user.UserInitializer
 import io.norselabs.vpn.core_vpn.user.UserInitializerInteractor
 import io.norselabs.vpn.core_vpn.vpn.connector.VPNConnector
@@ -30,19 +31,20 @@ class AppModule {
   @Singleton
   fun provideUserInitializerInteractor(
     repository: AppRepository,
-    storage: AppStorage,
     config: AppConfig,
   ): UserInitializerInteractor {
-    return UserInitializerInteractorImpl(repository, storage, config)
+    return UserInitializerInteractorImpl(repository, config)
   }
 
   @Provides
   @Singleton
   fun provideUserInitializer(
     interactor: UserInitializerInteractor,
+    coreStorage: CoreStorage,
   ): UserInitializer = UserInitializer(
     scope = CoroutineScope(SupervisorJob() + Dispatchers.IO),
     interactor = interactor,
+    coreStorage = coreStorage,
   )
 
   @Provides
@@ -55,7 +57,6 @@ class AppModule {
     return VPNConnectorInteractorImpl(
       repository = repository,
       v2RayRepository = v2RayRepository,
-      storage = storage,
     )
   }
 
@@ -63,9 +64,14 @@ class AppModule {
   @Singleton
   fun provideVPNConnector(
     gson: Gson,
+    coreStorage: CoreStorage,
     interactor: VPNConnectorInteractor,
   ): VPNConnector {
-    return VPNConnector(gson, interactor)
+    return VPNConnector(
+      gson = gson,
+      coreStorage = coreStorage,
+      interactor = interactor,
+    )
   }
 
   @Provides

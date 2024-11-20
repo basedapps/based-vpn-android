@@ -2,6 +2,7 @@ package io.norselabs.vpn.core_vpn.user
 
 import arrow.core.Either
 import arrow.core.flatMap
+import io.norselabs.vpn.core_vpn.storage.CoreStorage
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -15,6 +16,7 @@ import timber.log.Timber
 
 class UserInitializer(
   private val scope: CoroutineScope,
+  private val coreStorage: CoreStorage,
   private val interactor: UserInitializerInteractor,
 ) {
 
@@ -60,7 +62,7 @@ class UserInitializer(
   private suspend fun checkToken(): Either<UserStatus, Unit> {
     Timber.tag(TAG).d("Check token")
     return when {
-      interactor.getToken().isEmpty() -> getToken().map { }
+      coreStorage.getToken().isEmpty() -> getToken().map { }
       else -> Either.Right(Unit)
     }
   }
@@ -70,7 +72,8 @@ class UserInitializer(
     return interactor.registerDevice()
       .onRight { model ->
         Timber.tag(TAG).d("Token has been updated")
-        interactor.storeUserData(token = model.token, userId = model.id)
+        coreStorage.setToken(model.token)
+        coreStorage.setUserId(model.id)
       }
       .mapLeft { UserStatus.Failed }
   }

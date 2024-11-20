@@ -9,6 +9,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import io.norselabs.vpn.core_vpn.storage.CoreStorage
 import javax.inject.Singleton
 
 @Module
@@ -25,4 +26,12 @@ class StorageModule {
   @Provides
   @Singleton
   fun provideGson() = Gson()
+
+  @Provides
+  @Singleton
+  fun provideCoreStorage(
+    prefs: SharedPreferences,
+  ): CoreStorage {
+    return CoreStorage(prefs)
+  }
 }

@@ -12,6 +12,7 @@ import co.sentinel.vpn.based.storage.RatingStatus
 import co.sentinel.vpn.based.viewModel.dashboard.DashboardScreenEffect as Effect
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.norselabs.vpn.common.state.Status
+import io.norselabs.vpn.core_vpn.storage.CoreStorage
 import io.norselabs.vpn.core_vpn.user.UserInitializer
 import io.norselabs.vpn.core_vpn.user.UserStatus
 import io.norselabs.vpn.core_vpn.vpn.Destination
@@ -36,7 +37,8 @@ class DashboardScreenViewModel
 @Inject constructor(
   val stateHolder: DashboardScreenStateHolder,
   private val repository: AppRepository,
-  private val storage: AppStorage,
+  private val appStorage: AppStorage,
+  private val coreStorage: CoreStorage,
   private val connector: VPNConnector,
   private val vpnRepo: V2RayRepository,
   private val userInitializer: UserInitializer,
@@ -216,7 +218,7 @@ class DashboardScreenViewModel
   }
 
   private suspend fun selectRandomDestination() {
-    val protocol = storage.getVpnProtocol().takeIf { it != Protocol.NONE }
+    val protocol = coreStorage.getVpnProtocol().takeIf { it != Protocol.NONE }
     val countries = repository.getCountries(protocol = protocol, isFresh = false).getOrNull()?.data
     val country = countries?.randomOrNull() ?: return
     val cities = repository.getCities(
@@ -274,10 +276,10 @@ class DashboardScreenViewModel
   }
 
   private fun checkAppRatingRequest() {
-    val rating = storage.getRatingStatus()
+    val rating = appStorage.getRatingStatus()
     when (rating) {
       RatingStatus.New -> {
-        storage.setRatingStatus(RatingStatus.RequestOnNext)
+        appStorage.setRatingStatus(RatingStatus.RequestOnNext)
       }
 
       RatingStatus.RequestOnNext -> {
@@ -292,16 +294,16 @@ class DashboardScreenViewModel
     when (click) {
       RatingClick.Positive -> {
         stateHolder.sendEffect(Effect.ShowRating)
-        storage.setRatingStatus(RatingStatus.Requested)
+        appStorage.setRatingStatus(RatingStatus.Requested)
       }
 
       RatingClick.Negative -> {
         stateHolder.sendEffect(Effect.EmailToSupport)
-        storage.setRatingStatus(RatingStatus.Requested)
+        appStorage.setRatingStatus(RatingStatus.Requested)
       }
 
       RatingClick.Dismiss -> {
-        storage.setRatingStatus(RatingStatus.New)
+        appStorage.setRatingStatus(RatingStatus.New)
       }
     }
     stateHolder.updateState { copy(isRatingAlertVisible = false) }

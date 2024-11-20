@@ -2,7 +2,7 @@ package co.sentinel.vpn.based.vpn
 
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
-import io.norselabs.logging.logNonFatal
+import io.norselabs.vpn.common_logger.logNonFatal
 import io.norselabs.vpn.v2ray.control.V2RayInitializer
 import javax.inject.Inject
 import javax.inject.Singleton

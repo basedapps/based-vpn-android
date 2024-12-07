@@ -25,18 +25,18 @@ dependencyResolutionManagement {
         }
         flatDir { dirs 'app/libs' }
         maven {
+            url "https://nexus.norselabs.dev/repository/maven-releases/"
+            credentials {
+                username "${System.getenv("NORSELABS_REPO_LOGIN")}"
+                password "${System.getenv("NORSELABS_REPO_PASSWORD")}"
+            }
+        }
+        maven {
             url "http://nexus.basedapps.co.uk/repository/maven-releases/"
             allowInsecureProtocol true
             credentials {
                 username "${System.getenv("SENTINEL_NEXUS_LOGIN")}"
                 password "${System.getenv("SENTINEL_NEXUS_PASSWORD")}"
-            }
-        }
-        maven {
-            url "https://nexus.norselabs.dev/repository/maven-releases/"
-            credentials {
-                username "${System.getenv("NORSELABS_REPO_LOGIN")}"
-                password "${System.getenv("NORSELABS_REPO_PASSWORD")}"
             }
         }
         mavenLocal()
@@ -49,4 +49,5 @@ include ':app',
         ':core_vpn',
         ':common',
         ':common_flags',
-        ':common_map'
+        ':common_map',
+        ':common_net_apps'

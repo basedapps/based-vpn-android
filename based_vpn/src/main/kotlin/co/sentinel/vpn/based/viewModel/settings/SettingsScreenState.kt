@@ -10,8 +10,7 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
 class SettingsScreenStateHolder
-@Inject
-constructor(
+@Inject constructor(
   config: AppConfig,
 ) : ViewStateHolder<SettingsScreenState, SettingsScreenEffect>(
   SettingsScreenState(
@@ -44,5 +43,6 @@ data class SettingsScreenState(
 
 sealed interface SettingsScreenEffect {
   data object OpenTelegram : SettingsScreenEffect
+  data object SplitTunneling : SettingsScreenEffect
   data object ShareLogs : SettingsScreenEffect
 }

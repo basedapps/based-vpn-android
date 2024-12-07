@@ -85,11 +85,13 @@ dependencies {
     implementation libs.google.firebase.analytics
     implementation libs.android.appcompat
     implementation libs.kotlin.collection.immutable
+    implementation libs.coil
 //    implementation libs.core.vpn
     implementation libs.common
     implementation libs.common.map
     implementation libs.common.flags
     implementation libs.common.logger
+    implementation libs.common.net.apps
 
     kapt libs.hilt.compiler
 

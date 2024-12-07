@@ -76,6 +76,10 @@ class SettingsScreenViewModel
     stateHolder.updateState { copy(isProtocolSelectorVisible = false) }
   }
 
+  fun onSplitTunnelClick() {
+    stateHolder.sendEffect(SettingsScreenEffect.SplitTunneling)
+  }
+
   fun onTelegramClick() {
     stateHolder.sendEffect(SettingsScreenEffect.OpenTelegram)
   }

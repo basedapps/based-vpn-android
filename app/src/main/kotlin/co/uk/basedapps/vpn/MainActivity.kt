@@ -16,6 +16,7 @@ import co.uk.basedapps.vpn.ui.screens.cities.CitiesScreen
 import co.uk.basedapps.vpn.ui.screens.countries.CountriesScreen
 import co.uk.basedapps.vpn.ui.screens.dashboard.DashboardScreen
 import co.uk.basedapps.vpn.ui.screens.settings.SettingsScreen
+import co.uk.basedapps.vpn.ui.screens.split_tunneling.SplitTunnelingScreenScreen
 import co.uk.basedapps.vpn.ui.theme.BasedVPNTheme
 import dagger.hilt.android.AndroidEntryPoint
 import io.norselabs.vpn.common_logger.logger.FileLogTree
@@ -72,7 +73,13 @@ class MainActivity : AppCompatActivity() {
           composable(Destination.Settings) {
             SettingsScreen(
               navigateBack = { navController.popBackStack() },
+              navigateToSplitTunneling = { navController.navigate(Destination.SplitTunneling) },
               shareLogs = ::shareLogs,
+            )
+          }
+          composable(Destination.SplitTunneling) {
+            SplitTunnelingScreenScreen(
+              navigateBack = { navController.popBackStack() },
             )
           }
         }
@@ -95,6 +102,7 @@ object Destination {
   const val Countries = "countries"
   const val Cities = "countries/{${Args.CountryId}}/cities"
   const val Settings = "settings"
+  const val SplitTunneling = "splitTunnel"
 }
 
 object Args {

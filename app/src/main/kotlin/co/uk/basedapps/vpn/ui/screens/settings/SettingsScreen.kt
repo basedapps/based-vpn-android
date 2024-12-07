@@ -38,6 +38,7 @@ import io.norselabs.vpn.core_vpn.vpn.Protocol
 @Composable
 fun SettingsScreen(
   navigateBack: () -> Unit,
+  navigateToSplitTunneling: () -> Unit,
   shareLogs: () -> Unit,
 ) {
 
@@ -49,6 +50,8 @@ fun SettingsScreen(
       is SettingsScreenEffect.OpenTelegram -> Unit
 
       is SettingsScreenEffect.ShareLogs -> shareLogs()
+
+      is SettingsScreenEffect.SplitTunneling -> navigateToSplitTunneling()
     }
   }
 
@@ -61,6 +64,7 @@ fun SettingsScreen(
     onProtocolRowClick = viewModel::onProtocolRowClick,
     onProtocolDialogConfirmClick = viewModel::onProtocolSelected,
     onProtocolDialogDismissClick = viewModel::onProtocolDialogDismissClick,
+    onSplitTunnelingClick = viewModel::onSplitTunnelClick,
     onLogsRowClick = viewModel::onLogsRowClick,
   )
 }
@@ -75,6 +79,7 @@ fun SettingsScreenStateless(
   onProtocolRowClick: () -> Unit,
   onProtocolDialogConfirmClick: (Protocol) -> Unit,
   onProtocolDialogDismissClick: () -> Unit,
+  onSplitTunnelingClick: () -> Unit,
   onLogsRowClick: () -> Unit,
 ) {
   Scaffold(
@@ -95,6 +100,7 @@ fun SettingsScreenStateless(
         onProtocolRowClick = onProtocolRowClick,
         onProtocolDialogConfirmClick = onProtocolDialogConfirmClick,
         onProtocolDialogDismissClick = onProtocolDialogDismissClick,
+        onSplitTunnelingClick = onSplitTunnelingClick,
         onLogsRowClick = onLogsRowClick,
       )
     },
@@ -111,6 +117,7 @@ fun Content(
   onProtocolRowClick: () -> Unit,
   onProtocolDialogConfirmClick: (Protocol) -> Unit,
   onProtocolDialogDismissClick: () -> Unit,
+  onSplitTunnelingClick: () -> Unit,
   onLogsRowClick: () -> Unit,
 ) {
   Box {
@@ -131,6 +138,13 @@ fun Content(
         value = stringResource(state.currentProtocol.getLabelRes()),
         modifier = Modifier
           .clickable(onClick = onProtocolRowClick),
+      )
+      HorizontalDivider(color = BasedAppColor.Divider)
+      SettingsRow(
+        title = stringResource(R.string.settings_row_split_tunneling),
+        value = "",
+        modifier = Modifier
+          .clickable(onClick = onSplitTunnelingClick),
       )
       HorizontalDivider(color = BasedAppColor.Divider)
       SettingsRow(

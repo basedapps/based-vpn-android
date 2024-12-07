@@ -72,15 +72,17 @@ navigation = { module = "androidx.navigation:navigation-compose", version.ref = 
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 # Other
 accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanist" }
+coil = { module = "io.coil-kt:coil-compose", version = "2.6.0" }
 play-ads = { module = "com.google.android.gms:play-services-ads", version = "22.6.0" }
 arrow-core = { module = "io.arrow-kt:arrow-core", version = "1.2.0" }
 # Norselabs
-vpn-v2ray = { module = "io.norselabs.vpn:v2ray", version = "0.0.8" }
+vpn-v2ray = { module = "io.norselabs.vpn:v2ray", version = "0.0.10" }
 core-vpn = { module = "io.norselabs.vpn:core_vpn", version = "0.0.2" }
 common = { module = "io.norselabs.vpn:common", version = "0.0.1" }
 common-map = { module = "io.norselabs.vpn:common_map", version = "0.0.1" }
-common-flags = { module = "io.norselabs.vpn:common_flags", version = "0.0.1" }
+common-flags = { module = "io.norselabs.vpn:common_flags", version = "0.0.2" }
 common-logger = { module = "io.norselabs.vpn:common_logger", version = "0.0.2" }
+common-net-apps = { module = "io.norselabs.vpn:common_net_apps", version = "0.0.1" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

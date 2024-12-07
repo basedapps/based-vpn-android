@@ -23,6 +23,7 @@
     <string name="settings_row_dns">DNS Server</string>
     <string name="settings_row_protocol">VPN protocol</string>
     <string name="settings_row_logs">Share logs</string>
+    <string name="settings_row_split_tunneling">Split Tunneling</string>
 
     <string name="settings_protocol_change_title">Choose protocol</string>
 
@@ -39,4 +40,8 @@
     <string name="update_required_title">Update Required</string>
     <string name="update_required_description">Please download the latest version of the app</string>
     <string name="update_required_button">Go to Play Store</string>
+
+    <string name="split_tunneling_title">Split Tunneling</string>
+    <string name="split_tunneling_selector">Split Tunneling</string>
+    <string name="split_tunneling_bypass_selector">Bypass Mode</string>
 </resources>

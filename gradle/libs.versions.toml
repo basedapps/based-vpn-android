@@ -77,7 +77,7 @@ play-ads = { module = "com.google.android.gms:play-services-ads", version = "22.
 arrow-core = { module = "io.arrow-kt:arrow-core", version = "1.2.0" }
 # Norselabs
 vpn-v2ray = { module = "io.norselabs.vpn:v2ray", version = "0.0.10" }
-core-vpn = { module = "io.norselabs.vpn:core_vpn", version = "0.0.2" }
+core-vpn = { module = "io.norselabs.vpn:core_vpn", version = "0.0.6" }
 common = { module = "io.norselabs.vpn:common", version = "0.0.1" }
 common-map = { module = "io.norselabs.vpn:common_map", version = "0.0.1" }
 common-flags = { module = "io.norselabs.vpn:common_flags", version = "0.0.2" }

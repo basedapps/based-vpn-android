@@ -30,12 +30,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import co.sentinel.vpn.based.viewModel.split_tunneling.NetworkApp
 import co.sentinel.vpn.based.viewModel.split_tunneling.SplitTunnelingScreenState as State
 import co.sentinel.vpn.based.viewModel.split_tunneling.SplitTunnelingScreenViewModel
-import co.sentinel.vpn.based.vpn.SplitTunnelingStatus
 import co.uk.basedapps.vpn.R
 import co.uk.basedapps.vpn.ui.theme.BasedAppColor
 import co.uk.basedapps.vpn.ui.widget.Dropdown
 import co.uk.basedapps.vpn.ui.widget.TopBar
 import coil.compose.AsyncImage
+import io.norselabs.vpn.core_vpn.vpn.split_tunneling.SplitTunnelingStatus
 import kotlinx.collections.immutable.persistentListOf
 
 @Composable

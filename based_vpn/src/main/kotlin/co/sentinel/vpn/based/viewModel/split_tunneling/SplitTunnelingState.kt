@@ -1,9 +1,9 @@
 package co.sentinel.vpn.based.viewModel.split_tunneling
 
 import android.graphics.drawable.Drawable
-import co.sentinel.vpn.based.vpn.SplitTunnelingConfigurator
-import co.sentinel.vpn.based.vpn.SplitTunnelingStatus
 import io.norselabs.vpn.common.state.ViewStateHolder
+import io.norselabs.vpn.core_vpn.vpn.split_tunneling.SplitTunnelingConfigurator
+import io.norselabs.vpn.core_vpn.vpn.split_tunneling.SplitTunnelingStatus
 import javax.inject.Inject
 
 class SplitTunnelingScreenStateHolder

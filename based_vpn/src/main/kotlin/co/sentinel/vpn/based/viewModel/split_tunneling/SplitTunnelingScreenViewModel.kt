@@ -2,9 +2,9 @@ package co.sentinel.vpn.based.viewModel.split_tunneling
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import co.sentinel.vpn.based.vpn.SplitTunnelingConfigurator
-import co.sentinel.vpn.based.vpn.SplitTunnelingStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.norselabs.vpn.core_vpn.vpn.split_tunneling.SplitTunnelingConfigurator
+import io.norselabs.vpn.core_vpn.vpn.split_tunneling.SplitTunnelingStatus
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

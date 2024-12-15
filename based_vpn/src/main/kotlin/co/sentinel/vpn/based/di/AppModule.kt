@@ -5,7 +5,6 @@ import co.sentinel.vpn.based.app_config.AppConfig
 import co.sentinel.vpn.based.core_impl.user.UserInitializerInteractorImpl
 import co.sentinel.vpn.based.core_impl.vpn.VPNConnectorInteractorImpl
 import co.sentinel.vpn.based.network.repository.AppRepository
-import co.sentinel.vpn.based.storage.AppStorage
 import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
@@ -17,6 +16,7 @@ import io.norselabs.vpn.core_vpn.user.UserInitializerInteractor
 import io.norselabs.vpn.core_vpn.vpn.connector.VPNConnector
 import io.norselabs.vpn.core_vpn.vpn.connector.VPNConnectorInteractor
 import io.norselabs.vpn.core_vpn.vpn.destination.DestinationStorage
+import io.norselabs.vpn.core_vpn.vpn.split_tunneling.SplitTunnelingConfigurator
 import io.norselabs.vpn.v2ray.repo.V2RayRepository
 import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineScope
@@ -52,7 +52,6 @@ class AppModule {
   fun provideVPNConnectorInteractor(
     repository: AppRepository,
     v2RayRepository: V2RayRepository,
-    storage: AppStorage,
   ): VPNConnectorInteractor {
     return VPNConnectorInteractorImpl(
       repository = repository,
@@ -81,5 +80,13 @@ class AppModule {
     prefs: SharedPreferences,
   ): DestinationStorage {
     return DestinationStorage(gson, prefs)
+  }
+
+  @Provides
+  @Singleton
+  fun provideSplitTunnelingConfigurator(
+    v2RayRepository: V2RayRepository,
+  ): SplitTunnelingConfigurator {
+    return SplitTunnelingConfigurator(v2RayRepository)
   }
 }

@@ -1,11 +1,8 @@
-package co.sentinel.vpn.based.vpn
+package io.norselabs.vpn.core_vpn.vpn.split_tunneling
 
 import io.norselabs.vpn.v2ray.repo.V2RayRepository
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class SplitTunnelingConfigurator @Inject constructor(
+class SplitTunnelingConfigurator(
   private val repo: V2RayRepository,
 ) {
 
@@ -29,10 +26,4 @@ class SplitTunnelingConfigurator @Inject constructor(
   fun setApps(apps: Set<String>) {
     repo.setPerAppProxySet(apps)
   }
-}
-
-enum class SplitTunnelingStatus {
-  Disabled,
-  Enabled,
-  Bypass,
 }

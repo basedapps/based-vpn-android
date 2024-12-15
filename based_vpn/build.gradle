@@ -78,12 +78,12 @@ dependencies {
     implementation libs.http.logger
     implementation libs.gson
     implementation libs.gson.converter
-    implementation libs.arrow.core
+//    implementation libs.arrow.core
     implementation libs.vpn.v2ray
     implementation libs.common
     implementation libs.common.flags
     implementation libs.common.logger
-//    implementation libs.core.vpn
+    implementation libs.core.vpn
     implementation libs.compose.runtime
     implementation libs.android.appcompat
     implementation libs.kotlin.collection.immutable

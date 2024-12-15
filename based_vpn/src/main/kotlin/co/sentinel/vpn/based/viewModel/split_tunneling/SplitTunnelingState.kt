@@ -1,23 +1,22 @@
 package co.sentinel.vpn.based.viewModel.split_tunneling
 
 import android.graphics.drawable.Drawable
+import co.sentinel.vpn.based.vpn.SplitTunnelingConfigurator
+import co.sentinel.vpn.based.vpn.SplitTunnelingStatus
 import io.norselabs.vpn.common.state.ViewStateHolder
-import io.norselabs.vpn.v2ray.repo.V2RayRepository
 import javax.inject.Inject
 
 class SplitTunnelingScreenStateHolder
 @Inject constructor(
-  v2RayRepository: V2RayRepository,
+  splitTunneling: SplitTunnelingConfigurator,
 ) : ViewStateHolder<SplitTunnelingScreenState, SplitTunnelingScreenEffect>(
   SplitTunnelingScreenState(
-    isSplitTunnelingEnabled = v2RayRepository.isPerAppProxyEnabled(),
-    isBypassModeEnabled = v2RayRepository.isBypassEnabled(),
+    status = splitTunneling.getStatus(),
   ),
 )
 
 data class SplitTunnelingScreenState(
-  val isSplitTunnelingEnabled: Boolean,
-  val isBypassModeEnabled: Boolean,
+  val status: SplitTunnelingStatus,
   val applications: List<NetworkApp> = emptyList(),
 )
 
@@ -29,6 +28,4 @@ data class NetworkApp(
   val isChecked: Boolean,
 )
 
-sealed interface SplitTunnelingScreenEffect {
-  data object Temp : SplitTunnelingScreenEffect
-}
+sealed interface SplitTunnelingScreenEffect

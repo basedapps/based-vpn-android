@@ -18,22 +18,25 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import co.sentinel.vpn.based.compose.EffectHandler
 import co.sentinel.vpn.based.viewModel.split_tunneling.NetworkApp
-import co.sentinel.vpn.based.viewModel.split_tunneling.SplitTunnelingScreenEffect
 import co.sentinel.vpn.based.viewModel.split_tunneling.SplitTunnelingScreenState as State
 import co.sentinel.vpn.based.viewModel.split_tunneling.SplitTunnelingScreenViewModel
+import co.sentinel.vpn.based.vpn.SplitTunnelingStatus
 import co.uk.basedapps.vpn.R
 import co.uk.basedapps.vpn.ui.theme.BasedAppColor
+import co.uk.basedapps.vpn.ui.widget.Dropdown
 import co.uk.basedapps.vpn.ui.widget.TopBar
 import coil.compose.AsyncImage
+import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun SplitTunnelingScreenScreen(
@@ -43,17 +46,10 @@ fun SplitTunnelingScreenScreen(
   val viewModel = hiltViewModel<SplitTunnelingScreenViewModel>()
   val state by viewModel.stateHolder.state.collectAsState()
 
-  EffectHandler(viewModel.stateHolder.effects) { effect ->
-    when (effect) {
-      is SplitTunnelingScreenEffect.Temp -> Unit
-    }
-  }
-
   SplitTunnelingScreenStateless(
     state = state,
     navigateBack = navigateBack,
-    onSplitTunnelingEnabled = viewModel::onSplitTunnelingEnabled,
-    onBypassModeEnabled = viewModel::onBypassModeEnabled,
+    setSplitTunnelingStatus = viewModel::setSplitTunnelingStatus,
     onAppChecked = viewModel::onAppChecked,
   )
 }
@@ -62,10 +58,10 @@ fun SplitTunnelingScreenScreen(
 private fun SplitTunnelingScreenStateless(
   state: State,
   navigateBack: () -> Unit,
-  onSplitTunnelingEnabled: (Boolean) -> Unit,
-  onBypassModeEnabled: (Boolean) -> Unit,
+  setSplitTunnelingStatus: (SplitTunnelingStatus) -> Unit,
   onAppChecked: (NetworkApp, Boolean) -> Unit,
 ) {
+  val context = LocalContext.current
   Scaffold(
     containerColor = BasedAppColor.Background,
     topBar = {
@@ -80,25 +76,30 @@ private fun SplitTunnelingScreenStateless(
           .padding(paddingValues)
           .fillMaxSize(),
       ) {
-        Row(
+        Dropdown(
+          label = stringResource(R.string.split_tunneling_selector),
+          items = remember {
+            persistentListOf(
+              SplitTunnelingStatus.Disabled,
+              SplitTunnelingStatus.Enabled,
+              SplitTunnelingStatus.Bypass,
+            )
+          },
+          selected = state.status,
+          mapItemLabel = { status ->
+            context.getString(
+              when (status) {
+                SplitTunnelingStatus.Disabled -> R.string.split_tunneling_disabled
+                SplitTunnelingStatus.Enabled -> R.string.split_tunneling_enabled
+                SplitTunnelingStatus.Bypass -> R.string.split_tunneling_bypass
+              },
+            )
+          },
+          onSelect = setSplitTunnelingStatus,
           modifier = Modifier
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-            .fillMaxWidth(),
-        ) {
-          SwitchRow(
-            text = stringResource(R.string.split_tunneling_selector),
-            checked = state.isSplitTunnelingEnabled,
-            onCheckedChange = onSplitTunnelingEnabled,
-            modifier = Modifier.weight(1f),
-          )
-          Spacer(modifier = Modifier.size(16.dp))
-          SwitchRow(
-            text = stringResource(R.string.split_tunneling_bypass_selector),
-            checked = state.isBypassModeEnabled,
-            onCheckedChange = onBypassModeEnabled,
-            modifier = Modifier.weight(1f),
-          )
-        }
+            .fillMaxWidth()
+            .padding(16.dp),
+        )
         LazyColumn(
           modifier = Modifier.weight(1f),
         ) {

@@ -43,5 +43,7 @@
 
     <string name="split_tunneling_title">Split Tunneling</string>
     <string name="split_tunneling_selector">Split Tunneling</string>
-    <string name="split_tunneling_bypass_selector">Bypass Mode</string>
+    <string name="split_tunneling_enabled">Enable DVPN for selected apps</string>
+    <string name="split_tunneling_bypass">Disable DVPN for selected apps</string>
+    <string name="split_tunneling_disabled">Disabled</string>
 </resources>

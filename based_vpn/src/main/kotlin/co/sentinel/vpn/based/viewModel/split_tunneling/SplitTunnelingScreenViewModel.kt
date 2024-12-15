@@ -2,8 +2,9 @@ package co.sentinel.vpn.based.viewModel.split_tunneling
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import co.sentinel.vpn.based.vpn.SplitTunnelingConfigurator
+import co.sentinel.vpn.based.vpn.SplitTunnelingStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.norselabs.vpn.v2ray.repo.V2RayRepository
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -13,7 +14,7 @@ class SplitTunnelingScreenViewModel
 @Inject constructor(
   val stateHolder: SplitTunnelingScreenStateHolder,
   private val appsProvider: NetAppsProvider,
-  private val v2RayRepository: V2RayRepository,
+  private val splitTunneling: SplitTunnelingConfigurator,
 ) : ViewModel() {
 
   private val state: SplitTunnelingScreenState
@@ -25,7 +26,7 @@ class SplitTunnelingScreenViewModel
 
   private fun initApps() {
     viewModelScope.launch(Dispatchers.IO) {
-      val checkedApps = v2RayRepository.getPerAppProxySet()
+      val checkedApps = splitTunneling.getApps()
       val apps = appsProvider.getNetApps()
         .map { app ->
           if (checkedApps.contains(app.packageName)) {
@@ -41,18 +42,9 @@ class SplitTunnelingScreenViewModel
     }
   }
 
-  fun onSplitTunnelingEnabled(isEnabled: Boolean) {
-    v2RayRepository.enablePerAppProxy(isEnabled)
-    stateHolder.updateState {
-      copy(isSplitTunnelingEnabled = isEnabled)
-    }
-  }
-
-  fun onBypassModeEnabled(isEnabled: Boolean) {
-    v2RayRepository.enableBypass(isEnabled)
-    stateHolder.updateState {
-      copy(isBypassModeEnabled = isEnabled)
-    }
+  fun setSplitTunnelingStatus(status: SplitTunnelingStatus) {
+    splitTunneling.setStatus(status)
+    stateHolder.updateState { copy(status = status) }
   }
 
   fun onAppChecked(app: NetworkApp, isChecked: Boolean) {
@@ -67,6 +59,6 @@ class SplitTunnelingScreenViewModel
       .filter { it.isChecked }
       .map { it.packageName }
       .toSet()
-    v2RayRepository.setPerAppProxySet(newSet)
+    splitTunneling.setApps(newSet)
   }
 }

@@ -31,14 +31,6 @@ dependencyResolutionManagement {
                 password "${System.getenv("NORSELABS_REPO_PASSWORD")}"
             }
         }
-        maven {
-            url "http://nexus.basedapps.co.uk/repository/maven-releases/"
-            allowInsecureProtocol true
-            credentials {
-                username "${System.getenv("SENTINEL_NEXUS_LOGIN")}"
-                password "${System.getenv("SENTINEL_NEXUS_PASSWORD")}"
-            }
-        }
         mavenLocal()
     }
 }

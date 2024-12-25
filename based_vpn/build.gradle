@@ -45,7 +45,7 @@ publishing {
         release(MavenPublication) {
             groupId = 'co.sentinel.vpn'
             artifactId = 'based'
-            version = '0.0.18'
+            version = '0.0.19'
 
             afterEvaluate {
                 from components.release
@@ -54,12 +54,10 @@ publishing {
     }
     repositories {
         maven {
-            name = 'Nexus'
-            url = 'http://nexus.basedapps.co.uk/repository/maven-releases/'
-            allowInsecureProtocol true
+            url "https://nexus.norselabs.dev/repository/maven-releases/"
             credentials {
-                username "${System.getenv("SENTINEL_NEXUS_LOGIN")}"
-                password "${System.getenv("SENTINEL_NEXUS_PASSWORD")}"
+                username "${System.getenv("NORSELABS_REPO_LOGIN")}"
+                password "${System.getenv("NORSELABS_REPO_PASSWORD")}"
             }
         }
     }

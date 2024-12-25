@@ -43,7 +43,7 @@ android {
 publishing {
     publications {
         release(MavenPublication) {
-            groupId = 'co.sentinel.vpn'
+            groupId = 'io.norselabs.vpn'
             artifactId = 'based'
             version = '0.0.19'
 

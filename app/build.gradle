@@ -99,5 +99,5 @@ dependencies {
 
     implementation project(path: ':based_vpn')
     implementation project(path: ':core_vpn')
-//    implementation "co.sentinel.vpn:based:0.0.1"
+//    implementation "io.norselabs.vpn:based:0.0.1"
 }

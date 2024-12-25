@@ -20,10 +20,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import co.sentinel.vpn.based.viewModel.settings.SettingsScreenState
-import co.sentinel.vpn.based.vpn.DdsConfigurator
 import co.uk.basedapps.vpn.R
 import co.uk.basedapps.vpn.ui.screens.settings.getLabelRes
+import io.norselabs.vpn.based.viewModel.settings.SettingsScreenState
+import io.norselabs.vpn.based.vpn.DdsConfigurator
 
 @Composable
 fun DnsDialog(

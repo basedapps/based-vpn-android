@@ -76,7 +76,7 @@ dependencies {
     implementation libs.http.logger
     implementation libs.gson
     implementation libs.gson.converter
-//    implementation libs.arrow.core
+    implementation libs.arrow.core
     implementation libs.vpn.v2ray
     implementation libs.common
     implementation libs.common.flags
@@ -86,7 +86,7 @@ dependencies {
     implementation libs.android.appcompat
     implementation libs.kotlin.collection.immutable
 
-    implementation project(path: ':core_vpn')
+//    implementation project(path: ':core_vpn')
 
     kapt libs.hilt.compiler
 }

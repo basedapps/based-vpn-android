@@ -1,16 +1,16 @@
 package io.norselabs.vpn.based.di
 
-import android.content.SharedPreferences
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import io.norselabs.vpn.based.app_config.AppConfig
-import io.norselabs.vpn.based.network.Api
-import io.norselabs.vpn.based.network.ConnectApi
-import io.norselabs.vpn.based.network.HeadersInterceptor
-import io.norselabs.vpn.based.network.repository.AppRepository
-import io.norselabs.vpn.based.network.repository.AppRepositoryImpl
+import io.norselabs.vpn.common_network.AppRepository
+import io.norselabs.vpn.common_network.DnsBasedClient
+import io.norselabs.vpn.common_network.HeadersInterceptor
+import io.norselabs.vpn.common_network.api.Api
+import io.norselabs.vpn.common_network.api.ConnectApi
+import io.norselabs.vpn.core_vpn.storage.CoreStorage
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 import okhttp3.OkHttpClient
@@ -26,8 +26,11 @@ class NetworkModule {
   @Singleton
   fun provideHeadersInterceptor(
     config: AppConfig,
-    prefs: SharedPreferences,
-  ): HeadersInterceptor = HeadersInterceptor(config, prefs)
+    storage: CoreStorage,
+  ): HeadersInterceptor = HeadersInterceptor(
+    appToken = config.getAppToken(),
+    userTokenProvider = { storage.getToken() },
+  )
 
   @Provides
   @Singleton
@@ -90,9 +93,16 @@ class NetworkModule {
 
   @Provides
   @Singleton
+  fun provideDnsBasedClient(api: Api): DnsBasedClient {
+    return DnsBasedClient(api)
+  }
+
+  @Provides
+  @Singleton
   fun provideRepository(
     api: Api,
     connectApi: ConnectApi,
     client: OkHttpClient,
-  ): AppRepository = AppRepositoryImpl(api, connectApi, client)
+    dnsBasedClient: DnsBasedClient,
+  ): AppRepository = AppRepository(api, connectApi, client, dnsBasedClient)
 }

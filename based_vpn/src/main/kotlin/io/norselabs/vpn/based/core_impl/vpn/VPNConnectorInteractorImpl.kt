@@ -2,14 +2,16 @@ package io.norselabs.vpn.based.core_impl.vpn
 
 import arrow.core.Either
 import arrow.core.flatMap
-import io.norselabs.vpn.based.network.repository.AppRepository
 import io.norselabs.vpn.based.vpn.ProfileDecoder
+import io.norselabs.vpn.common_network.AppRepository
 import io.norselabs.vpn.core_vpn.vpn.Credentials
 import io.norselabs.vpn.core_vpn.vpn.Destination
 import io.norselabs.vpn.core_vpn.vpn.Protocol
 import io.norselabs.vpn.core_vpn.vpn.connector.VPNConnectorInteractor
 import io.norselabs.vpn.v2ray.error.V2RayError
 import io.norselabs.vpn.v2ray.repo.V2RayRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 
 class VPNConnectorInteractorImpl(
@@ -23,23 +25,23 @@ class VPNConnectorInteractorImpl(
   ): Either<Exception, Credentials> {
     val city = (destination as? Destination.City)
       ?: return Either.Left(Exception("Destination.Server is not supported yet"))
-    return repository.getCredentials(city.countryId, city.cityId, protocol)
+    return repository.getCredentials(city.cityId, protocol?.strValue)
       .flatMap { response ->
         val data = response.data
         when (data.protocol) {
-          Protocol.WIREGUARD -> Credentials.Wireguard(
+          Protocol.WIREGUARD.strValue -> Credentials.Wireguard(
             payload = data.payload,
             privateKey = data.privateKey,
-            serverId = data.server?.id,
+            serverId = data.server.id,
           )
 
-          Protocol.V2RAY -> Credentials.V2Ray(
+          Protocol.V2RAY.strValue -> Credentials.V2Ray(
             payload = data.payload,
             uid = data.privateKey,
-            serverId = data.server?.id,
+            serverId = data.server.id,
           )
 
-          Protocol.NONE -> null
+          else -> null
         }
           ?.let { credentials -> Either.Right(credentials) }
           ?: Either.Left(Exception("Unknown protocol"))
@@ -47,7 +49,9 @@ class VPNConnectorInteractorImpl(
   }
 
   override suspend fun resetConnection() {
-    repository.resetConnection()
+    withContext(Dispatchers.IO) {
+      repository.resetConnection()
+    }
   }
 
   override fun parseHttpCode(exception: Exception): Int? {

@@ -31,13 +31,9 @@ android {
     }
 
     buildTypes {
-        debug {
-            buildConfigField "String", "API_URL", "\"https://vpn-api.basedapps.co.uk\""
-        }
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            buildConfigField "String", "API_URL", "\"https://vpn-api.basedapps.co.uk\""
         }
     }
     compileOptions {

@@ -33,10 +33,10 @@ import co.uk.basedapps.vpn.ui.theme.BasedAppColor
 import co.uk.basedapps.vpn.ui.widget.ErrorScreen
 import co.uk.basedapps.vpn.ui.widget.TopBar
 import io.norselabs.vpn.based.compose.EffectHandler
-import io.norselabs.vpn.based.network.model.City
 import io.norselabs.vpn.based.viewModel.cities.CitiesScreenEffect as Effect
 import io.norselabs.vpn.based.viewModel.cities.CitiesScreenState as State
 import io.norselabs.vpn.based.viewModel.cities.CitiesScreenViewModel
+import io.norselabs.vpn.based.viewModel.cities.CityUi
 import io.norselabs.vpn.common.state.Status
 
 @Composable
@@ -70,7 +70,7 @@ fun CitiesScreen(
 fun CitiesScreenStateless(
   state: State,
   navigateBack: () -> Unit,
-  onItemClick: (City) -> Unit,
+  onItemClick: (CityUi) -> Unit,
   onTryAgainClick: () -> Unit,
 ) {
   Scaffold(
@@ -96,7 +96,7 @@ fun CitiesScreenStateless(
 private fun Content(
   paddingValues: PaddingValues,
   state: State,
-  onItemClick: (City) -> Unit,
+  onItemClick: (CityUi) -> Unit,
   onTryAgainClick: () -> Unit,
 ) {
   Box(
@@ -125,7 +125,7 @@ private fun Content(
 @Composable
 private fun Data(
   state: State,
-  onItemClick: (City) -> Unit,
+  onItemClick: (CityUi) -> Unit,
 ) {
   LazyColumn(
     modifier = Modifier.fillMaxSize(),
@@ -139,8 +139,8 @@ private fun Data(
 
 @Composable
 private fun CityRow(
-  city: City,
-  onItemClick: (City) -> Unit,
+  city: CityUi,
+  onItemClick: (CityUi) -> Unit,
 ) {
   Row(
     modifier = Modifier

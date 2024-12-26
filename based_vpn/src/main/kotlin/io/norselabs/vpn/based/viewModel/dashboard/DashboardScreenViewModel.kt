@@ -5,13 +5,13 @@ import androidx.lifecycle.viewModelScope
 import arrow.core.Either
 import arrow.core.flatMap
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.norselabs.vpn.based.network.model.IpData
-import io.norselabs.vpn.based.network.repository.AppRepository
-import io.norselabs.vpn.based.network.repository.CitiesRequest
 import io.norselabs.vpn.based.storage.AppStorage
 import io.norselabs.vpn.based.storage.RatingStatus
 import io.norselabs.vpn.based.viewModel.dashboard.DashboardScreenEffect as Effect
 import io.norselabs.vpn.common.state.Status
+import io.norselabs.vpn.common_network.AppRepository
+import io.norselabs.vpn.common_network.models.CitiesRequest
+import io.norselabs.vpn.common_network.models.NetworkData
 import io.norselabs.vpn.core_vpn.storage.CoreStorage
 import io.norselabs.vpn.core_vpn.user.UserInitializer
 import io.norselabs.vpn.core_vpn.user.UserStatus
@@ -124,9 +124,9 @@ class DashboardScreenViewModel
   private suspend fun updateNetworkInfo(isNetworkChanged: Boolean) {
     userInitializer.hasToken().firstOrNull { it }
     stateHolder.updateState { copy(retryAttempt = state.retryAttempt + 1) }
-    repository.getIp()
+    repository.getIpData()
       .flatMap { res ->
-        val currentIp = state.ipData?.ip
+        val currentIp = state.networkData?.ip
         if (isNetworkChanged && currentIp == res.data.ip) {
           Either.Left(Unit)
         } else {
@@ -137,10 +137,14 @@ class DashboardScreenViewModel
       .onLeft { handleNetworkInfoError(isNetworkChanged) }
   }
 
-  private fun parseNetworkInfo(ipData: IpData) {
+  private fun parseNetworkInfo(networkData: NetworkData) {
     stateHolder.updateState {
       copy(
-        ipData = ipData,
+        networkData = NetworkDataUi(
+          ip = networkData.ip,
+          lat = networkData.info.lat,
+          long = networkData.info.long,
+        ),
         retryAttempt = 0,
       )
     }
@@ -219,10 +223,10 @@ class DashboardScreenViewModel
 
   private suspend fun selectRandomDestination() {
     val protocol = coreStorage.getVpnProtocol().takeIf { it != Protocol.NONE }
-    val countries = repository.getCountries(protocol = protocol, isFresh = false).getOrNull()?.data
+    val countries = repository.getCountries(protocol = protocol?.strValue, isFresh = false).getOrNull()?.data
     val country = countries?.randomOrNull() ?: return
     val cities = repository.getCities(
-      request = CitiesRequest(country.id, protocol),
+      request = CitiesRequest(country.id, protocol?.strValue),
       isFresh = false,
     ).getOrNull()?.data
     val city = cities?.randomOrNull() ?: return

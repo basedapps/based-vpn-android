@@ -37,16 +37,16 @@ import co.uk.basedapps.vpn.ui.theme.BasedAppColor
 import co.uk.basedapps.vpn.ui.widget.ErrorScreen
 import co.uk.basedapps.vpn.ui.widget.TopBar
 import io.norselabs.vpn.based.compose.EffectHandler
-import io.norselabs.vpn.based.network.model.Country
 import io.norselabs.vpn.based.viewModel.countries.CountriesScreenEffect as Effect
 import io.norselabs.vpn.based.viewModel.countries.CountriesScreenState as State
 import io.norselabs.vpn.based.viewModel.countries.CountriesScreenViewModel
+import io.norselabs.vpn.based.viewModel.countries.CountryUi
 import io.norselabs.vpn.common.state.Status
 
 @Composable
 fun CountriesScreen(
   navigateBack: () -> Unit,
-  navigateToCities: (Country) -> Unit,
+  navigateToCities: (String) -> Unit,
 ) {
   val viewModel = hiltViewModel<CountriesScreenViewModel>()
   val state by viewModel.stateHolder.state.collectAsState()
@@ -54,7 +54,7 @@ fun CountriesScreen(
   EffectHandler(viewModel.stateHolder.effects) { effect ->
     when (effect) {
       is Effect.ShowCitiesScreen ->
-        navigateToCities(effect.country)
+        navigateToCities(effect.countryId)
     }
   }
 
@@ -70,7 +70,7 @@ fun CountriesScreen(
 fun CountriesScreenStateless(
   state: State,
   navigateBack: () -> Unit,
-  onItemClick: (Country) -> Unit,
+  onItemClick: (CountryUi) -> Unit,
   onTryAgainClick: () -> Unit,
 ) {
   Scaffold(
@@ -96,7 +96,7 @@ fun CountriesScreenStateless(
 fun Content(
   paddingValues: PaddingValues,
   state: State,
-  onItemClick: (Country) -> Unit,
+  onItemClick: (CountryUi) -> Unit,
   onTryAgainClick: () -> Unit,
 ) {
   Box(
@@ -125,7 +125,7 @@ fun Content(
 @Composable
 private fun Data(
   state: State,
-  onItemClick: (Country) -> Unit,
+  onItemClick: (CountryUi) -> Unit,
 ) {
   LazyColumn(
     modifier = Modifier.fillMaxSize(),
@@ -139,8 +139,8 @@ private fun Data(
 
 @Composable
 private fun CountryRow(
-  country: Country,
-  onItemClick: (Country) -> Unit,
+  country: CountryUi,
+  onItemClick: (CountryUi) -> Unit,
 ) {
   Row(
     modifier = Modifier

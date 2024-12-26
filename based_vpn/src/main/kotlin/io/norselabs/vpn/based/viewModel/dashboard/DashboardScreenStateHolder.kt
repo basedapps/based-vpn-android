@@ -1,6 +1,5 @@
 package io.norselabs.vpn.based.viewModel.dashboard
 
-import io.norselabs.vpn.based.network.model.IpData
 import io.norselabs.vpn.common.state.Status
 import io.norselabs.vpn.common.state.ViewStateHolder
 import io.norselabs.vpn.core_vpn.user.UserStatus
@@ -16,12 +15,18 @@ data class DashboardScreenState(
   val status: Status = Status.Data,
   val vpnStatus: VpnStatus = VpnStatus.Disconnected,
   val userStatus: UserStatus = UserStatus.Determining,
-  val ipData: IpData? = null,
+  val networkData: NetworkDataUi? = null,
   val destination: Destination? = null,
   val retryAttempt: Int = 0,
   val isDestinationLoading: Boolean = false,
   val isErrorAlertVisible: Boolean = false,
   val isRatingAlertVisible: Boolean = false,
+)
+
+data class NetworkDataUi(
+  val ip: String,
+  val lat: Double,
+  val long: Double,
 )
 
 sealed interface DashboardScreenEffect {

@@ -78,10 +78,11 @@ arrow-core = { module = "io.arrow-kt:arrow-core", version = "1.2.0" }
 # Norselabs
 vpn-v2ray = { module = "io.norselabs.vpn:v2ray", version = "0.0.10" }
 core-vpn = { module = "io.norselabs.vpn:core_vpn", version = "0.0.6" }
-common = { module = "io.norselabs.vpn:common", version = "0.0.1" }
+common = { module = "io.norselabs.vpn:common", version = "0.0.2" }
 common-map = { module = "io.norselabs.vpn:common_map", version = "0.0.1" }
 common-flags = { module = "io.norselabs.vpn:common_flags", version = "0.0.2" }
 common-logger = { module = "io.norselabs.vpn:common_logger", version = "0.0.2" }
+common-network = { module = "io.norselabs.vpn:common_network", version = "0.0.1" }
 common-net-apps = { module = "io.norselabs.vpn:common_net_apps", version = "0.0.1" }
 
 [plugins]

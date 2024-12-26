@@ -9,7 +9,7 @@ import dagger.hilt.components.SingletonComponent
 import io.norselabs.vpn.based.app_config.AppConfig
 import io.norselabs.vpn.based.core_impl.user.UserInitializerInteractorImpl
 import io.norselabs.vpn.based.core_impl.vpn.VPNConnectorInteractorImpl
-import io.norselabs.vpn.based.network.repository.AppRepository
+import io.norselabs.vpn.common_network.AppRepository
 import io.norselabs.vpn.core_vpn.storage.CoreStorage
 import io.norselabs.vpn.core_vpn.user.UserInitializer
 import io.norselabs.vpn.core_vpn.user.UserInitializerInteractor

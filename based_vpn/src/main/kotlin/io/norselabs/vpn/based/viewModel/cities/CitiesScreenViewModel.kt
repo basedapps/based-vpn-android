@@ -3,10 +3,9 @@ package io.norselabs.vpn.based.viewModel.cities
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.norselabs.vpn.based.network.model.City
-import io.norselabs.vpn.based.network.repository.AppRepository
-import io.norselabs.vpn.based.network.repository.CitiesRequest
 import io.norselabs.vpn.common.state.Status
+import io.norselabs.vpn.common_network.AppRepository
+import io.norselabs.vpn.common_network.models.CitiesRequest
 import io.norselabs.vpn.core_vpn.storage.CoreStorage
 import io.norselabs.vpn.core_vpn.vpn.Destination
 import io.norselabs.vpn.core_vpn.vpn.Protocol
@@ -41,14 +40,16 @@ class CitiesScreenViewModel
   private fun getCities(countryId: String) {
     viewModelScope.launch {
       val protocol = coreStorage.getVpnProtocol().takeIf { it != Protocol.NONE }
-      val countries = repository.getCountries(protocol).getOrNull()?.data
-      val cities = repository.getCities(CitiesRequest(countryId, protocol)).getOrNull()?.data
+      val countries = repository.getCountries(protocol?.strValue).getOrNull()?.data
+      val cities = repository.getCities(CitiesRequest(countryId, protocol?.strValue)).getOrNull()?.data
       if (countries != null && cities != null) {
         stateHolder.updateState {
           copy(
             status = Status.Data,
             country = countries.first { it.id == countryId },
-            cities = cities,
+            cities = cities.map { city ->
+              CityUi(city.id, city.countryId, city.name, city.serversAvailable)
+            },
           )
         }
       } else {
@@ -57,7 +58,7 @@ class CitiesScreenViewModel
     }
   }
 
-  fun onCityClick(city: City) {
+  fun onCityClick(city: CityUi) {
     val country = state.country ?: return
     destinationStorage.storeDestination(
       Destination.City(

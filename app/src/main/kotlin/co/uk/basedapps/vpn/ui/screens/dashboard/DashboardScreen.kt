@@ -57,10 +57,10 @@ import co.uk.basedapps.vpn.ui.widget.BasedButton
 import co.uk.basedapps.vpn.ui.widget.ButtonStyle
 import co.uk.basedapps.vpn.ui.widget.ErrorScreen
 import io.norselabs.vpn.based.compose.EffectHandler
-import io.norselabs.vpn.based.network.model.IpData
 import io.norselabs.vpn.based.viewModel.dashboard.DashboardScreenEffect as Effect
 import io.norselabs.vpn.based.viewModel.dashboard.DashboardScreenState as State
 import io.norselabs.vpn.based.viewModel.dashboard.DashboardScreenViewModel
+import io.norselabs.vpn.based.viewModel.dashboard.NetworkDataUi
 import io.norselabs.vpn.based.viewModel.dashboard.RatingClick
 import io.norselabs.vpn.based.viewModel.dashboard.VpnStatus
 import io.norselabs.vpn.based.vpn.getVpnPermissionRequest
@@ -211,8 +211,8 @@ private fun Content(
         onSettingsClick = onSettingsClick,
       )
       WorldMap(
-        lat = state.ipData?.latitude ?: 0.0,
-        long = state.ipData?.longitude ?: 0.0,
+        lat = state.networkData?.lat ?: 0.0,
+        long = state.networkData?.long ?: 0.0,
         color = when (state.vpnStatus) {
           is VpnStatus.Connected -> Color(0xFF09D1BC)
           else -> Color(0xFFF0A83E)
@@ -316,7 +316,7 @@ private fun TopBar(
           fontWeight = FontWeight.Bold,
         )
         Text(
-          text = state.ipData?.ip.orEmpty(),
+          text = state.networkData?.ip.orEmpty(),
           color = BasedAppColor.TextPrimary,
           fontSize = 18.sp,
           fontWeight = FontWeight.Bold,
@@ -493,10 +493,10 @@ fun DashboardScreenPreview() {
           countryName = "Argentina",
           countryCode = "AR",
         ),
-        ipData = IpData(
+        networkData = NetworkDataUi(
           ip = "91.208.132.23",
-          latitude = 0.0,
-          longitude = 0.0,
+          lat = 0.0,
+          long = 0.0,
         ),
       ),
       onConnectClick = {},

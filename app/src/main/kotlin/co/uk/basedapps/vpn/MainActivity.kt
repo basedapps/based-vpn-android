@@ -50,8 +50,8 @@ class MainActivity : AppCompatActivity() {
           composable(Destination.Countries) {
             CountriesScreen(
               navigateBack = { navController.popBackStack() },
-              navigateToCities = { country ->
-                navController.navigate("countries/${country.id}/cities")
+              navigateToCities = { countryId ->
+                navController.navigate("countries/$countryId/cities")
               },
             )
           }

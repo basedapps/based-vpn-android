@@ -2,9 +2,10 @@ package io.norselabs.vpn.based.core_impl.user
 
 import arrow.core.Either
 import io.norselabs.vpn.based.app_config.AppConfig
-import io.norselabs.vpn.based.network.model.DataObj
-import io.norselabs.vpn.based.network.model.TokenModel
-import io.norselabs.vpn.based.network.repository.AppRepository
+import io.norselabs.vpn.common.utils.VersionComparator
+import io.norselabs.vpn.common_network.AppRepository
+import io.norselabs.vpn.common_network.models.DataObj
+import io.norselabs.vpn.common_network.models.TokenModel
 import io.norselabs.vpn.core_vpn.user.Token
 import io.norselabs.vpn.core_vpn.user.UserInitializerInteractor
 import retrofit2.HttpException
@@ -15,16 +16,15 @@ class UserInitializerInteractorImpl(
 ) : UserInitializerInteractor {
 
   override suspend fun checkVersion(): Either<Exception, Boolean> {
-    return repository.getVersion()
-      .map { response ->
-        val versions = response.data
-        versions.appVersion <= config.getBasedAppVersion() &&
-          versions.apiVersion <= config.getBasedApiVersion()
-      }
+    val minVersion = repository.getVersion().getOrNull() ?: "0.0.0"
+    val appVersion = config.getAppVersion()
+    return Either.Right(
+      VersionComparator.compare(appVersion, minVersion) != -1,
+    )
   }
 
   override suspend fun registerDevice(): Either<Exception, Token> {
-    return repository.registerDevice().map(::parseToken)
+    return repository.registerDevice(config.getAppToken()).map(::parseToken)
   }
 
   override suspend fun getSession(): Either<Exception, Token> {

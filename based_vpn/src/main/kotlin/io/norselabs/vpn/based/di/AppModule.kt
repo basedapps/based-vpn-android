@@ -9,6 +9,7 @@ import dagger.hilt.components.SingletonComponent
 import io.norselabs.vpn.based.app_config.AppConfig
 import io.norselabs.vpn.based.core_impl.user.UserInitializerInteractorImpl
 import io.norselabs.vpn.based.core_impl.vpn.VPNConnectorInteractorImpl
+import io.norselabs.vpn.based.network.DnsRequests
 import io.norselabs.vpn.common_network.AppRepository
 import io.norselabs.vpn.core_vpn.storage.CoreStorage
 import io.norselabs.vpn.core_vpn.user.UserInitializer
@@ -32,8 +33,9 @@ class AppModule {
   fun provideUserInitializerInteractor(
     repository: AppRepository,
     config: AppConfig,
+    dnsRequests: DnsRequests,
   ): UserInitializerInteractor {
-    return UserInitializerInteractorImpl(repository, config)
+    return UserInitializerInteractorImpl(repository, config, dnsRequests)
   }
 
   @Provides

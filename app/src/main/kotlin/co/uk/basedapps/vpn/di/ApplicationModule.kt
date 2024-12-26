@@ -10,6 +10,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import io.norselabs.vpn.based.app_config.AppConfig
+import io.norselabs.vpn.based.network.DnsRequests
 import io.norselabs.vpn.based.viewModel.split_tunneling.NetAppsProvider
 import io.norselabs.vpn.based.viewModel.split_tunneling.NetworkApp
 import io.norselabs.vpn.common_logger.logger.FileLogTree
@@ -29,8 +30,6 @@ class ApplicationModule {
     override fun getAppVersion() = BuildConfig.VERSION_NAME
     override fun getPackage() = "co.uk.basedapps.vpn"
     override fun getBaseUrl() = "https://api.dvpnsdk.com"
-    override fun getBasedAppVersion(): Long = 1
-    override fun getBasedApiVersion(): Long = 2
     override fun getAppToken(): String = "d03xozoa1yiiojofx19fs3mhbmyy2lre"
   }
 
@@ -78,6 +77,14 @@ class ApplicationModule {
             }
         }
       }
+    }
+  }
+
+  @Provides
+  @Singleton
+  fun provideDnsRequests(): DnsRequests {
+    return object : DnsRequests {
+      override val version: String = "update.independentdvpn.com"
     }
   }
 }

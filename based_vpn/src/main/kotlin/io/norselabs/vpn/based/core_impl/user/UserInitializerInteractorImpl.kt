@@ -2,6 +2,7 @@ package io.norselabs.vpn.based.core_impl.user
 
 import arrow.core.Either
 import io.norselabs.vpn.based.app_config.AppConfig
+import io.norselabs.vpn.based.network.DnsRequests
 import io.norselabs.vpn.common.utils.VersionComparator
 import io.norselabs.vpn.common_network.AppRepository
 import io.norselabs.vpn.common_network.models.DataObj
@@ -13,10 +14,11 @@ import retrofit2.HttpException
 class UserInitializerInteractorImpl(
   private val repository: AppRepository,
   private val config: AppConfig,
+  private val dnsRequests: DnsRequests,
 ) : UserInitializerInteractor {
 
   override suspend fun checkVersion(): Either<Exception, Boolean> {
-    val minVersion = repository.getVersion().getOrNull() ?: "0.0.0"
+    val minVersion = repository.getVersion(dnsRequests.version).getOrNull() ?: "0.0.0"
     val appVersion = config.getAppVersion()
     return Either.Right(
       VersionComparator.compare(appVersion, minVersion) != -1,

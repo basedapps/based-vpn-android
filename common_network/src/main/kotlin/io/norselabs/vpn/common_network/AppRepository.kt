@@ -65,8 +65,8 @@ class AppRepository(
     api.getServer(serverId)
   }
 
-  suspend fun getVersion(): Either<Exception, String> {
-    return dnsClient.getVersion()
+  suspend fun getVersion(request: String): Either<Exception, String> {
+    return dnsClient.getVersion(request)
   }
 
   fun resetConnection() {

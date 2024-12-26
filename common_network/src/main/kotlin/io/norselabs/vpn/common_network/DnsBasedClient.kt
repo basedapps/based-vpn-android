@@ -17,8 +17,8 @@ class DnsBasedClient(
     "https://9.9.9.9:5053/dns-query",
   )
 
-  suspend fun getVersion(): Either<Exception, String> {
-    val response = request("dvpn.update.norselabs.io")
+  suspend fun getVersion(request: String): Either<Exception, String> {
+    val response = request(request)
     return response
       ?.split(";")
       ?.firstOrNull { it.startsWith("ANDROID") }

@@ -1,4 +1,4 @@
-package io.norselabs.vpn.common.network.cache
+package io.norselabs.vpn.common_network.cache
 
 class CacheUnit<Input, Output>(
   private val fetcher: suspend (Input) -> Output,

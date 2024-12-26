@@ -42,4 +42,5 @@ include ':app',
         ':common',
         ':common_flags',
         ':common_map',
-        ':common_net_apps'
+        ':common_net_apps',
+        ':common_network'

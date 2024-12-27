@@ -84,7 +84,7 @@ dependencies {
     implementation libs.coil
 //    implementation libs.core.vpn
     implementation libs.common
-    implementation libs.common.map
+//    implementation libs.common.map
     implementation libs.common.flags
     implementation libs.common.logger
     implementation libs.common.net.apps
@@ -95,5 +95,6 @@ dependencies {
 
     implementation project(path: ':based_vpn')
     implementation project(path: ':core_vpn')
+    implementation project(path: ':common_map')
 //    implementation "io.norselabs.vpn:based:0.0.1"
 }

@@ -40,7 +40,12 @@ fun WorldMap(
   val radiusPx = with(LocalDensity.current) { 3.dp.toPx() }
   val imgSize = remember { mutableStateOf(Size.Zero) }
   val viewSize = remember { mutableStateOf(Size.Zero) }
-  val scale = remember { derivedStateOf { viewSize.value.height / imgSize.value.height } }
+  val scale = remember {
+    derivedStateOf {
+      val scale = viewSize.value.height / imgSize.value.height
+      scale.takeIf { !it.isNaN() && it.isFinite() } ?: 1f
+    }
+  }
   val pointOffset = remember {
     derivedStateOf {
       if (coordinates.value.first == 0f || coordinates.value.second == 0f) {

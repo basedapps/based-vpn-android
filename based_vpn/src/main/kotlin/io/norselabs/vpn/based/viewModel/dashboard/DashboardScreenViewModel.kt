@@ -65,7 +65,7 @@ class DashboardScreenViewModel
             val isQuick = state.vpnStatus.isQuick()
             setVpnStatus(VpnStatus.Connecting(isQuick))
           }
-          updateNetworkInfo(true)
+          updateNetworkInfo(true) // todo: disconnect on error
           flowOf(isConnected)
         }
         .collect { isConnected ->

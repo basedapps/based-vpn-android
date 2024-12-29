@@ -57,6 +57,7 @@ import co.uk.basedapps.vpn.ui.widget.BasedButton
 import co.uk.basedapps.vpn.ui.widget.ButtonStyle
 import co.uk.basedapps.vpn.ui.widget.ErrorScreen
 import io.norselabs.vpn.based.compose.EffectHandler
+import io.norselabs.vpn.based.viewModel.dashboard.DashboardScreenEffect
 import io.norselabs.vpn.based.viewModel.dashboard.DashboardScreenEffect as Effect
 import io.norselabs.vpn.based.viewModel.dashboard.DashboardScreenState as State
 import io.norselabs.vpn.based.viewModel.dashboard.DashboardScreenViewModel
@@ -113,6 +114,8 @@ fun DashboardScreen(
       is Effect.ShowRating -> {
         Timber.tag("DashboardScreenEffect").d("ShowRating")
       }
+
+      is DashboardScreenEffect.ShareLogs -> Unit
     }
   }
 

@@ -37,6 +37,7 @@ sealed interface DashboardScreenEffect {
   data object ShowGooglePlay : DashboardScreenEffect
   data object ShowRating : DashboardScreenEffect
   data object EmailToSupport : DashboardScreenEffect
+  data object ShareLogs : DashboardScreenEffect
 }
 
 sealed interface VpnStatus {

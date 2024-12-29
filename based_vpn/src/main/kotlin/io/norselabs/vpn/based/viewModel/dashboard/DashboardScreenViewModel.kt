@@ -271,6 +271,10 @@ class DashboardScreenViewModel
     stateHolder.sendEffect(Effect.ShowGooglePlay)
   }
 
+  fun onShareLogsClick() {
+    stateHolder.sendEffect(Effect.ShareLogs)
+  }
+
   fun onAlertConfirmClick() {
     stateHolder.updateState { copy(isErrorAlertVisible = false) }
   }

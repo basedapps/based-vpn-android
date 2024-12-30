@@ -11,6 +11,7 @@ import timber.log.Timber
 
 class FileLogTree(
   private val context: Context,
+  private val excluded: List<String> = emptyList(),
 ) : Timber.Tree() {
 
   companion object {
@@ -37,7 +38,10 @@ class FileLogTree(
       file.apply {
         bufferedWriter().use { buffer ->
           accumulatedLogs.forEach { line ->
-            buffer.write(line)
+            val preparedLine = excluded.fold(line) { acc, ex ->
+              acc.replace(ex, "(*****)")
+            }
+            buffer.write(preparedLine)
           }
         }
       }

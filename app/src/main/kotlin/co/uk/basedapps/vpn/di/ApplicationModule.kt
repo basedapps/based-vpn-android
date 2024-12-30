@@ -35,8 +35,14 @@ class ApplicationModule {
 
   @Provides
   @Singleton
-  fun provideFileLogTree(@ApplicationContext context: Context): FileLogTree {
-    return FileLogTree(context)
+  fun provideFileLogTree(
+    @ApplicationContext context: Context,
+    appConfig: AppConfig,
+  ): FileLogTree {
+    return FileLogTree(
+      context = context,
+      excluded = listOf(appConfig.getBaseUrl().replace("https://", "")),
+    )
   }
 
   @Provides

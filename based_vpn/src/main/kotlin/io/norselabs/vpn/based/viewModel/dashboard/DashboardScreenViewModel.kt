@@ -12,6 +12,8 @@ import io.norselabs.vpn.common.state.Status
 import io.norselabs.vpn.common_network.AppRepository
 import io.norselabs.vpn.common_network.models.CitiesRequest
 import io.norselabs.vpn.common_network.models.NetworkData
+import io.norselabs.vpn.core_vpn.connectivity.NetworkState
+import io.norselabs.vpn.core_vpn.connectivity.NetworkStateMonitor
 import io.norselabs.vpn.core_vpn.storage.CoreStorage
 import io.norselabs.vpn.core_vpn.user.UserInitializer
 import io.norselabs.vpn.core_vpn.user.UserStatus
@@ -30,6 +32,7 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeout
 import timber.log.Timber
 
 @HiltViewModel
@@ -43,6 +46,7 @@ class DashboardScreenViewModel
   private val vpnRepo: V2RayRepository,
   private val userInitializer: UserInitializer,
   private val destinationStorage: DestinationStorage,
+  private val networkMonitor: NetworkStateMonitor,
 ) : ViewModel() {
 
   private var connectJob: Job? = null
@@ -51,9 +55,21 @@ class DashboardScreenViewModel
     get() = stateHolder.state.value
 
   init {
+    observeNetworkState()
     observeConnectionState()
     observeUserStatus()
     observeDestination()
+  }
+
+  private fun observeNetworkState() {
+    viewModelScope.launch {
+      networkMonitor.networkState.collect { state ->
+        Timber.tag(TAG).d("Network State: $state")
+        if (state is NetworkState.Connected) {
+          updateNetworkInfo(true)
+        }
+      }
+    }
   }
 
   @OptIn(ExperimentalCoroutinesApi::class)
@@ -64,9 +80,15 @@ class DashboardScreenViewModel
           if (isConnected) {
             val isQuick = state.vpnStatus.isQuick()
             setVpnStatus(VpnStatus.Connecting(isQuick))
+            if (checkConnection()) {
+              flowOf(true)
+            } else {
+              stopVpn()
+              flowOf(false)
+            }
+          } else {
+            flowOf(false)
           }
-          updateNetworkInfo(true) // todo: disconnect on error
-          flowOf(isConnected)
         }
         .collect { isConnected ->
           val isQuick = state.vpnStatus.isQuick()
@@ -115,10 +137,26 @@ class DashboardScreenViewModel
   }
 
   private fun setVpnStatus(vpnStatus: VpnStatus) {
-    Timber.tag(TAG).d("VPN Status: $vpnStatus")
+    Timber.tag(TAG).d("Set VPN Status: $vpnStatus")
     stateHolder.updateState {
       copy(vpnStatus = vpnStatus)
     }
+  }
+
+  private suspend fun checkConnection(): Boolean {
+    repeat(MAX_ATTEMPTS) {
+      val isConnected = try {
+        withTimeout(3000) {
+          repository.checkConnection()
+            .isRight()
+            .also { Timber.tag(TAG).d("Connection check: $it") }
+        }
+      } catch (e: Exception) {
+        false
+      }
+      if (isConnected) return true
+    }
+    return false
   }
 
   private suspend fun updateNetworkInfo(isNetworkChanged: Boolean) {
@@ -166,12 +204,14 @@ class DashboardScreenViewModel
 
   fun onConnectClick() {
     if (state.vpnStatus is VpnStatus.Disconnected) {
+      Timber.tag(TAG).d("Connect clicked")
       initConnection(isQuick = false)
     }
   }
 
   fun onQuickConnectClick() {
     if (state.vpnStatus is VpnStatus.Disconnected) {
+      Timber.tag(TAG).d("Quick Connect clicked")
       viewModelScope.launch {
         stateHolder.updateState { copy(isDestinationLoading = true) }
         selectRandomDestination()
@@ -183,6 +223,7 @@ class DashboardScreenViewModel
 
   fun onDisconnectClick() {
     if (state.vpnStatus !is VpnStatus.Disconnected) {
+      Timber.tag(TAG).d("Disconnect clicked")
       stopVpn()
     }
   }
@@ -318,7 +359,7 @@ class DashboardScreenViewModel
   }
 
   companion object {
-    const val TAG = "DashboardTag"
-    const val MAX_ATTEMPTS = 5
+    const val TAG = "Dashboard"
+    const val MAX_ATTEMPTS = 3
   }
 }

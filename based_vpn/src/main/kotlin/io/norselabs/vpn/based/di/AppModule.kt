@@ -1,16 +1,19 @@
 package io.norselabs.vpn.based.di
 
+import android.content.Context
 import android.content.SharedPreferences
 import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import io.norselabs.vpn.based.app_config.AppConfig
 import io.norselabs.vpn.based.core_impl.user.UserInitializerInteractorImpl
 import io.norselabs.vpn.based.core_impl.vpn.VPNConnectorInteractorImpl
 import io.norselabs.vpn.based.network.DnsRequests
 import io.norselabs.vpn.common_network.AppRepository
+import io.norselabs.vpn.core_vpn.connectivity.NetworkStateMonitor
 import io.norselabs.vpn.core_vpn.storage.CoreStorage
 import io.norselabs.vpn.core_vpn.user.UserInitializer
 import io.norselabs.vpn.core_vpn.user.UserInitializerInteractor
@@ -90,5 +93,13 @@ class AppModule {
     v2RayRepository: V2RayRepository,
   ): SplitTunnelingConfigurator {
     return SplitTunnelingConfigurator(v2RayRepository)
+  }
+
+  @Provides
+  @Singleton
+  fun provideNetworkStateMonitor(
+    @ApplicationContext context: Context,
+  ): NetworkStateMonitor {
+    return NetworkStateMonitor(context)
   }
 }

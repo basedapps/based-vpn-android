@@ -43,6 +43,9 @@ interface Api {
   @GET("server/{serverId}")
   suspend fun getServer(@Path("serverId") serverId: String): DataObj<Server>
 
+  @GET("health")
+  suspend fun checkConnection()
+
   @GET
   suspend fun getDNS(
     @Url url: String,

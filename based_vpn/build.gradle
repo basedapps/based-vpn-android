@@ -88,6 +88,7 @@ dependencies {
     implementation libs.kotlin.collection.immutable
 
 //    implementation project(path: ':common_network')
+//    implementation project(path: ':core_vpn')
 
     kapt libs.hilt.compiler
 }

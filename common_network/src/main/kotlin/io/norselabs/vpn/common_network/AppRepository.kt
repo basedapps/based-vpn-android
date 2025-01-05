@@ -69,6 +69,11 @@ class AppRepository(
     return dnsClient.getVersion(request)
   }
 
+  suspend fun checkConnection(): Either<Exception, Boolean> = execute {
+    api.checkConnection()
+    true
+  }
+
   fun resetConnection() {
     client.connectionPool.evictAll()
   }

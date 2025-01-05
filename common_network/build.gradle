@@ -36,7 +36,7 @@ publishing {
         release(MavenPublication) {
             groupId = 'io.norselabs.vpn'
             artifactId = 'common_network'
-            version = '0.0.2'
+            version = '0.0.3'
 
             afterEvaluate {
                 from components.release
@@ -61,4 +61,5 @@ dependencies {
     implementation libs.arrow.core
     implementation libs.timber
     implementation libs.http.logger
+    implementation libs.coroutines.core
 }

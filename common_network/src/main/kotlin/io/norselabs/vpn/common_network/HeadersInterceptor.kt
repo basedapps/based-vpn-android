@@ -4,7 +4,6 @@ import okhttp3.Interceptor
 import okhttp3.Response
 
 class HeadersInterceptor(
-  private val appToken: String,
   private val userTokenProvider: () -> String,
 ) : Interceptor {
 
@@ -14,7 +13,6 @@ class HeadersInterceptor(
       request()
         .newBuilder()
         .apply {
-          addHeader("X-App-Token", appToken)
           if (token.isNotEmpty()) {
             addHeader("X-Device-Token", token)
           }

@@ -27,10 +27,8 @@ class NetworkModule {
   @Provides
   @Singleton
   fun provideHeadersInterceptor(
-    config: AppConfig,
     storage: CoreStorage,
   ): HeadersInterceptor = HeadersInterceptor(
-    appToken = config.getAppToken(),
     userTokenProvider = { storage.getToken() },
   )
 
@@ -122,5 +120,12 @@ class NetworkModule {
     connectApi: ConnectApi,
     client: OkHttpClient,
     dnsBasedClient: DnsBasedClient,
-  ): AppRepository = AppRepository(api, connectApi, client, dnsBasedClient)
+    config: AppConfig,
+  ): AppRepository = AppRepository(
+    api = api,
+    connectApi = connectApi,
+    client = client,
+    dnsClient = dnsBasedClient,
+    appToken = config.getAppToken(),
+  )
 }

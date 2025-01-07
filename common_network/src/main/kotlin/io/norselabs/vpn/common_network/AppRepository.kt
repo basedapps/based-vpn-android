@@ -1,6 +1,7 @@
 package io.norselabs.vpn.common_network
 
 import arrow.core.Either
+import arrow.core.flatMap
 import io.norselabs.vpn.common_network.api.Api
 import io.norselabs.vpn.common_network.api.ConnectApi
 import io.norselabs.vpn.common_network.cache.CacheUnit
@@ -23,6 +24,7 @@ class AppRepository(
   private val connectApi: ConnectApi,
   private val client: OkHttpClient,
   private val dnsClient: DnsBasedClient,
+  private val appToken: String,
 ) {
 
   private val countriesCache = CacheUnit<String?, DataList<Country>> { protocol ->
@@ -66,7 +68,17 @@ class AppRepository(
   }
 
   suspend fun getVersion(request: String): Either<Exception, String> {
-    return dnsClient.getVersion(request)
+    return execute { api.getConfig(appToken) }
+      .flatMap { configs ->
+        configs.data
+          .firstOrNull { it.key == "minimal_android_version" }?.value
+          ?.let { Either.Right(it) }
+          ?: Either.Left(Unit)
+      }
+      .fold(
+        ifLeft = { dnsClient.getVersion(request) },
+        ifRight = { Either.Right(it) },
+      )
   }
 
   suspend fun checkConnection(): Either<Exception, Boolean> = execute {

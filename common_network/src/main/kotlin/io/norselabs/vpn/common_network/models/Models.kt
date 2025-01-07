@@ -142,3 +142,10 @@ data class Server(
   @SerializedName("protocol")
   val protocol: String,
 )
+
+data class ConfigValue(
+  @SerializedName("key")
+  val key: String,
+  @SerializedName("value")
+  val value: String,
+)

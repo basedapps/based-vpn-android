@@ -26,32 +26,45 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.hilt.getScreenModel
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import co.uk.basedapps.vpn.R
 import co.uk.basedapps.vpn.ui.theme.BasedAppColor
 import co.uk.basedapps.vpn.ui.widget.Dropdown
 import co.uk.basedapps.vpn.ui.widget.TopBar
 import coil.compose.AsyncImage
+import io.norselabs.vpn.based.compose.EffectHandler
 import io.norselabs.vpn.based.viewModel.split_tunneling.NetworkApp
+import io.norselabs.vpn.based.viewModel.split_tunneling.SplitTunnelingScreenEffect as Effect
 import io.norselabs.vpn.based.viewModel.split_tunneling.SplitTunnelingScreenState as State
 import io.norselabs.vpn.based.viewModel.split_tunneling.SplitTunnelingScreenViewModel
 import io.norselabs.vpn.core_vpn.vpn.split_tunneling.SplitTunnelingStatus
 import kotlinx.collections.immutable.persistentListOf
 
-@Composable
-fun SplitTunnelingScreenScreen(
-  navigateBack: () -> Unit,
-) {
+class SplitTunnelingScreen : Screen {
 
-  val viewModel = hiltViewModel<SplitTunnelingScreenViewModel>()
-  val state by viewModel.stateHolder.state.collectAsState()
+  @Composable
+  override fun Content() {
+    val viewModel = getScreenModel<SplitTunnelingScreenViewModel>()
+    val state by viewModel.stateHolder.state.collectAsState()
 
-  SplitTunnelingScreenStateless(
-    state = state,
-    navigateBack = navigateBack,
-    setSplitTunnelingStatus = viewModel::setSplitTunnelingStatus,
-    onAppChecked = viewModel::onAppChecked,
-  )
+    val navigator = LocalNavigator.currentOrThrow
+
+    EffectHandler(viewModel.stateHolder.effects) { effect ->
+      when (effect) {
+        is Effect.GoBack -> navigator.pop()
+      }
+    }
+
+    SplitTunnelingScreenStateless(
+      state = state,
+      navigateBack = viewModel::onBackClick,
+      setSplitTunnelingStatus = viewModel::setSplitTunnelingStatus,
+      onAppChecked = viewModel::onAppChecked,
+    )
+  }
 }
 
 @Composable

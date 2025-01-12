@@ -21,52 +21,56 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.hilt.getScreenModel
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import co.sentinel.based_vpn.R as BasedR
 import co.uk.basedapps.vpn.R
 import co.uk.basedapps.vpn.ui.screens.settings.widgets.DnsDialog
 import co.uk.basedapps.vpn.ui.screens.settings.widgets.ProtocolDialog
+import co.uk.basedapps.vpn.ui.screens.split_tunneling.SplitTunnelingScreen
 import co.uk.basedapps.vpn.ui.theme.BasedAppColor
 import co.uk.basedapps.vpn.ui.widget.TopBar
 import io.norselabs.vpn.based.compose.EffectHandler
-import io.norselabs.vpn.based.viewModel.settings.SettingsScreenEffect
+import io.norselabs.vpn.based.viewModel.settings.SettingsScreenEffect as Effect
 import io.norselabs.vpn.based.viewModel.settings.SettingsScreenState as State
 import io.norselabs.vpn.based.viewModel.settings.SettingsScreenViewModel
 import io.norselabs.vpn.based.vpn.DdsConfigurator
 import io.norselabs.vpn.core_vpn.vpn.Protocol
 
-@Composable
-fun SettingsScreen(
-  navigateBack: () -> Unit,
-  navigateToSplitTunneling: () -> Unit,
-  shareLogs: () -> Unit,
-) {
+class SettingsScreen : Screen {
 
-  val viewModel = hiltViewModel<SettingsScreenViewModel>()
-  val state by viewModel.stateHolder.state.collectAsState()
+  @Composable
+  override fun Content() {
+    val viewModel = getScreenModel<SettingsScreenViewModel>()
+    val state by viewModel.stateHolder.state.collectAsState()
 
-  EffectHandler(viewModel.stateHolder.effects) { effect ->
-    when (effect) {
-      is SettingsScreenEffect.OpenTelegram -> Unit
+    val navigator = LocalNavigator.currentOrThrow
 
-      is SettingsScreenEffect.ShareLogs -> shareLogs()
+    EffectHandler(viewModel.stateHolder.effects) { effect ->
+      when (effect) {
+        is Effect.GoBack -> navigator.pop()
 
-      is SettingsScreenEffect.SplitTunneling -> navigateToSplitTunneling()
+        is Effect.OpenTelegram -> Unit
+
+        is Effect.SplitTunneling -> navigator.push(SplitTunnelingScreen())
+      }
     }
-  }
 
-  SettingsScreenStateless(
-    state = state,
-    navigateBack = navigateBack,
-    onDnsRowClick = viewModel::onDnsRowClick,
-    onDnsDialogConfirmClick = viewModel::onDnsSelected,
-    onDnsDialogDismissClick = viewModel::onDnsDialogDismissClick,
-    onProtocolRowClick = viewModel::onProtocolRowClick,
-    onProtocolDialogConfirmClick = viewModel::onProtocolSelected,
-    onProtocolDialogDismissClick = viewModel::onProtocolDialogDismissClick,
-    onSplitTunnelingClick = viewModel::onSplitTunnelClick,
-    onLogsRowClick = viewModel::onLogsRowClick,
-  )
+    SettingsScreenStateless(
+      state = state,
+      navigateBack = viewModel::onBackClick,
+      onDnsRowClick = viewModel::onDnsRowClick,
+      onDnsDialogConfirmClick = viewModel::onDnsSelected,
+      onDnsDialogDismissClick = viewModel::onDnsDialogDismissClick,
+      onProtocolRowClick = viewModel::onProtocolRowClick,
+      onProtocolDialogConfirmClick = viewModel::onProtocolSelected,
+      onProtocolDialogDismissClick = viewModel::onProtocolDialogDismissClick,
+      onSplitTunnelingClick = viewModel::onSplitTunnelClick,
+      onLogsRowClick = viewModel::onLogsRowClick,
+    )
+  }
 }
 
 @Composable

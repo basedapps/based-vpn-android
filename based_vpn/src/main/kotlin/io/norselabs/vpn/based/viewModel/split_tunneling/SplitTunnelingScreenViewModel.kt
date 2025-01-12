@@ -1,21 +1,20 @@
 package io.norselabs.vpn.based.viewModel.split_tunneling
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
+import cafe.adriel.voyager.core.model.ScreenModel
+import cafe.adriel.voyager.core.model.screenModelScope
+import io.norselabs.vpn.based.viewModel.split_tunneling.SplitTunnelingScreenEffect as Effect
 import io.norselabs.vpn.core_vpn.vpn.split_tunneling.SplitTunnelingConfigurator
 import io.norselabs.vpn.core_vpn.vpn.split_tunneling.SplitTunnelingStatus
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-@HiltViewModel
 class SplitTunnelingScreenViewModel
 @Inject constructor(
   val stateHolder: SplitTunnelingScreenStateHolder,
   private val appsProvider: NetAppsProvider,
   private val splitTunneling: SplitTunnelingConfigurator,
-) : ViewModel() {
+) : ScreenModel {
 
   private val state: SplitTunnelingScreenState
     get() = stateHolder.state.value
@@ -25,7 +24,7 @@ class SplitTunnelingScreenViewModel
   }
 
   private fun initApps() {
-    viewModelScope.launch(Dispatchers.IO) {
+    screenModelScope.launch(Dispatchers.IO) {
       val checkedApps = splitTunneling.getApps()
       val apps = appsProvider.getNetApps()
         .map { app ->
@@ -60,5 +59,9 @@ class SplitTunnelingScreenViewModel
       .map { it.packageName }
       .toSet()
     splitTunneling.setApps(newSet)
+  }
+
+  fun onBackClick() {
+    stateHolder.sendEffect(Effect.GoBack)
   }
 }

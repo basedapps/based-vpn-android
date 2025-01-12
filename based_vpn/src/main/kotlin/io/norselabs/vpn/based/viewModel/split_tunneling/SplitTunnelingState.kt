@@ -28,4 +28,6 @@ data class NetworkApp(
   val isChecked: Boolean,
 )
 
-sealed interface SplitTunnelingScreenEffect
+sealed interface SplitTunnelingScreenEffect {
+  data object GoBack : SplitTunnelingScreenEffect
+}

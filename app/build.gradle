@@ -71,10 +71,9 @@ dependencies {
     implementation libs.coroutines.core
     implementation libs.timber
     implementation libs.dagger.hilt
-    implementation libs.hilt.navigation.compose
     implementation libs.lifecycle.runtime
+    implementation libs.bundles.voyager
     implementation libs.bundles.compose
-    implementation libs.navigation
     implementation libs.accompanist.systemuicontroller
     implementation platform(libs.google.firebase.bom)
     implementation libs.google.firebase.crashlytics

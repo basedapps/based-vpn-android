@@ -12,6 +12,8 @@ import io.norselabs.vpn.based.app_config.AppConfig
 import io.norselabs.vpn.based.core_impl.user.UserInitializerInteractorImpl
 import io.norselabs.vpn.based.core_impl.vpn.VPNConnectorInteractorImpl
 import io.norselabs.vpn.based.network.DnsRequests
+import io.norselabs.vpn.common_logger.logger.FileLogTree
+import io.norselabs.vpn.common_logger.share.LogsSender
 import io.norselabs.vpn.common_network.AppRepository
 import io.norselabs.vpn.core_vpn.connectivity.NetworkStateMonitor
 import io.norselabs.vpn.core_vpn.storage.CoreStorage
@@ -101,5 +103,14 @@ class AppModule {
     @ApplicationContext context: Context,
   ): NetworkStateMonitor {
     return NetworkStateMonitor(context)
+  }
+
+  @Provides
+  @Singleton
+  fun provideLogsSender(
+    config: AppConfig,
+    fileLogTree: FileLogTree,
+  ): LogsSender {
+    return LogsSender(appId = config.getAppId(), fileLogTree = fileLogTree)
   }
 }

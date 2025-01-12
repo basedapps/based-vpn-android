@@ -42,7 +42,7 @@ data class SettingsScreenState(
 )
 
 sealed interface SettingsScreenEffect {
+  data object GoBack : SettingsScreenEffect
   data object OpenTelegram : SettingsScreenEffect
   data object SplitTunneling : SettingsScreenEffect
-  data object ShareLogs : SettingsScreenEffect
 }

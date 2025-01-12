@@ -20,10 +20,9 @@ retrofit = "2.9.0"
 gson = "2.10.1"
 lifecycle = "2.8.1"
 timber = "5.0.1"
-navigation = "2.7.7"
-hiltNavigation = "1.2.0"
 appcompat = "1.7.0"
 composeActivity = "1.9.1"
+voyager = "1.0.0"
 
 [libraries]
 # Android
@@ -46,7 +45,6 @@ accompanist-permissions = { module = "com.google.accompanist:accompanist-permiss
 # DI
 dagger-hilt = { module = "com.google.dagger:hilt-android", version.ref = "dagger" }
 hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "dagger" }
-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigation" }
 # Google
 google-firebase-bom = { module = "com.google.firebase:firebase-bom", version = "32.6.0" }
 google-firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
@@ -66,8 +64,6 @@ retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit
 http-logger = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "okhttp" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 gson-converter = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
-# Navigation
-navigation = { module = "androidx.navigation:navigation-compose", version.ref = "navigation" }
 #Logs
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 # Other
@@ -75,13 +71,19 @@ accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-
 coil = { module = "io.coil-kt:coil-compose", version = "2.6.0" }
 play-ads = { module = "com.google.android.gms:play-services-ads", version = "22.6.0" }
 arrow-core = { module = "io.arrow-kt:arrow-core", version = "1.2.0" }
+# Navigation
+voyager-core = { module = "cafe.adriel.voyager:voyager-core", version.ref = "voyager" }
+voyager-navigator = { module = "cafe.adriel.voyager:voyager-navigator", version.ref = "voyager" }
+voyager-screenmodel = { module = "cafe.adriel.voyager:voyager-screenmodel", version.ref = "voyager" }
+voyager-transitions = { module = "cafe.adriel.voyager:voyager-transitions", version.ref = "voyager" }
+voyager-hilt = { module = "cafe.adriel.voyager:voyager-hilt", version.ref = "voyager" }
 # Norselabs
 vpn-v2ray = { module = "io.norselabs.vpn:v2ray", version = "0.0.10" }
 core-vpn = { module = "io.norselabs.vpn:core_vpn", version = "0.0.7" }
 common = { module = "io.norselabs.vpn:common", version = "0.0.2" }
 common-map = { module = "io.norselabs.vpn:common_map", version = "0.0.2" }
 common-flags = { module = "io.norselabs.vpn:common_flags", version = "0.0.2" }
-common-logger = { module = "io.norselabs.vpn:common_logger", version = "0.0.3" }
+common-logger = { module = "io.norselabs.vpn:common_logger", version = "0.0.4" }
 common-network = { module = "io.norselabs.vpn:common_network", version = "0.0.4" }
 common-net-apps = { module = "io.norselabs.vpn:common_net_apps", version = "0.0.1" }
 
@@ -105,4 +107,12 @@ compose = [
     "compose-ui-tooling",
     "compose-ui-tooling-preview",
     "kotlin-collection-immutable",
+]
+
+voyager = [
+    "voyager-core",
+    "voyager-navigator",
+    "voyager-screenmodel",
+    "voyager-transitions",
+    "voyager-hilt",
 ]

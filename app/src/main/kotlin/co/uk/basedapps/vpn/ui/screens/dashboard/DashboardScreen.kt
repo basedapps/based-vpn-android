@@ -48,8 +48,13 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.hilt.getScreenModel
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import co.uk.basedapps.vpn.R
+import co.uk.basedapps.vpn.ui.screens.countries.CountriesScreen
+import co.uk.basedapps.vpn.ui.screens.settings.SettingsScreen
 import co.uk.basedapps.vpn.ui.theme.BasedAppColor
 import co.uk.basedapps.vpn.ui.theme.BasedVPNTheme
 import co.uk.basedapps.vpn.ui.widget.BasedAlertDialog
@@ -57,7 +62,6 @@ import co.uk.basedapps.vpn.ui.widget.BasedButton
 import co.uk.basedapps.vpn.ui.widget.ButtonStyle
 import co.uk.basedapps.vpn.ui.widget.ErrorScreen
 import io.norselabs.vpn.based.compose.EffectHandler
-import io.norselabs.vpn.based.viewModel.dashboard.DashboardScreenEffect
 import io.norselabs.vpn.based.viewModel.dashboard.DashboardScreenEffect as Effect
 import io.norselabs.vpn.based.viewModel.dashboard.DashboardScreenState as State
 import io.norselabs.vpn.based.viewModel.dashboard.DashboardScreenViewModel
@@ -74,64 +78,63 @@ import io.norselabs.vpn.core_vpn.user.UserStatus
 import io.norselabs.vpn.core_vpn.vpn.Destination
 import timber.log.Timber
 
-@Composable
-fun DashboardScreen(
-  navigateToCountries: () -> Unit,
-  navigateToSettings: () -> Unit,
-) {
-  val viewModel = hiltViewModel<DashboardScreenViewModel>()
-  val state by viewModel.stateHolder.state.collectAsState()
+class DashboardScreen : Screen {
 
-  val context = LocalContext.current
+  @Composable
+  override fun Content() {
+    val viewModel = getScreenModel<DashboardScreenViewModel>()
+    val state by viewModel.stateHolder.state.collectAsState()
 
-  val vpnPermissionRequest = rememberLauncherForActivityResult(
-    ActivityResultContracts.StartActivityForResult(),
-  ) { result ->
-    viewModel.onPermissionsResult(result.resultCode == Activity.RESULT_OK)
-  }
+    val context = LocalContext.current
+    val navigator = LocalNavigator.currentOrThrow
 
-  EffectHandler(viewModel.stateHolder.effects) { effect ->
-    when (effect) {
-      is Effect.ShowAd -> viewModel.onAdShown()
+    val vpnPermissionRequest = rememberLauncherForActivityResult(
+      ActivityResultContracts.StartActivityForResult(),
+    ) { result ->
+      viewModel.onPermissionsResult(result.resultCode == Activity.RESULT_OK)
+    }
 
-      is Effect.ShowSelectServer -> navigateToCountries()
+    EffectHandler(viewModel.stateHolder.effects) { effect ->
+      when (effect) {
+        is Effect.ShowAd -> viewModel.onAdShown()
 
-      is Effect.CheckVpnPermission -> {
-        val intent = getVpnPermissionRequest(context)
-        if (intent != null) {
-          vpnPermissionRequest.launch(intent)
-        } else {
-          viewModel.onPermissionsResult(true)
+        is Effect.ShowSelectServer -> navigator.push(CountriesScreen())
+
+        is Effect.CheckVpnPermission -> {
+          val intent = getVpnPermissionRequest(context)
+          if (intent != null) {
+            vpnPermissionRequest.launch(intent)
+          } else {
+            viewModel.onPermissionsResult(true)
+          }
+        }
+
+        is Effect.ShowSettings -> navigator.push(SettingsScreen())
+
+        is Effect.ShowGooglePlay -> context.goToGooglePlay()
+
+        is Effect.EmailToSupport -> context.mailTo("hello@world.com")
+
+        is Effect.ShowRating -> {
+          Timber.tag("DashboardScreenEffect").d("ShowRating")
         }
       }
-
-      is Effect.ShowSettings -> navigateToSettings()
-
-      is Effect.ShowGooglePlay -> context.goToGooglePlay()
-
-      is Effect.EmailToSupport -> context.mailTo("hello@world.com")
-
-      is Effect.ShowRating -> {
-        Timber.tag("DashboardScreenEffect").d("ShowRating")
-      }
-
-      is DashboardScreenEffect.ShareLogs -> Unit
     }
-  }
 
-  DashboardScreenStateless(
-    state = state,
-    onConnectClick = viewModel::onConnectClick,
-    onDisconnectClick = viewModel::onDisconnectClick,
-    onQuickConnectClick = viewModel::onQuickConnectClick,
-    onSelectServerClick = viewModel::onSelectServerClick,
-    onSettingsClick = viewModel::onSettingsClick,
-    onTryAgainClick = viewModel::onTryAgainClick,
-    onUpdateClick = viewModel::onUpdateClick,
-    onAlertConfirmClick = viewModel::onAlertConfirmClick,
-    onAlertDismissRequest = viewModel::onAlertDismissRequest,
-    onRatingClick = viewModel::onRatingClick,
-  )
+    DashboardScreenStateless(
+      state = state,
+      onConnectClick = viewModel::onConnectClick,
+      onDisconnectClick = viewModel::onDisconnectClick,
+      onQuickConnectClick = viewModel::onQuickConnectClick,
+      onSelectServerClick = viewModel::onSelectServerClick,
+      onSettingsClick = viewModel::onSettingsClick,
+      onTryAgainClick = viewModel::onTryAgainClick,
+      onUpdateClick = viewModel::onUpdateClick,
+      onAlertConfirmClick = viewModel::onAlertConfirmClick,
+      onAlertDismissRequest = viewModel::onAlertDismissRequest,
+      onRatingClick = viewModel::onRatingClick,
+    )
+  }
 }
 
 @Composable

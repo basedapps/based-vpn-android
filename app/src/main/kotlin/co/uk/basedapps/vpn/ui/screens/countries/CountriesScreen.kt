@@ -31,8 +31,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.hilt.getScreenModel
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import co.uk.basedapps.vpn.R
+import co.uk.basedapps.vpn.ui.screens.cities.CitiesScreen
 import co.uk.basedapps.vpn.ui.theme.BasedAppColor
 import co.uk.basedapps.vpn.ui.widget.ErrorScreen
 import co.uk.basedapps.vpn.ui.widget.TopBar
@@ -43,27 +47,31 @@ import io.norselabs.vpn.based.viewModel.countries.CountriesScreenViewModel
 import io.norselabs.vpn.based.viewModel.countries.CountryUi
 import io.norselabs.vpn.common.state.Status
 
-@Composable
-fun CountriesScreen(
-  navigateBack: () -> Unit,
-  navigateToCities: (String) -> Unit,
-) {
-  val viewModel = hiltViewModel<CountriesScreenViewModel>()
-  val state by viewModel.stateHolder.state.collectAsState()
+class CountriesScreen : Screen {
 
-  EffectHandler(viewModel.stateHolder.effects) { effect ->
-    when (effect) {
-      is Effect.ShowCitiesScreen ->
-        navigateToCities(effect.countryId)
+  @Composable
+  override fun Content() {
+    val viewModel = getScreenModel<CountriesScreenViewModel>()
+    val state by viewModel.stateHolder.state.collectAsState()
+
+    val navigator = LocalNavigator.currentOrThrow
+
+    EffectHandler(viewModel.stateHolder.effects) { effect ->
+      when (effect) {
+        is Effect.GoBack -> navigator.pop()
+
+        is Effect.ShowCitiesScreen ->
+          navigator.push(CitiesScreen(effect.countryId))
+      }
     }
-  }
 
-  CountriesScreenStateless(
-    state = state,
-    navigateBack = navigateBack,
-    onItemClick = viewModel::onCountryClick,
-    onTryAgainClick = viewModel::onTryAgainClick,
-  )
+    CountriesScreenStateless(
+      state = state,
+      navigateBack = viewModel::onBackClick,
+      onItemClick = viewModel::onCountryClick,
+      onTryAgainClick = viewModel::onTryAgainClick,
+    )
+  }
 }
 
 @Composable

@@ -1,30 +1,31 @@
 package io.norselabs.vpn.based.viewModel.settings
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
+import cafe.adriel.voyager.core.model.ScreenModel
+import cafe.adriel.voyager.core.model.screenModelScope
 import io.norselabs.vpn.based.language.LanguageManager
+import io.norselabs.vpn.based.viewModel.settings.SettingsScreenEffect as Effect
 import io.norselabs.vpn.based.viewModel.settings.dto.AppLang
 import io.norselabs.vpn.based.vpn.DdsConfigurator
+import io.norselabs.vpn.common_logger.share.LogsSender
 import io.norselabs.vpn.core_vpn.storage.CoreStorage
 import io.norselabs.vpn.core_vpn.vpn.Protocol
 import javax.inject.Inject
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.launch
 
-@HiltViewModel
 class SettingsScreenViewModel
 @Inject constructor(
   val stateHolder: SettingsScreenStateHolder,
   private val dnsConfigurator: DdsConfigurator,
   private val coreStorage: CoreStorage,
-) : ViewModel() {
+  private val logsSender: LogsSender,
+) : ScreenModel {
 
   private val state: SettingsScreenState
     get() = stateHolder.state.value
 
   init {
-    viewModelScope.launch {
+    screenModelScope.launch {
       val dns = dnsConfigurator.getDefaultDns()
       val protocol = coreStorage.getVpnProtocol()
       stateHolder.updateState {
@@ -47,7 +48,7 @@ class SettingsScreenViewModel
         currentDns = dns,
       )
     }
-    viewModelScope.launch {
+    screenModelScope.launch {
       dnsConfigurator.setDns(dns)
     }
   }
@@ -67,7 +68,7 @@ class SettingsScreenViewModel
         currentProtocol = protocol,
       )
     }
-    viewModelScope.launch {
+    screenModelScope.launch {
       coreStorage.setVpnProtocol(protocol)
     }
   }
@@ -77,15 +78,15 @@ class SettingsScreenViewModel
   }
 
   fun onSplitTunnelClick() {
-    stateHolder.sendEffect(SettingsScreenEffect.SplitTunneling)
+    stateHolder.sendEffect(Effect.SplitTunneling)
   }
 
   fun onTelegramClick() {
-    stateHolder.sendEffect(SettingsScreenEffect.OpenTelegram)
+    stateHolder.sendEffect(Effect.OpenTelegram)
   }
 
   fun onLogsRowClick() {
-    stateHolder.sendEffect(SettingsScreenEffect.ShareLogs)
+    logsSender.shareLogs()
   }
 
   fun setSupportedLanguages(languages: List<AppLang>) {
@@ -103,5 +104,9 @@ class SettingsScreenViewModel
     stateHolder.updateState {
       copy(currentLang = lang)
     }
+  }
+
+  fun onBackClick() {
+    stateHolder.sendEffect(Effect.GoBack)
   }
 }

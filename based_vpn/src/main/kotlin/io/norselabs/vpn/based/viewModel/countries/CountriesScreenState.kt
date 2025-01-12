@@ -25,5 +25,6 @@ data class CountryUi(
 )
 
 sealed interface CountriesScreenEffect {
+  data object GoBack : CountriesScreenEffect
   data class ShowCitiesScreen(val countryId: String) : CountriesScreenEffect
 }

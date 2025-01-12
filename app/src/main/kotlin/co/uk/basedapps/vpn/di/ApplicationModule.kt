@@ -27,6 +27,7 @@ class ApplicationModule {
   @Provides
   @Singleton
   fun provideAppConfig(): AppConfig = object : AppConfig {
+    override fun getAppId(): String = BuildConfig.APPLICATION_ID
     override fun getAppVersion() = BuildConfig.VERSION_NAME
     override fun getPackage() = "co.uk.basedapps.vpn"
     override fun getBaseUrl() = "https://api.dvpnsdk.com"

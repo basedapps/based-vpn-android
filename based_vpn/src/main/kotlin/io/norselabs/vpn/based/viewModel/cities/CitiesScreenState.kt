@@ -26,5 +26,6 @@ data class CityUi(
 )
 
 sealed interface CitiesScreenEffect {
+  data object GoBack : CitiesScreenEffect
   data object GoBackToRoot : CitiesScreenEffect
 }

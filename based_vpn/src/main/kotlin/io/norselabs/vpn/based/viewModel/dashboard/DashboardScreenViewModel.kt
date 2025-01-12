@@ -1,14 +1,14 @@
 package io.norselabs.vpn.based.viewModel.dashboard
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import arrow.core.Either
 import arrow.core.flatMap
-import dagger.hilt.android.lifecycle.HiltViewModel
+import cafe.adriel.voyager.core.model.ScreenModel
+import cafe.adriel.voyager.core.model.screenModelScope
 import io.norselabs.vpn.based.storage.AppStorage
 import io.norselabs.vpn.based.storage.RatingStatus
 import io.norselabs.vpn.based.viewModel.dashboard.DashboardScreenEffect as Effect
 import io.norselabs.vpn.common.state.Status
+import io.norselabs.vpn.common_logger.share.LogsSender
 import io.norselabs.vpn.common_network.AppRepository
 import io.norselabs.vpn.common_network.models.CitiesRequest
 import io.norselabs.vpn.common_network.models.NetworkData
@@ -35,7 +35,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
 import timber.log.Timber
 
-@HiltViewModel
 class DashboardScreenViewModel
 @Inject constructor(
   val stateHolder: DashboardScreenStateHolder,
@@ -47,7 +46,8 @@ class DashboardScreenViewModel
   private val userInitializer: UserInitializer,
   private val destinationStorage: DestinationStorage,
   private val networkMonitor: NetworkStateMonitor,
-) : ViewModel() {
+  private val logsSender: LogsSender,
+) : ScreenModel {
 
   private var connectJob: Job? = null
 
@@ -62,7 +62,7 @@ class DashboardScreenViewModel
   }
 
   private fun observeNetworkState() {
-    viewModelScope.launch {
+    screenModelScope.launch {
       networkMonitor.networkState.collect { state ->
         Timber.tag(TAG).d("Network State: $state")
         if (state is NetworkState.Connected) {
@@ -74,7 +74,7 @@ class DashboardScreenViewModel
 
   @OptIn(ExperimentalCoroutinesApi::class)
   private fun observeConnectionState() {
-    viewModelScope.launch {
+    screenModelScope.launch {
       vpnRepo.isConnected
         .flatMapLatest { isConnected ->
           if (isConnected) {
@@ -103,7 +103,7 @@ class DashboardScreenViewModel
   }
 
   private fun observeUserStatus() {
-    viewModelScope.launch {
+    screenModelScope.launch {
       userInitializer.status.collect { userStatus ->
         Timber.tag(TAG).d("User Status: $userStatus")
         stateHolder.updateState { copy(userStatus = userStatus) }
@@ -122,7 +122,7 @@ class DashboardScreenViewModel
   }
 
   private fun observeDestination() {
-    viewModelScope.launch {
+    screenModelScope.launch {
       destinationStorage.observe().collect { destination ->
         val previousDestination = state.destination
         stateHolder.updateState { copy(destination = destination) }
@@ -212,7 +212,7 @@ class DashboardScreenViewModel
   fun onQuickConnectClick() {
     if (state.vpnStatus is VpnStatus.Disconnected) {
       Timber.tag(TAG).d("Quick Connect clicked")
-      viewModelScope.launch {
+      screenModelScope.launch {
         stateHolder.updateState { copy(isDestinationLoading = true) }
         selectRandomDestination()
         stateHolder.updateState { copy(isDestinationLoading = false) }
@@ -254,7 +254,7 @@ class DashboardScreenViewModel
   }
 
   private fun connectVpn() {
-    connectJob = viewModelScope.launch {
+    connectJob = screenModelScope.launch {
       val destination = state.destination ?: return@launch
       connector.connect(destination)
         .onLeft { setVpnStatus(VpnStatus.Disconnected) }
@@ -313,7 +313,7 @@ class DashboardScreenViewModel
   }
 
   fun onShareLogsClick() {
-    stateHolder.sendEffect(Effect.ShareLogs)
+    logsSender.shareLogs()
   }
 
   fun onAlertConfirmClick() {

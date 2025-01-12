@@ -1,8 +1,8 @@
 package io.norselabs.vpn.based.viewModel.cities
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
+import cafe.adriel.voyager.core.model.ScreenModel
+import cafe.adriel.voyager.core.model.screenModelScope
+import io.norselabs.vpn.based.viewModel.cities.CitiesScreenEffect as Effect
 import io.norselabs.vpn.common.state.Status
 import io.norselabs.vpn.common_network.AppRepository
 import io.norselabs.vpn.common_network.models.CitiesRequest
@@ -13,14 +13,13 @@ import io.norselabs.vpn.core_vpn.vpn.destination.DestinationStorage
 import javax.inject.Inject
 import kotlinx.coroutines.launch
 
-@HiltViewModel
 class CitiesScreenViewModel
 @Inject constructor(
   val stateHolder: CitiesScreenStateHolder,
   private val repository: AppRepository,
   private val coreStorage: CoreStorage,
   private val destinationStorage: DestinationStorage,
-) : ViewModel() {
+) : ScreenModel {
 
   private val state: CitiesScreenState
     get() = stateHolder.state.value
@@ -38,7 +37,7 @@ class CitiesScreenViewModel
   }
 
   private fun getCities(countryId: String) {
-    viewModelScope.launch {
+    screenModelScope.launch {
       val protocol = coreStorage.getVpnProtocol().takeIf { it != Protocol.NONE }
       val countries = repository.getCountries(protocol?.strValue).getOrNull()?.data
       val cities = repository.getCities(CitiesRequest(countryId, protocol?.strValue)).getOrNull()?.data
@@ -69,7 +68,11 @@ class CitiesScreenViewModel
         countryCode = country.code,
       ),
     )
-    stateHolder.sendEffect(CitiesScreenEffect.GoBackToRoot)
+    stateHolder.sendEffect(Effect.GoBackToRoot)
+  }
+
+  fun onBackClick() {
+    stateHolder.sendEffect(Effect.GoBack)
   }
 
   fun onTryAgainClick() {

@@ -24,13 +24,10 @@ import io.norselabs.vpn.core_vpn.vpn.destination.DestinationStorage
 import io.norselabs.vpn.v2ray.repo.V2RayRepository
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
 import timber.log.Timber
@@ -72,24 +69,9 @@ class DashboardScreenViewModel
     }
   }
 
-  @OptIn(ExperimentalCoroutinesApi::class)
   private fun observeConnectionState() {
     screenModelScope.launch {
       vpnRepo.isConnected
-        .flatMapLatest { isConnected ->
-          if (isConnected) {
-            val isQuick = state.vpnStatus.isQuick()
-            setVpnStatus(VpnStatus.Connecting(isQuick))
-            if (checkConnection()) {
-              flowOf(true)
-            } else {
-              stopVpn()
-              flowOf(false)
-            }
-          } else {
-            flowOf(false)
-          }
-        }
         .collect { isConnected ->
           val isQuick = state.vpnStatus.isQuick()
           setVpnStatus(
@@ -143,6 +125,7 @@ class DashboardScreenViewModel
     }
   }
 
+  // todo: show an error if check connection is failed instead of disconnection VPN
   private suspend fun checkConnection(): Boolean {
     repeat(MAX_ATTEMPTS) {
       val isConnected = try {
@@ -245,6 +228,7 @@ class DashboardScreenViewModel
     if (isSuccess) {
       stateHolder.sendEffect(Effect.ShowAd)
     } else {
+      // todo: show an error
       stateHolder.updateState { copy(vpnStatus = VpnStatus.Disconnected) }
     }
   }
@@ -254,8 +238,8 @@ class DashboardScreenViewModel
   }
 
   private fun connectVpn() {
+    val destination = state.destination ?: return
     connectJob = screenModelScope.launch {
-      val destination = state.destination ?: return@launch
       connector.connect(destination)
         .onLeft { setVpnStatus(VpnStatus.Disconnected) }
         .onRight { checkAppRatingRequest() }

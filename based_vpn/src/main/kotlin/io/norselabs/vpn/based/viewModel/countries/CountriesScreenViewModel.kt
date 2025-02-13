@@ -9,6 +9,7 @@ import io.norselabs.vpn.common_network.AppRepository
 import io.norselabs.vpn.core_vpn.storage.CoreStorage
 import io.norselabs.vpn.core_vpn.vpn.Protocol
 import javax.inject.Inject
+import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.launch
 
 class CountriesScreenViewModel
@@ -42,7 +43,7 @@ class CountriesScreenViewModel
                 flag = mapToFlag(country.code),
                 serversAvailable = country.serversAvailable,
               )
-            },
+            }.toPersistentList(),
           )
         }
       } else {

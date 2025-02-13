@@ -43,7 +43,7 @@ import io.norselabs.vpn.based.viewModel.cities.CityUi
 import io.norselabs.vpn.common.state.Status
 
 class CitiesScreen(
-  private val countryId: String?,
+  private val countryId: String,
 ) : Screen {
 
   @Composable

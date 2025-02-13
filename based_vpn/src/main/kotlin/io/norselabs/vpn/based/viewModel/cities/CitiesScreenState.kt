@@ -4,6 +4,8 @@ import io.norselabs.vpn.common.state.Status
 import io.norselabs.vpn.common.state.ViewStateHolder
 import io.norselabs.vpn.common_network.models.Country
 import javax.inject.Inject
+import kotlinx.collections.immutable.PersistentList
+import kotlinx.collections.immutable.persistentListOf
 
 class CitiesScreenStateHolder
 @Inject
@@ -15,7 +17,7 @@ data class CitiesScreenState(
   val status: Status = Status.Loading,
   val countryId: String? = null,
   val country: Country? = null,
-  val cities: List<CityUi> = emptyList(),
+  val cities: PersistentList<CityUi> = persistentListOf(),
 )
 
 data class CityUi(

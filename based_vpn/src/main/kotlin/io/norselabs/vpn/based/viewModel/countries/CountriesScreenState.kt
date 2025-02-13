@@ -4,6 +4,8 @@ import io.norselabs.vpn.common.state.Status
 import io.norselabs.vpn.common.state.ViewStateHolder
 import io.norselabs.vpn.common_flags.CountryFlag
 import javax.inject.Inject
+import kotlinx.collections.immutable.PersistentList
+import kotlinx.collections.immutable.persistentListOf
 
 class CountriesScreenStateHolder
 @Inject
@@ -13,7 +15,7 @@ constructor() : ViewStateHolder<CountriesScreenState, CountriesScreenEffect>(
 
 data class CountriesScreenState(
   val status: Status = Status.Data,
-  val countries: List<CountryUi> = emptyList(),
+  val countries: PersistentList<CountryUi> = persistentListOf(),
 )
 
 data class CountryUi(

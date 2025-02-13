@@ -11,6 +11,7 @@ import io.norselabs.vpn.core_vpn.vpn.Destination
 import io.norselabs.vpn.core_vpn.vpn.Protocol
 import io.norselabs.vpn.core_vpn.vpn.destination.DestinationStorage
 import javax.inject.Inject
+import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.launch
 
 class CitiesScreenViewModel
@@ -24,16 +25,14 @@ class CitiesScreenViewModel
   private val state: CitiesScreenState
     get() = stateHolder.state.value
 
-  fun setCountryId(countryId: String?) {
-    if (countryId != null) {
-      stateHolder.updateState {
-        copy(
-          status = Status.Loading,
-          countryId = countryId,
-        )
-      }
-      getCities(countryId)
+  fun setCountryId(countryId: String) {
+    stateHolder.updateState {
+      copy(
+        status = Status.Loading,
+        countryId = countryId,
+      )
     }
+    getCities(countryId)
   }
 
   private fun getCities(countryId: String) {
@@ -48,7 +47,7 @@ class CitiesScreenViewModel
             country = countries.first { it.id == countryId },
             cities = cities.map { city ->
               CityUi(city.id, city.countryId, city.name, city.serversAvailable)
-            },
+            }.toPersistentList(),
           )
         }
       } else {
@@ -76,7 +75,9 @@ class CitiesScreenViewModel
   }
 
   fun onTryAgainClick() {
-    stateHolder.updateState { copy(status = Status.Error(true)) }
+    stateHolder.updateState {
+      copy(status = Status.Error(true))
+    }
     state.countryId?.let(::getCities)
   }
 }

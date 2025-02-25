@@ -6,11 +6,13 @@ import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -21,97 +23,124 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.ScaleFactor
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import kotlin.math.abs
 import kotlin.math.ln
+import kotlin.math.max
+import kotlin.math.min
+import kotlin.math.sign
 import kotlin.math.tan
+import kotlinx.coroutines.launch
 
 @Composable
 fun WorldMap(
   lat: Double,
   long: Double,
-  color: Color,
+  mapColor: Color,
+  dotColor: Color,
   modifier: Modifier = Modifier,
+  dotSize: Dp = 6.dp,
+  mapScale: Float = 1.5f,
 ) {
   val coordinates = remember { mutableStateOf(0f to 0f) }
+
   LaunchedEffect(lat, long) {
     coordinates.value = getCoordinates(latitude = lat, longitude = long)
   }
 
-  val radiusPx = with(LocalDensity.current) { 3.dp.toPx() }
+  val radiusPx = with(LocalDensity.current) { dotSize.toPx() }
+
   val imgSize = remember { mutableStateOf(Size.Zero) }
   val viewSize = remember { mutableStateOf(Size.Zero) }
-  val scale = remember {
-    derivedStateOf {
-      val scale = viewSize.value.height / imgSize.value.height
-      scale.takeIf { !it.isNaN() && it.isFinite() } ?: 1f
-    }
-  }
+  val scale = remember { mutableFloatStateOf(1f) }
+
   val pointOffset = remember {
     derivedStateOf {
       if (coordinates.value.first == 0f || coordinates.value.second == 0f) {
         Offset.Zero
       } else {
+        // space from screen start to unscaled map start
+        val leftSpace = (viewSize.value.width - imgSize.value.width) / 2
+        val topSpace = (viewSize.value.height - imgSize.value.height) / 2
+
+        // coordinate offset
+        val xOffset = imgSize.value.width * coordinates.value.first
+        val yOffset = imgSize.value.height * coordinates.value.second
         Offset(
-          x = viewSize.value.width * coordinates.value.first,
-          y = imgSize.value.height * coordinates.value.second + (viewSize.value.height - imgSize.value.height) / 2,
+          x = leftSpace + xOffset,
+          y = topSpace + yOffset,
         )
       }
     }
   }
-  val widthExcessHalf = remember {
-    derivedStateOf {
-      (imgSize.value.width * scale.value - viewSize.value.width) / 2
-    }
-  }
-  val transX = rememberSaveable(
-    saver = screenAnimationSaver(),
-  ) { Animatable(0f) }
+
+  val transX = rememberSaveable(saver = screenAnimationSaver()) { Animatable(0f) }
+  val transY = rememberSaveable(saver = screenAnimationSaver()) { Animatable(0f) }
 
   LaunchedEffect(pointOffset.value) {
     if (pointOffset.value == Offset.Zero) return@LaunchedEffect
-    val x = pointOffset.value.x
-    val zone = viewSize.value.width / 3
-    val trans = when {
-      x < zone -> widthExcessHalf.value
-      x > 2 * zone -> widthExcessHalf.value * -1
-      else -> 0f
-    }
-    transX.animateTo(
-      targetValue = trans,
-      animationSpec = tween(500),
-    )
+    val point = pointOffset.value
+    val image = imgSize.value
+    val view = viewSize.value
+    val scaleFactor = scale.floatValue
+
+    // delta from screen center to point
+    val pointDx = (view.width / 2 - point.x) * scaleFactor
+    val pointDy = (view.height / 2 - point.y) * scaleFactor
+
+    // max delta to avoid moving out of map bounds
+    val maxDx = (image.width * scaleFactor - view.width) / 2
+    val maxDy = (image.height * scaleFactor - view.height) / 2
+
+    val dx = min(abs(pointDx), maxDx) * pointDx.sign
+    val dy = min(abs(pointDy), maxDy) * pointDy.sign
+
+    launch { transX.animateTo(targetValue = dx, animationSpec = tween(500)) }
+    launch { transY.animateTo(targetValue = dy, animationSpec = tween(500)) }
   }
 
   Image(
-    colorFilter = ColorFilter.tint(color.copy(alpha = 0.15f)),
+    colorFilter = ColorFilter.tint(mapColor),
     painter = painterResource(R.drawable.img_map),
     contentDescription = null,
     contentScale = object : ContentScale {
       override fun computeScaleFactor(srcSize: Size, dstSize: Size): ScaleFactor {
-        val scaleValue = dstSize.width / srcSize.width
+        // scale to fit map in the box
+        val initialWidthScale = dstSize.height / srcSize.height
+        val initialHeightScale = dstSize.width / srcSize.width
+        val initialScale = min(initialWidthScale, initialHeightScale)
+        // scale to fix the min dimension
+        val additionalWidthScale = dstSize.width / srcSize.width / initialScale
+        val additionalHeightScale = dstSize.height / srcSize.height / initialScale
+        val additionalScale = max(additionalWidthScale, additionalHeightScale)
+        scale.floatValue = additionalScale * mapScale
+
         viewSize.value = dstSize
-        imgSize.value = Size(srcSize.width * scaleValue, srcSize.height * scaleValue)
-        return ScaleFactor(scaleValue, scaleValue)
+        imgSize.value = Size(srcSize.width * initialScale, srcSize.height * initialScale)
+        return ScaleFactor(initialScale, initialScale)
       }
     },
     modifier = modifier
+      .clipToBounds() // Prevent the view from drawing outside its bounding box
       .graphicsLayer {
-        scaleX = scale.value
-        scaleY = scale.value
+        scaleX = scale.floatValue
+        scaleY = scale.floatValue
         translationX = transX.value
+        translationY = transY.value
       }
       .drawWithContent {
         drawContent()
         val offset = pointOffset.value
         if (offset != Offset.Zero) {
           drawCircle(
-            color = color.copy(alpha = 0.2f),
-            radius = radiusPx * 3,
+            color = dotColor.copy(alpha = 0.2f),
+            radius = radiusPx * 3 / scale.floatValue,
             center = offset,
           )
           drawCircle(
-            color = color,
-            radius = radiusPx,
+            color = dotColor,
+            radius = radiusPx / scale.floatValue,
             center = offset,
           )
         }

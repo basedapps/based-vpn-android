@@ -216,13 +216,15 @@ private fun Content(
         state = state,
         onSettingsClick = onSettingsClick,
       )
+      val color = when (state.vpnStatus) {
+        is VpnStatus.Connected -> Color(0xFF09D1BC)
+        else -> Color(0xFFF0A83E)
+      }
       WorldMap(
         lat = state.networkData?.lat ?: 0.0,
         long = state.networkData?.long ?: 0.0,
-        color = when (state.vpnStatus) {
-          is VpnStatus.Connected -> Color(0xFF09D1BC)
-          else -> Color(0xFFF0A83E)
-        },
+        mapColor = color.copy(alpha = 0.15f),
+        dotColor = color,
         modifier = Modifier.weight(1f),
       )
       BottomBar(

@@ -96,5 +96,6 @@ dependencies {
     implementation project(path: ':core_vpn')
     implementation project(path: ':common_map')
     implementation project(path: ':common_logger')
+    implementation project(path: ':common_referral')
 //    implementation "io.norselabs.vpn:based:0.0.1"
 }

@@ -77,6 +77,9 @@ voyager-navigator = { module = "cafe.adriel.voyager:voyager-navigator", version.
 voyager-screenmodel = { module = "cafe.adriel.voyager:voyager-screenmodel", version.ref = "voyager" }
 voyager-transitions = { module = "cafe.adriel.voyager:voyager-transitions", version.ref = "voyager" }
 voyager-hilt = { module = "cafe.adriel.voyager:voyager-hilt", version.ref = "voyager" }
+# Install referrers
+branch = { module = "io.branch.sdk.android:library", version = "5.15.1" }
+ads-identifier-google = { module = "com.google.android.gms:play-services-ads-identifier", version = "18.2.0" }
 # Norselabs
 vpn-v2ray = { module = "io.norselabs.vpn:v2ray", version = "0.0.10" }
 core-vpn = { module = "io.norselabs.vpn:core_vpn", version = "0.0.7" }
@@ -115,4 +118,9 @@ voyager = [
     "voyager-screenmodel",
     "voyager-transitions",
     "voyager-hilt",
+]
+
+referrers = [
+    "branch",
+    "ads-identifier-google",
 ]

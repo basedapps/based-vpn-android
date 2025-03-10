@@ -28,6 +28,18 @@ fun Context.mailTo(email: String) {
   startActivitySafe(intent)
 }
 
+fun Context.shareText(text: String) {
+  val intent = Intent.createChooser(
+    Intent().apply {
+      action = Intent.ACTION_SEND
+      putExtra(Intent.EXTRA_TEXT, text)
+      type = "text/plain"
+    },
+    null,
+  )
+  startActivitySafe(intent)
+}
+
 fun Context.startActivitySafe(
   intent: Intent,
   onActivityNotStarted: ((Intent, Exception) -> Unit)? = null,

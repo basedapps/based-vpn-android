@@ -41,7 +41,7 @@ fun WorldMap(
   dotColor: Color,
   modifier: Modifier = Modifier,
   dotSize: Dp = 6.dp,
-  mapScale: Float = 1.5f,
+  mapScale: Float = 1f,
 ) {
   val coordinates = remember { mutableStateOf(0f to 0f) }
 

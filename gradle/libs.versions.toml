@@ -1,34 +1,35 @@
 [versions]
 # Platform
 minSdk = "26"
-compileSdk = "34"
+compileSdk = "35"
 targetJvm = "VERSION_17"
-kotlin = "1.9.23"
-agp = "8.3.2"
+kotlin = "2.1.10"
+agp = "8.9.0"
 
 # Libs
-androidCore = "1.13.1"
+androidCore = "1.15.0"
 preference = "1.2.1"
-compose = "1.6.7"
-composeCompiler = "1.5.11"
-composeMaterial3 = "1.2.1"
-accompanist = "0.34.0"
-coroutines = "1.8.0"
-dagger = "2.49"
+compose = "1.7.8"
+composeMaterial3 = "1.3.1"
+accompanist = "0.37.2"
+coroutines = "1.10.1"
+dagger = "2.55"
 okhttp = "4.12.0"
 retrofit = "2.9.0"
-gson = "2.10.1"
-lifecycle = "2.8.1"
+gson = "2.11.0"
+lifecycle = "2.8.7"
 timber = "5.0.1"
 appcompat = "1.7.0"
-composeActivity = "1.9.1"
-voyager = "1.0.0"
+composeActivity = "1.10.1"
+voyager = "1.1.0-beta03"
+ktor = "2.3.11"
 
 [libraries]
 # Android
 android-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidCore" }
 android-preference-ktx = { module = "androidx.preference:preference-ktx", version.ref = "preference" }
 android-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
+
 # Compose
 compose-activity = { module = "androidx.activity:activity-compose", version.ref = "composeActivity" }
 compose-animation = { module = "androidx.compose.animation:animation", version.ref = "compose" }
@@ -42,52 +43,72 @@ compose-foundation = { module = "androidx.compose.foundation:foundation", versio
 compose-layout = { module = "androidx.compose.foundation:foundation-layout", version.ref = "compose" }
 compose-material3 = { module = "androidx.compose.material3:material3", version.ref = "composeMaterial3" }
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist" }
+
 # DI
 dagger-hilt = { module = "com.google.dagger:hilt-android", version.ref = "dagger" }
 hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "dagger" }
+
 # Google
 google-firebase-bom = { module = "com.google.firebase:firebase-bom", version = "32.6.0" }
 google-firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
 google-firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics" }
+
 # Lifecycle
 lifecycle-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycle" }
 lifecycle-runtime = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycle" }
+
 # Kotlin
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
-kotlin-collection-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version = "0.3.5" }
+kotlin-collection-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version = "0.3.8" }
+kotlin-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version = "1.8.0" }
+
+## Ktor
+ktor-client-common = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
+ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
+ktor-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
+ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
+ktor-serialization = { module = "io.ktor:ktor-serialization", version.ref = "ktor" }
+
 # Gradle
 agp = { module = "com.android.tools.build:gradle", version.ref = "agp" }
+
 # Coroutines
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+
 # Network
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 http-logger = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "okhttp" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 gson-converter = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
+
 #Logs
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
+
 # Other
-accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanist" }
 coil = { module = "io.coil-kt:coil-compose", version = "2.6.0" }
 play-ads = { module = "com.google.android.gms:play-services-ads", version = "22.6.0" }
 arrow-core = { module = "io.arrow-kt:arrow-core", version = "1.2.0" }
+
 # Navigation
 voyager-core = { module = "cafe.adriel.voyager:voyager-core", version.ref = "voyager" }
 voyager-navigator = { module = "cafe.adriel.voyager:voyager-navigator", version.ref = "voyager" }
 voyager-screenmodel = { module = "cafe.adriel.voyager:voyager-screenmodel", version.ref = "voyager" }
 voyager-transitions = { module = "cafe.adriel.voyager:voyager-transitions", version.ref = "voyager" }
 voyager-hilt = { module = "cafe.adriel.voyager:voyager-hilt", version.ref = "voyager" }
+
 # Install referrers
 branch = { module = "io.branch.sdk.android:library", version = "5.15.1" }
 ads-identifier-google = { module = "com.google.android.gms:play-services-ads-identifier", version = "18.2.0" }
+
 # Norselabs
 vpn-v2ray = { module = "io.norselabs.vpn:v2ray", version = "0.0.10" }
-core-vpn = { module = "io.norselabs.vpn:core_vpn", version = "0.0.7" }
+dvpn-sdk = { module = "io.norselabs.vpn:dvpn_sdk", version = "0.0.4" }
+core-vpn = { module = "io.norselabs.vpn:core_vpn", version = "0.1.1" }
 common = { module = "io.norselabs.vpn:common", version = "0.0.2" }
-common-map = { module = "io.norselabs.vpn:common_map", version = "0.0.2" }
+common-map = { module = "io.norselabs.vpn:common_map", version = "0.0.4" }
 common-flags = { module = "io.norselabs.vpn:common_flags", version = "0.0.2" }
 common-logger = { module = "io.norselabs.vpn:common_logger", version = "0.0.4" }
-common-network = { module = "io.norselabs.vpn:common_network", version = "0.0.4" }
 common-net-apps = { module = "io.norselabs.vpn:common_net_apps", version = "0.0.1" }
 
 [plugins]
@@ -97,6 +118,8 @@ google-crashlytics = { id = "com.google.firebase.crashlytics", version = "2.9.9"
 google-services = { id = "com.google.gms.google-services", version = "4.4.0" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 dagger-hilt = { id = "com.google.dagger.hilt.android", version.ref = "dagger" }
 
 [bundles]
@@ -123,4 +146,14 @@ voyager = [
 referrers = [
     "branch",
     "ads-identifier-google",
+]
+
+ktor-all = [
+    "ktor-client-common",
+    "ktor-client-okhttp",
+    "ktor-client-logging",
+    "ktor-kotlinx-json",
+    "ktor-client-content-negotiation",
+    "ktor-serialization",
+    "kotlin-serialization-json",
 ]

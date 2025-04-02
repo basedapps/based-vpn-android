@@ -5,7 +5,7 @@ import cafe.adriel.voyager.hilt.ScreenModelKey
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
+import dagger.hilt.android.components.ActivityComponent
 import dagger.multibindings.IntoMap
 import io.norselabs.vpn.based.viewModel.cities.CitiesScreenViewModel
 import io.norselabs.vpn.based.viewModel.countries.CountriesScreenViewModel
@@ -14,7 +14,7 @@ import io.norselabs.vpn.based.viewModel.settings.SettingsScreenViewModel
 import io.norselabs.vpn.based.viewModel.split_tunneling.SplitTunnelingScreenViewModel
 
 @Module
-@InstallIn(SingletonComponent::class)
+@InstallIn(ActivityComponent::class)
 abstract class ViewModelsModule {
 
   @Binds

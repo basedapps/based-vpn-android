@@ -8,12 +8,16 @@ import io.norselabs.vpn.core_vpn.storage.CoreStorage
 import io.norselabs.vpn.core_vpn.vpn.Credentials
 import io.norselabs.vpn.core_vpn.vpn.Destination
 import io.norselabs.vpn.core_vpn.vpn.Protocol
+import io.norselabs.vpn.core_vpn.vpn.utils.ProfileDecoder
+import io.norselabs.vpn.sdk.common.SdkError
+import io.norselabs.vpn.sdk.dvpn_client.DVPNClient
 import timber.log.Timber
 
 class VPNConnector(
   private val gson: Gson,
+  private val dvpn: DVPNClient,
   private val coreStorage: CoreStorage,
-  private val interactor: VPNConnectorInteractor,
+  private val interactor: VPNInteractor,
 ) {
 
   suspend fun connect(destination: Destination): Either<Error, Unit> {
@@ -32,11 +36,44 @@ class VPNConnector(
   private suspend fun getCredentials(destination: Destination): Either<Error, Credentials> {
     val protocol = coreStorage.getVpnProtocol()
       .takeIf { it != Protocol.NONE }
-    return interactor.getCredentials(
+    return getCredentials(
       destination = destination,
       protocol = protocol,
     )
       .mapLeft { parseError(it) }
+  }
+
+  suspend fun getCredentials(
+    destination: Destination,
+    protocol: Protocol?,
+  ): Either<SdkError, Credentials> {
+    val city = (destination as? Destination.City)
+      ?: return Either.Left(SdkError.Unknown("Destination.Server is not supported yet"))
+    return dvpn.getCredentials(city.cityId, protocol?.strValue)
+      .flatMap { data ->
+        val protocol = data.protocol
+        val privateKey = data.privateKey
+        val uid = data.uid
+        when {
+          protocol == Protocol.WIREGUARD.strValue && privateKey != null ->
+            Credentials.Wireguard(
+              payload = data.payload,
+              privateKey = privateKey,
+              serverId = data.server.id,
+            )
+
+          protocol == Protocol.V2RAY.strValue && uid != null ->
+            Credentials.V2Ray(
+              payload = data.payload,
+              uid = uid,
+              serverId = data.server.id,
+            )
+
+          else -> null
+        }
+          ?.let { credentials -> Either.Right(credentials) }
+          ?: Either.Left(SdkError.Unknown("Unknown protocol"))
+      }
   }
 
   private fun parseDeeplink(deeplink: Destination.Deeplink): Either<Error, Credentials> {
@@ -63,17 +100,19 @@ class VPNConnector(
     }
   }
 
-  private fun parseError(exception: Exception): Error {
-    Timber.tag(TAG).d("Credentials creation failed: $exception")
-    val code = interactor.parseHttpCode(exception)
+  private fun parseError(error: SdkError): Error {
+    Timber.tag(TAG).d("Credentials creation failed: $error")
+    val code = (error as? SdkError.HttpError)?.code
     return when (code) {
       401, 403, 425 -> Error.UserToken
-      else -> Error.GetCredentials(exception)
+      else -> Error.GetCredentials(error)
     }
   }
 
   private suspend fun connectVpn(credentials: Credentials): Either<Error, Unit> {
-    interactor.startVpn(credentials).getOrNull()
+    ProfileDecoder.decode(credentials)?.let { profile ->
+      interactor.startVpn(profile).getOrNull()
+    }
       ?: return Either.Left(Error.StartV2Ray)
 
     coreStorage.setCurrentServerId(credentials.serverId)
@@ -84,7 +123,7 @@ class VPNConnector(
   }
 
   sealed interface Error {
-    data class GetCredentials(val exception: Exception) : Error
+    data class GetCredentials(val error: SdkError) : Error
     data object ParseCredentials : Error
     data object UserToken : Error
     data object StartV2Ray : Error

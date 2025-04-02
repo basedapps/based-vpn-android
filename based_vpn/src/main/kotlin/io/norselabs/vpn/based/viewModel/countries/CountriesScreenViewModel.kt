@@ -5,9 +5,9 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import io.norselabs.vpn.based.viewModel.countries.CountriesScreenEffect as Effect
 import io.norselabs.vpn.common.state.Status
 import io.norselabs.vpn.common_flags.mapToFlag
-import io.norselabs.vpn.common_network.AppRepository
 import io.norselabs.vpn.core_vpn.storage.CoreStorage
 import io.norselabs.vpn.core_vpn.vpn.Protocol
+import io.norselabs.vpn.sdk.dvpn_client.DVPNClient
 import javax.inject.Inject
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.launch
@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 class CountriesScreenViewModel
 @Inject constructor(
   val stateHolder: CountriesScreenStateHolder,
-  private val repository: AppRepository,
+  private val dvpnClient: DVPNClient,
   private val coreStorage: CoreStorage,
 ) : ScreenModel {
 
@@ -30,7 +30,7 @@ class CountriesScreenViewModel
   private fun getCountries() {
     screenModelScope.launch {
       val protocol = coreStorage.getVpnProtocol().takeIf { it != Protocol.NONE }
-      val countries = repository.getCountries(protocol?.strValue).getOrNull()?.data
+      val countries = dvpnClient.getCountries(protocol?.strValue).getOrNull()
       if (countries != null) {
         stateHolder.updateState {
           copy(

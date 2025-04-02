@@ -2,7 +2,11 @@ package io.norselabs.vpn.core_vpn.user
 
 import arrow.core.Either
 import arrow.core.flatMap
+import io.norselabs.vpn.common.utils.VersionComparator
 import io.norselabs.vpn.core_vpn.storage.CoreStorage
+import io.norselabs.vpn.sdk.common.SdkError
+import io.norselabs.vpn.sdk.dvpn_client.DVPNClient
+import io.norselabs.vpn.sdk.services.device.TokenModel
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -17,7 +21,8 @@ import timber.log.Timber
 class UserInitializer(
   private val scope: CoroutineScope,
   private val coreStorage: CoreStorage,
-  private val interactor: UserInitializerInteractor,
+  private val dvpn: DVPNClient,
+  private val appVersion: String,
 ) {
 
   private val _status = MutableStateFlow(UserStatus.Determining)
@@ -49,14 +54,12 @@ class UserInitializer(
 
   private suspend fun isUpdateRequired(): Either<UserStatus, Unit> {
     Timber.tag(TAG).d("Check version")
-    return interactor.checkVersion()
-      .flatMap { isFine ->
-        when {
-          isFine -> Either.Right(Unit)
-          else -> Either.Left(UserStatus.VersionOutdated)
-        }
-      }
-      .mapLeft { UserStatus.VersionOutdated }
+    val minVersion = dvpn.getVersion().getOrNull() ?: "0.0.0"
+    val isFine = VersionComparator.compare(appVersion, minVersion) != -1
+    return when {
+      isFine -> Either.Right(Unit)
+      else -> Either.Left(UserStatus.VersionOutdated)
+    }
   }
 
   private suspend fun checkToken(): Either<UserStatus, Unit> {
@@ -69,7 +72,8 @@ class UserInitializer(
 
   private suspend fun getToken(): Either<UserStatus, Token> {
     Timber.tag(TAG).d("Get token")
-    return interactor.registerDevice()
+    return dvpn.registerDevice()
+      .map(::parseToken)
       .onRight { model ->
         Timber.tag(TAG).d("Token has been updated")
         coreStorage.setToken(model.token)
@@ -81,10 +85,11 @@ class UserInitializer(
   private suspend fun checkEnrollment(): Either<UserStatus, Unit> {
     enrolmentAttempt++
     Timber.tag(TAG).d("Try enroll. Attempt $enrolmentAttempt")
-    return interactor.getSession()
+    return dvpn.getSession()
+      .map(::parseToken)
       .fold(
         ifLeft = { exception ->
-          val code = interactor.parseHttpCode(exception)
+          val code = (exception as? SdkError.HttpError)?.code
           when (code) {
             401 -> {
               Timber.tag(TAG).d("Token expired")
@@ -109,6 +114,15 @@ class UserInitializer(
           else -> Either.Left(UserStatus.NotEnrolled)
         }
       }
+  }
+
+  private fun parseToken(data: TokenModel): Token {
+    return Token(
+      id = data.id,
+      token = data.token,
+      isBanned = data.isBanned,
+      isEnrolled = data.isEnrolled,
+    )
   }
 
   companion object {

@@ -5,6 +5,7 @@ plugins {
     alias libs.plugins.dagger.hilt
     alias libs.plugins.google.services
     alias libs.plugins.google.crashlytics
+    alias libs.plugins.compose.compiler
 }
 
 android {
@@ -17,8 +18,8 @@ android {
         targetSdk libs.versions.compileSdk.get().toInteger()
         compileSdk libs.versions.compileSdk.get().toInteger()
 
-        versionCode 11
-        versionName "2.0.0"
+        versionCode 12
+        versionName "2.0.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -46,9 +47,6 @@ android {
     buildFeatures {
         compose true
     }
-    composeOptions {
-        kotlinCompilerExtensionVersion libs.versions.composeCompiler.get()
-    }
     packagingOptions {
         resources {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
@@ -74,18 +72,17 @@ dependencies {
     implementation libs.lifecycle.runtime
     implementation libs.bundles.voyager
     implementation libs.bundles.compose
-    implementation libs.accompanist.systemuicontroller
     implementation platform(libs.google.firebase.bom)
     implementation libs.google.firebase.crashlytics
     implementation libs.google.firebase.analytics
     implementation libs.android.appcompat
     implementation libs.kotlin.collection.immutable
     implementation libs.coil
-//    implementation libs.core.vpn
+    implementation libs.core.vpn
     implementation libs.common
 //    implementation libs.common.map
     implementation libs.common.flags
-//    implementation libs.common.logger
+    implementation libs.common.logger
     implementation libs.common.net.apps
 
     kapt libs.hilt.compiler
@@ -93,9 +90,8 @@ dependencies {
     implementation(name: "libv2ray", ext: "aar")
 
     implementation project(path: ':based_vpn')
-    implementation project(path: ':core_vpn')
+//    implementation project(path: ':core_vpn')
     implementation project(path: ':common_map')
-    implementation project(path: ':common_logger')
+//    implementation project(path: ':common_logger')
     implementation project(path: ':common_referral')
-//    implementation "io.norselabs.vpn:based:0.0.1"
 }

@@ -2,7 +2,7 @@ package io.norselabs.vpn.based.viewModel.cities
 
 import io.norselabs.vpn.common.state.Status
 import io.norselabs.vpn.common.state.ViewStateHolder
-import io.norselabs.vpn.common_network.models.Country
+import io.norselabs.vpn.sdk.services.destination.Country
 import javax.inject.Inject
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf

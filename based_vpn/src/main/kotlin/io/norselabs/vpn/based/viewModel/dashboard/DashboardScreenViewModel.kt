@@ -9,9 +9,6 @@ import io.norselabs.vpn.based.storage.RatingStatus
 import io.norselabs.vpn.based.viewModel.dashboard.DashboardScreenEffect as Effect
 import io.norselabs.vpn.common.state.Status
 import io.norselabs.vpn.common_logger.share.LogsSender
-import io.norselabs.vpn.common_network.AppRepository
-import io.norselabs.vpn.common_network.models.CitiesRequest
-import io.norselabs.vpn.common_network.models.NetworkData
 import io.norselabs.vpn.core_vpn.connectivity.NetworkState
 import io.norselabs.vpn.core_vpn.connectivity.NetworkStateMonitor
 import io.norselabs.vpn.core_vpn.storage.CoreStorage
@@ -21,6 +18,9 @@ import io.norselabs.vpn.core_vpn.vpn.Destination
 import io.norselabs.vpn.core_vpn.vpn.Protocol
 import io.norselabs.vpn.core_vpn.vpn.connector.VPNConnector
 import io.norselabs.vpn.core_vpn.vpn.destination.DestinationStorage
+import io.norselabs.vpn.sdk.dvpn_client.DVPNClient
+import io.norselabs.vpn.sdk.services.connection.NetworkData
+import io.norselabs.vpn.sdk.services.destination.CitiesRequest
 import io.norselabs.vpn.v2ray.repo.V2RayRepository
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
@@ -35,7 +35,7 @@ import timber.log.Timber
 class DashboardScreenViewModel
 @Inject constructor(
   val stateHolder: DashboardScreenStateHolder,
-  private val repository: AppRepository,
+  private val dvpnClient: DVPNClient,
   private val appStorage: AppStorage,
   private val coreStorage: CoreStorage,
   private val connector: VPNConnector,
@@ -130,7 +130,7 @@ class DashboardScreenViewModel
     repeat(MAX_ATTEMPTS) {
       val isConnected = try {
         withTimeout(3000) {
-          repository.checkConnection()
+          dvpnClient.checkConnection()
             .isRight()
             .also { Timber.tag(TAG).d("Connection check: $it") }
         }
@@ -145,13 +145,13 @@ class DashboardScreenViewModel
   private suspend fun updateNetworkInfo(isNetworkChanged: Boolean) {
     userInitializer.hasToken().firstOrNull { it }
     stateHolder.updateState { copy(retryAttempt = state.retryAttempt + 1) }
-    repository.getIpData()
-      .flatMap { res ->
+    dvpnClient.getIpData()
+      .flatMap { data ->
         val currentIp = state.networkData?.ip
-        if (isNetworkChanged && currentIp == res.data.ip) {
+        if (isNetworkChanged && currentIp == data.ip) {
           Either.Left(Unit)
         } else {
-          Either.Right(res.data)
+          Either.Right(data)
         }
       }
       .onRight(::parseNetworkInfo)
@@ -248,12 +248,12 @@ class DashboardScreenViewModel
 
   private suspend fun selectRandomDestination() {
     val protocol = coreStorage.getVpnProtocol().takeIf { it != Protocol.NONE }
-    val countries = repository.getCountries(protocol = protocol?.strValue, isFresh = false).getOrNull()?.data
+    val countries = dvpnClient.getCountries(protocol = protocol?.strValue, isFresh = false).getOrNull()
     val country = countries?.randomOrNull() ?: return
-    val cities = repository.getCities(
+    val cities = dvpnClient.getCities(
       request = CitiesRequest(country.id, protocol?.strValue),
       isFresh = false,
-    ).getOrNull()?.data
+    ).getOrNull()
     val city = cities?.randomOrNull() ?: return
     destinationStorage.storeDestination(
       Destination.City(

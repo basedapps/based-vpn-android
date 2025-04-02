@@ -9,20 +9,17 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import io.norselabs.vpn.based.app_config.AppConfig
-import io.norselabs.vpn.based.core_impl.user.UserInitializerInteractorImpl
-import io.norselabs.vpn.based.core_impl.vpn.VPNConnectorInteractorImpl
-import io.norselabs.vpn.based.network.DnsRequests
+import io.norselabs.vpn.based.core_impl.vpn.VPNInteractorImpl
 import io.norselabs.vpn.common_logger.logger.FileLogTree
 import io.norselabs.vpn.common_logger.share.LogsSender
-import io.norselabs.vpn.common_network.AppRepository
 import io.norselabs.vpn.core_vpn.connectivity.NetworkStateMonitor
 import io.norselabs.vpn.core_vpn.storage.CoreStorage
 import io.norselabs.vpn.core_vpn.user.UserInitializer
-import io.norselabs.vpn.core_vpn.user.UserInitializerInteractor
 import io.norselabs.vpn.core_vpn.vpn.connector.VPNConnector
-import io.norselabs.vpn.core_vpn.vpn.connector.VPNConnectorInteractor
+import io.norselabs.vpn.core_vpn.vpn.connector.VPNInteractor
 import io.norselabs.vpn.core_vpn.vpn.destination.DestinationStorage
 import io.norselabs.vpn.core_vpn.vpn.split_tunneling.SplitTunnelingConfigurator
+import io.norselabs.vpn.sdk.dvpn_client.DVPNClient
 import io.norselabs.vpn.v2ray.repo.V2RayRepository
 import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineScope
@@ -35,33 +32,23 @@ class AppModule {
 
   @Provides
   @Singleton
-  fun provideUserInitializerInteractor(
-    repository: AppRepository,
-    config: AppConfig,
-    dnsRequests: DnsRequests,
-  ): UserInitializerInteractor {
-    return UserInitializerInteractorImpl(repository, config, dnsRequests)
-  }
-
-  @Provides
-  @Singleton
   fun provideUserInitializer(
-    interactor: UserInitializerInteractor,
+    config: AppConfig,
+    dvpnClient: DVPNClient,
     coreStorage: CoreStorage,
   ): UserInitializer = UserInitializer(
     scope = CoroutineScope(SupervisorJob() + Dispatchers.IO),
-    interactor = interactor,
     coreStorage = coreStorage,
+    dvpn = dvpnClient,
+    appVersion = config.getAppVersion(),
   )
 
   @Provides
   @Singleton
   fun provideVPNConnectorInteractor(
-    repository: AppRepository,
     v2RayRepository: V2RayRepository,
-  ): VPNConnectorInteractor {
-    return VPNConnectorInteractorImpl(
-      repository = repository,
+  ): VPNInteractor {
+    return VPNInteractorImpl(
       v2RayRepository = v2RayRepository,
     )
   }
@@ -71,10 +58,12 @@ class AppModule {
   fun provideVPNConnector(
     gson: Gson,
     coreStorage: CoreStorage,
-    interactor: VPNConnectorInteractor,
+    dvpnClient: DVPNClient,
+    interactor: VPNInteractor,
   ): VPNConnector {
     return VPNConnector(
       gson = gson,
+      dvpn = dvpnClient,
       coreStorage = coreStorage,
       interactor = interactor,
     )

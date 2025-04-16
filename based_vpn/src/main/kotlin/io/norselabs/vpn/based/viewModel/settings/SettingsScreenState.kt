@@ -31,7 +31,6 @@ data class SettingsScreenState(
   val protocolOptions: ImmutableList<Protocol> = persistentListOf(
     Protocol.WIREGUARD,
     Protocol.V2RAY,
-    Protocol.NONE,
   ),
   val isProtocolSelectorVisible: Boolean = false,
 

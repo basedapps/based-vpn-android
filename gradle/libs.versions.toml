@@ -104,7 +104,7 @@ ads-identifier-google = { module = "com.google.android.gms:play-services-ads-ide
 # Norselabs
 vpn-v2ray = { module = "io.norselabs.vpn:v2ray", version = "0.0.10" }
 dvpn-sdk = { module = "io.norselabs.vpn:dvpn_sdk", version = "0.0.4" }
-core-vpn = { module = "io.norselabs.vpn:core_vpn", version = "0.1.1" }
+core-vpn = { module = "io.norselabs.vpn:core_vpn", version = "0.1.2" }
 common = { module = "io.norselabs.vpn:common", version = "0.0.2" }
 common-map = { module = "io.norselabs.vpn:common_map", version = "0.0.4" }
 common-flags = { module = "io.norselabs.vpn:common_flags", version = "0.0.2" }

@@ -66,7 +66,7 @@ class SettingsScreen : Screen {
       onDnsDialogDismissClick = viewModel::onDnsDialogDismissClick,
       onProtocolRowClick = viewModel::onProtocolRowClick,
       onProtocolDialogConfirmClick = viewModel::onProtocolSelected,
-      onProtocolDialogDismissClick = viewModel::onProtocolDialogDismissClick,
+      onProtocolDialogClearClick = viewModel::onProtocolDialogClearClick,
       onSplitTunnelingClick = viewModel::onSplitTunnelClick,
       onLogsRowClick = viewModel::onLogsRowClick,
     )
@@ -82,7 +82,7 @@ fun SettingsScreenStateless(
   onDnsDialogDismissClick: () -> Unit,
   onProtocolRowClick: () -> Unit,
   onProtocolDialogConfirmClick: (Protocol) -> Unit,
-  onProtocolDialogDismissClick: () -> Unit,
+  onProtocolDialogClearClick: () -> Unit,
   onSplitTunnelingClick: () -> Unit,
   onLogsRowClick: () -> Unit,
 ) {
@@ -103,7 +103,7 @@ fun SettingsScreenStateless(
         onDnsDialogDismissClick = onDnsDialogDismissClick,
         onProtocolRowClick = onProtocolRowClick,
         onProtocolDialogConfirmClick = onProtocolDialogConfirmClick,
-        onProtocolDialogDismissClick = onProtocolDialogDismissClick,
+        onProtocolDialogClearClick = onProtocolDialogClearClick,
         onSplitTunnelingClick = onSplitTunnelingClick,
         onLogsRowClick = onLogsRowClick,
       )
@@ -120,7 +120,7 @@ fun Content(
   onDnsDialogDismissClick: () -> Unit,
   onProtocolRowClick: () -> Unit,
   onProtocolDialogConfirmClick: (Protocol) -> Unit,
-  onProtocolDialogDismissClick: () -> Unit,
+  onProtocolDialogClearClick: () -> Unit,
   onSplitTunnelingClick: () -> Unit,
   onLogsRowClick: () -> Unit,
 ) {
@@ -172,8 +172,8 @@ fun Content(
       ProtocolDialog(
         state = state,
         onConfirmClick = onProtocolDialogConfirmClick,
-        onDismissClick = onProtocolDialogDismissClick,
-        onDismissRequest = onProtocolDialogDismissClick,
+        onClearClick = onProtocolDialogClearClick,
+        onDismissRequest = onProtocolDialogClearClick,
       )
     }
   }

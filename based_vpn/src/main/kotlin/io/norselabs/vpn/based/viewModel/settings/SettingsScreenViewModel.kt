@@ -61,7 +61,7 @@ class SettingsScreenViewModel
     stateHolder.updateState { copy(isProtocolSelectorVisible = true) }
   }
 
-  fun onProtocolSelected(protocol: Protocol) {
+  fun onProtocolSelected(protocol: Protocol?) {
     stateHolder.updateState {
       copy(
         isProtocolSelectorVisible = false,
@@ -73,8 +73,8 @@ class SettingsScreenViewModel
     }
   }
 
-  fun onProtocolDialogDismissClick() {
-    stateHolder.updateState { copy(isProtocolSelectorVisible = false) }
+  fun onProtocolDialogClearClick() {
+    onProtocolSelected(null)
   }
 
   fun onSplitTunnelClick() {

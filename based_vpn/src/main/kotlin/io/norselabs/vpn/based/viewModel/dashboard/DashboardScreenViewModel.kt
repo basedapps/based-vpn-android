@@ -15,7 +15,6 @@ import io.norselabs.vpn.core_vpn.storage.CoreStorage
 import io.norselabs.vpn.core_vpn.user.UserInitializer
 import io.norselabs.vpn.core_vpn.user.UserStatus
 import io.norselabs.vpn.core_vpn.vpn.Destination
-import io.norselabs.vpn.core_vpn.vpn.Protocol
 import io.norselabs.vpn.core_vpn.vpn.connector.VPNConnector
 import io.norselabs.vpn.core_vpn.vpn.destination.DestinationStorage
 import io.norselabs.vpn.sdk.dvpn_client.DVPNClient
@@ -247,7 +246,7 @@ class DashboardScreenViewModel
   }
 
   private suspend fun selectRandomDestination() {
-    val protocol = coreStorage.getVpnProtocol().takeIf { it != Protocol.NONE }
+    val protocol = coreStorage.getVpnProtocol()
     val countries = dvpnClient.getCountries(protocol = protocol?.strValue, isFresh = false).getOrNull()
     val country = countries?.randomOrNull() ?: return
     val cities = dvpnClient.getCities(

@@ -6,7 +6,6 @@ import io.norselabs.vpn.based.viewModel.countries.CountriesScreenEffect as Effec
 import io.norselabs.vpn.common.state.Status
 import io.norselabs.vpn.common_flags.mapToFlag
 import io.norselabs.vpn.core_vpn.storage.CoreStorage
-import io.norselabs.vpn.core_vpn.vpn.Protocol
 import io.norselabs.vpn.sdk.dvpn_client.DVPNClient
 import javax.inject.Inject
 import kotlinx.collections.immutable.toPersistentList
@@ -29,7 +28,7 @@ class CountriesScreenViewModel
 
   private fun getCountries() {
     screenModelScope.launch {
-      val protocol = coreStorage.getVpnProtocol().takeIf { it != Protocol.NONE }
+      val protocol = coreStorage.getVpnProtocol()
       val countries = dvpnClient.getCountries(protocol?.strValue).getOrNull()
       if (countries != null) {
         stateHolder.updateState {

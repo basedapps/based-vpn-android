@@ -6,7 +6,6 @@ import io.norselabs.vpn.based.viewModel.cities.CitiesScreenEffect as Effect
 import io.norselabs.vpn.common.state.Status
 import io.norselabs.vpn.core_vpn.storage.CoreStorage
 import io.norselabs.vpn.core_vpn.vpn.Destination
-import io.norselabs.vpn.core_vpn.vpn.Protocol
 import io.norselabs.vpn.core_vpn.vpn.destination.DestinationStorage
 import io.norselabs.vpn.sdk.dvpn_client.DVPNClient
 import io.norselabs.vpn.sdk.services.destination.CitiesRequest
@@ -37,7 +36,7 @@ class CitiesScreenViewModel
 
   private fun getCities(countryId: String) {
     screenModelScope.launch {
-      val protocol = coreStorage.getVpnProtocol().takeIf { it != Protocol.NONE }
+      val protocol = coreStorage.getVpnProtocol()
       val countries = dvpnClient.getCountries(protocol?.strValue).getOrNull()
       val cities = dvpnClient.getCities(CitiesRequest(countryId, protocol?.strValue)).getOrNull()
       if (countries != null && cities != null) {

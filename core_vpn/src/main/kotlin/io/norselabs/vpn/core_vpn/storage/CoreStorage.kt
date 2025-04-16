@@ -7,7 +7,9 @@ import io.norselabs.vpn.common.preferences.setValue
 import io.norselabs.vpn.core_vpn.vpn.Protocol
 import kotlinx.coroutines.flow.Flow
 
-class CoreStorage(prefs: SharedPreferences) {
+class CoreStorage(
+  private val prefs: SharedPreferences,
+) {
 
   private var tokenPref: String by prefs.delegate("device_token", "")
 
@@ -28,6 +30,10 @@ class CoreStorage(prefs: SharedPreferences) {
   }
 
   fun getUserId(): String = userIdPref
+
+  fun wasVpnProtocolSelected(): Boolean {
+    return prefs.getString("selected_protocol", null) != null
+  }
 
   fun setVpnProtocol(protocol: Protocol?) {
     protocolPref = protocol?.strValue.orEmpty()

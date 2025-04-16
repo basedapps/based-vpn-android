@@ -1,6 +1,7 @@
 package io.norselabs.vpn.core_vpn.vpn
 
 import com.google.gson.annotations.SerializedName
+import io.norselabs.vpn.core_vpn.vpn.Protocol.entries
 
 sealed interface Credentials {
 
@@ -22,13 +23,14 @@ sealed interface Credentials {
 enum class Protocol(val strValue: String) {
   WIREGUARD("WIREGUARD"),
   V2RAY("V2RAY"),
-  NONE("NONE"),
   ;
 
   companion object {
-    fun fromString(strValue: String) = entries.firstOrNull {
-      it.strValue.equals(other = strValue, ignoreCase = true)
-    } ?: NONE
+    fun fromString(strValue: String): Protocol? {
+      return entries.firstOrNull {
+        it.strValue.equals(other = strValue, ignoreCase = true)
+      }
+    }
   }
 }
 

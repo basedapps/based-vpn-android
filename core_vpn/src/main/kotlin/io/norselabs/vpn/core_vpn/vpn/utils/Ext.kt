@@ -6,6 +6,5 @@ fun Protocol.format(): String? {
   return when (this) {
     Protocol.WIREGUARD -> "WireGuard"
     Protocol.V2RAY -> "V2Ray"
-    Protocol.NONE -> null
   }
 }

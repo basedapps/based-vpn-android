@@ -35,7 +35,6 @@ class VPNConnector(
 
   private suspend fun getCredentials(destination: Destination): Either<Error, Credentials> {
     val protocol = coreStorage.getVpnProtocol()
-      .takeIf { it != Protocol.NONE }
     return getCredentials(
       destination = destination,
       protocol = protocol,

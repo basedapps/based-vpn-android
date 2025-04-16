@@ -29,11 +29,13 @@ class CoreStorage(prefs: SharedPreferences) {
 
   fun getUserId(): String = userIdPref
 
-  fun setVpnProtocol(protocol: Protocol) {
-    protocolPref = protocol.strValue
+  fun setVpnProtocol(protocol: Protocol?) {
+    protocolPref = protocol?.strValue.orEmpty()
   }
 
-  fun getVpnProtocol(): Protocol = Protocol.fromString(protocolPref)
+  fun getVpnProtocol(): Protocol? {
+    return Protocol.fromString(protocolPref)
+  }
 
   fun setCurrentServerId(serverId: String?) {
     currentServerIdPref.value = serverId.orEmpty()

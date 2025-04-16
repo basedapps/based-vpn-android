@@ -14,14 +14,14 @@ class ReferralManager(
     }
 
   suspend fun init(
-    userIdProvider: suspend () -> String,
+    tokenProvider: suspend () -> String,
   ) {
     val referredId = referredIdPref.orEmpty()
     if (referredId.isBlank()) return
 
-    val userId = userIdProvider()
-    if (userId.isNotBlank() && referredId.isNotBlank()) {
-      val result = registrar.register(userId, referredId)
+    val token = tokenProvider()
+    if (token.isNotBlank() && referredId.isNotBlank()) {
+      val result = registrar.register(token, referredId)
       if (result != ReferralRegistrar.Result.Fail) {
         referredIdPref = ""
       }
@@ -30,12 +30,12 @@ class ReferralManager(
 
   suspend fun registerReferral(
     referrerId: String,
-    userIdProvider: suspend () -> String,
+    tokenProvider: suspend () -> String,
   ) {
     referredIdPref = referrerId
-    val userId = userIdProvider()
-    if (userId.isNotBlank()) {
-      val result = registrar.register(userId, referrerId)
+    val token = tokenProvider()
+    if (token.isNotBlank()) {
+      val result = registrar.register(token, referrerId)
       if (result != ReferralRegistrar.Result.Fail) {
         referredIdPref = ""
       }

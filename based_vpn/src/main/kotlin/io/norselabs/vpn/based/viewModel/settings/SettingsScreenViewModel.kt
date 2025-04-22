@@ -5,10 +5,11 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import io.norselabs.vpn.based.language.LanguageManager
 import io.norselabs.vpn.based.viewModel.settings.SettingsScreenEffect as Effect
 import io.norselabs.vpn.based.viewModel.settings.dto.AppLang
-import io.norselabs.vpn.based.vpn.DdsConfigurator
 import io.norselabs.vpn.common_logger.share.LogsSender
 import io.norselabs.vpn.core_vpn.storage.CoreStorage
 import io.norselabs.vpn.core_vpn.vpn.Protocol
+import io.norselabs.vpn.core_vpn.vpn.dns.DnsConfigurator
+import io.norselabs.vpn.core_vpn.vpn.dns.DnsProvider
 import javax.inject.Inject
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.launch
@@ -16,7 +17,7 @@ import kotlinx.coroutines.launch
 class SettingsScreenViewModel
 @Inject constructor(
   val stateHolder: SettingsScreenStateHolder,
-  private val dnsConfigurator: DdsConfigurator,
+  private val dnsConfigurator: DnsConfigurator,
   private val coreStorage: CoreStorage,
   private val logsSender: LogsSender,
 ) : ScreenModel {
@@ -30,7 +31,7 @@ class SettingsScreenViewModel
       val protocol = coreStorage.getVpnProtocol()
       stateHolder.updateState {
         copy(
-          currentDns = dns,
+          currentDnsProvider = dns,
           currentProtocol = protocol,
         )
       }
@@ -41,11 +42,11 @@ class SettingsScreenViewModel
     stateHolder.updateState { copy(isDnsSelectorVisible = true) }
   }
 
-  fun onDnsSelected(dns: DdsConfigurator.Dns) {
+  fun onDnsSelected(dns: DnsProvider) {
     stateHolder.updateState {
       copy(
         isDnsSelectorVisible = false,
-        currentDns = dns,
+        currentDnsProvider = dns,
       )
     }
     screenModelScope.launch {

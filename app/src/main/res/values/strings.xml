@@ -30,7 +30,7 @@
 
     <string name="settings_dns_cloudflare">Cloudflare DNS</string>
     <string name="settings_dns_google">Google DNS</string>
-    <string name="settings_dns_handshake">Handshake DNS</string>
+    <string name="settings_dns_quad9">Quad9</string>
     <string name="settings_dns_change_title">Choose type</string>
 
     <string name="error_generic_title">Something went wrong</string>

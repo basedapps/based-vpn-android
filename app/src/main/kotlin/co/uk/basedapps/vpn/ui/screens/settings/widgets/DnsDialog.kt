@@ -23,16 +23,16 @@ import androidx.compose.ui.unit.dp
 import co.uk.basedapps.vpn.R
 import co.uk.basedapps.vpn.ui.screens.settings.getLabelRes
 import io.norselabs.vpn.based.viewModel.settings.SettingsScreenState
-import io.norselabs.vpn.based.vpn.DdsConfigurator
+import io.norselabs.vpn.core_vpn.vpn.dns.DnsProvider
 
 @Composable
 fun DnsDialog(
   state: SettingsScreenState,
-  onConfirmClick: (DdsConfigurator.Dns) -> Unit,
+  onConfirmClick: (DnsProvider) -> Unit,
   onDismissClick: () -> Unit,
   onDismissRequest: () -> Unit = {},
 ) {
-  var radioState by remember { mutableStateOf(state.currentDns) }
+  var radioState by remember { mutableStateOf(state.currentDnsProvider) }
   AlertDialog(
     onDismissRequest = onDismissRequest,
     title = { Text(stringResource(R.string.settings_dns_change_title)) },
@@ -83,7 +83,7 @@ fun DnsDialog(
 private fun DnsDialogPreview() {
   DnsDialog(
     state = SettingsScreenState(
-      currentDns = DdsConfigurator.Dns.Cloudflare,
+      currentDnsProvider = DnsProvider.Cloudflare,
     ),
     onConfirmClick = {},
     onDismissClick = {},

@@ -6,6 +6,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import io.norselabs.vpn.core_vpn.vpn.dns.DnsConfigurator
 import io.norselabs.vpn.v2ray.repo.V2RayRepository
 import javax.inject.Singleton
 
@@ -18,4 +19,12 @@ class V2RayModule {
   fun provideV2RayRepository(
     @ApplicationContext context: Context,
   ): V2RayRepository = V2RayRepository(context)
+
+  @Provides
+  @Singleton
+  fun provideDnsConfigurator(
+    v2Ray: V2RayRepository,
+  ): DnsConfigurator {
+    return DnsConfigurator(v2Ray)
+  }
 }

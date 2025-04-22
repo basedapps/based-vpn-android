@@ -2,9 +2,9 @@ package io.norselabs.vpn.based.viewModel.settings
 
 import io.norselabs.vpn.based.app_config.AppConfig
 import io.norselabs.vpn.based.viewModel.settings.dto.AppLang
-import io.norselabs.vpn.based.vpn.DdsConfigurator
 import io.norselabs.vpn.common.state.ViewStateHolder
 import io.norselabs.vpn.core_vpn.vpn.Protocol
+import io.norselabs.vpn.core_vpn.vpn.dns.DnsProvider
 import javax.inject.Inject
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -19,11 +19,11 @@ class SettingsScreenStateHolder
 )
 
 data class SettingsScreenState(
-  val currentDns: DdsConfigurator.Dns? = null,
-  val dnsOptions: ImmutableList<DdsConfigurator.Dns> = persistentListOf(
-    DdsConfigurator.Dns.Cloudflare,
-    DdsConfigurator.Dns.Google,
-    DdsConfigurator.Dns.Handshake,
+  val currentDnsProvider: DnsProvider? = null,
+  val dnsOptions: ImmutableList<DnsProvider> = persistentListOf(
+    DnsProvider.Quad9,
+    DnsProvider.Cloudflare,
+    DnsProvider.Google,
   ),
   val isDnsSelectorVisible: Boolean = false,
 

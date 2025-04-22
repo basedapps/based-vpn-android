@@ -35,9 +35,9 @@ import co.uk.basedapps.vpn.ui.widget.TopBar
 import io.norselabs.vpn.based.viewModel.settings.SettingsScreenEffect as Effect
 import io.norselabs.vpn.based.viewModel.settings.SettingsScreenState as State
 import io.norselabs.vpn.based.viewModel.settings.SettingsScreenViewModel
-import io.norselabs.vpn.based.vpn.DdsConfigurator
 import io.norselabs.vpn.common_compose.EffectHandler
 import io.norselabs.vpn.core_vpn.vpn.Protocol
+import io.norselabs.vpn.core_vpn.vpn.dns.DnsProvider
 
 class SettingsScreen : Screen {
 
@@ -78,7 +78,7 @@ fun SettingsScreenStateless(
   state: State,
   navigateBack: () -> Unit,
   onDnsRowClick: () -> Unit,
-  onDnsDialogConfirmClick: (DdsConfigurator.Dns) -> Unit,
+  onDnsDialogConfirmClick: (DnsProvider) -> Unit,
   onDnsDialogDismissClick: () -> Unit,
   onProtocolRowClick: () -> Unit,
   onProtocolDialogConfirmClick: (Protocol?) -> Unit,
@@ -116,7 +116,7 @@ fun Content(
   paddingValues: PaddingValues,
   state: State,
   onDnsRowClick: () -> Unit,
-  onDnsDialogConfirmClick: (DdsConfigurator.Dns) -> Unit,
+  onDnsDialogConfirmClick: (DnsProvider) -> Unit,
   onDnsDialogDismissClick: () -> Unit,
   onProtocolRowClick: () -> Unit,
   onProtocolDialogConfirmClick: (Protocol?) -> Unit,
@@ -131,7 +131,7 @@ fun Content(
     ) {
       SettingsRow(
         title = stringResource(R.string.settings_row_dns),
-        value = state.currentDns
+        value = state.currentDnsProvider
           ?.let { stringResource(it.getLabelRes()) } ?: "",
         modifier = Modifier
           .clickable(onClick = onDnsRowClick),
@@ -211,10 +211,10 @@ private fun SettingsRow(
   }
 }
 
-fun DdsConfigurator.Dns.getLabelRes() = when (this) {
-  DdsConfigurator.Dns.Cloudflare -> R.string.settings_dns_cloudflare
-  DdsConfigurator.Dns.Google -> R.string.settings_dns_google
-  DdsConfigurator.Dns.Handshake -> R.string.settings_dns_handshake
+fun DnsProvider.getLabelRes() = when (this) {
+  DnsProvider.Cloudflare -> R.string.settings_dns_cloudflare
+  DnsProvider.Google -> R.string.settings_dns_google
+  DnsProvider.Quad9 -> R.string.settings_dns_quad9
 }
 
 fun Protocol?.getLabelRes() = when (this) {

@@ -67,7 +67,6 @@ import io.norselabs.vpn.based.viewModel.dashboard.DashboardScreenViewModel
 import io.norselabs.vpn.based.viewModel.dashboard.NetworkDataUi
 import io.norselabs.vpn.based.viewModel.dashboard.RatingClick
 import io.norselabs.vpn.based.viewModel.dashboard.VpnStatus
-import io.norselabs.vpn.based.vpn.getVpnPermissionRequest
 import io.norselabs.vpn.common.ext.goToGooglePlay
 import io.norselabs.vpn.common.ext.mailTo
 import io.norselabs.vpn.common.state.Status
@@ -76,6 +75,7 @@ import io.norselabs.vpn.common_flags.mapToFlag
 import io.norselabs.vpn.common_map.WorldMap
 import io.norselabs.vpn.core_vpn.user.UserStatus
 import io.norselabs.vpn.core_vpn.vpn.Destination
+import io.norselabs.vpn.core_vpn.vpn.utils.getVpnPermissionRequest
 import timber.log.Timber
 
 class DashboardScreen : Screen {

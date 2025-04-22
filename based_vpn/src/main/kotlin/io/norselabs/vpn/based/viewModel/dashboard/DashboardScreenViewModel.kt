@@ -9,6 +9,7 @@ import io.norselabs.vpn.based.storage.RatingStatus
 import io.norselabs.vpn.based.viewModel.dashboard.DashboardScreenEffect as Effect
 import io.norselabs.vpn.common.state.Status
 import io.norselabs.vpn.common_logger.share.LogsSender
+import io.norselabs.vpn.common_purchases.PurchasesManager
 import io.norselabs.vpn.core_vpn.connectivity.NetworkState
 import io.norselabs.vpn.core_vpn.connectivity.NetworkStateMonitor
 import io.norselabs.vpn.core_vpn.storage.CoreStorage
@@ -43,6 +44,7 @@ class DashboardScreenViewModel
   private val destinationStorage: DestinationStorage,
   private val networkMonitor: NetworkStateMonitor,
   private val logsSender: LogsSender,
+  private val purchasesManager: PurchasesManager,
 ) : ScreenModel {
 
   private var connectJob: Job? = null
@@ -224,11 +226,17 @@ class DashboardScreenViewModel
   }
 
   fun onPermissionsResult(isSuccess: Boolean) {
-    if (isSuccess) {
-      stateHolder.sendEffect(Effect.ShowAd)
-    } else {
-      // todo: show an error
-      stateHolder.updateState { copy(vpnStatus = VpnStatus.Disconnected) }
+    screenModelScope.launch {
+      val isSubscribed = purchasesManager.getCustomerData()
+        .getOrNull()?.isSubscribed == true
+      when {
+        isSuccess && isSubscribed -> onAdShown()
+        isSuccess -> stateHolder.sendEffect(Effect.ShowAd)
+        else -> {
+          // todo: show an error
+          stateHolder.updateState { copy(vpnStatus = VpnStatus.Disconnected) }
+        }
+      }
     }
   }
 

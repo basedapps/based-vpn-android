@@ -43,7 +43,7 @@ publishing {
         release(MavenPublication) {
             groupId = 'io.norselabs.vpn'
             artifactId = 'based'
-            version = '0.2.4'
+            version = '0.2.5'
 
             afterEvaluate {
                 from components.release

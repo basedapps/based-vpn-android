@@ -1,4 +1,4 @@
-package io.norselabs.vpn.based.vpn
+package io.norselabs.vpn.core_vpn.vpn.utils
 
 import android.content.Context
 import android.content.Intent

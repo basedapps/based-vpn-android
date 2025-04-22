@@ -5,10 +5,12 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import io.norselabs.vpn.based.viewModel.countries.CountriesScreenEffect as Effect
 import io.norselabs.vpn.common.state.Status
 import io.norselabs.vpn.common_flags.mapToFlag
+import io.norselabs.vpn.common_purchases.PurchasesManager
 import io.norselabs.vpn.core_vpn.storage.CoreStorage
 import io.norselabs.vpn.sdk.dvpn_client.DVPNClient
 import javax.inject.Inject
 import kotlinx.collections.immutable.toPersistentList
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 class CountriesScreenViewModel
@@ -16,37 +18,53 @@ class CountriesScreenViewModel
   val stateHolder: CountriesScreenStateHolder,
   private val dvpnClient: DVPNClient,
   private val coreStorage: CoreStorage,
+  private val purchasesManager: PurchasesManager,
 ) : ScreenModel {
 
   private val state: CountriesScreenState
     get() = stateHolder.state.value
 
-  init {
-    stateHolder.updateState { copy(status = Status.Loading) }
-    getCountries()
+  private var fetchDataJob: Job? = null
+
+  fun fetchData() {
+    fetchDataJob?.cancel()
+    fetchDataJob = screenModelScope.launch {
+      val isSubscribed = purchasesManager.getCustomerData()
+        .getOrNull()?.isSubscribed == true
+      val wasSubscribed = state.isSubscribed
+      stateHolder.updateState {
+        copy(isSubscribed = isSubscribed)
+      }
+      val isFresh = wasSubscribed != isSubscribed || state.isRefreshing
+      getCountries(isFresh)
+    }
   }
 
-  private fun getCountries() {
-    screenModelScope.launch {
-      val protocol = coreStorage.getVpnProtocol()
-      val countries = dvpnClient.getCountries(protocol?.strValue).getOrNull()
-      if (countries != null) {
-        stateHolder.updateState {
-          copy(
-            status = Status.Data,
-            countries = countries.map { country ->
-              CountryUi(
-                id = country.id,
-                name = country.name,
-                code = country.code,
-                flag = mapToFlag(country.code),
-                serversAvailable = country.serversAvailable,
-              )
-            }.toPersistentList(),
-          )
-        }
-      } else {
-        stateHolder.updateState { copy(status = Status.Error(false)) }
+  private suspend fun getCountries(isFresh: Boolean) {
+    val protocol = coreStorage.getVpnProtocol()
+    val countries = dvpnClient.getCountries(protocol = protocol?.strValue, isFresh = isFresh).getOrNull()
+    if (countries != null) {
+      stateHolder.updateState {
+        copy(
+          status = Status.Data,
+          countries = countries.map { country ->
+            CountryUi(
+              id = country.id,
+              name = country.name,
+              code = country.code,
+              flag = mapToFlag(country.code),
+              serversAvailable = country.serversAvailable,
+            )
+          }.toPersistentList(),
+          isRefreshing = false,
+        )
+      }
+    } else {
+      stateHolder.updateState {
+        copy(
+          status = Status.Error(false),
+          isRefreshing = false,
+        )
       }
     }
   }
@@ -61,6 +79,16 @@ class CountriesScreenViewModel
 
   fun onTryAgainClick() {
     stateHolder.updateState { copy(status = Status.Error(true)) }
-    getCountries()
+    fetchData()
+  }
+
+  fun onSubscribeClick() {
+    stateHolder.sendEffect(Effect.ShowPurchaseScreen)
+  }
+
+  fun onPull2Refresh() {
+    if (state.isRefreshing) return
+    stateHolder.updateState { copy(isRefreshing = true) }
+    fetchData()
   }
 }

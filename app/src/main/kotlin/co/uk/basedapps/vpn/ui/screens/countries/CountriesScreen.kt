@@ -16,10 +16,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -46,6 +48,7 @@ import io.norselabs.vpn.based.viewModel.countries.CountriesScreenState as State
 import io.norselabs.vpn.based.viewModel.countries.CountriesScreenViewModel
 import io.norselabs.vpn.based.viewModel.countries.CountryUi
 import io.norselabs.vpn.common.state.Status
+import io.norselabs.vpn.common_compose.NavigationSpacer
 
 class CountriesScreen : Screen {
 
@@ -62,13 +65,20 @@ class CountriesScreen : Screen {
 
         is Effect.ShowCitiesScreen ->
           navigator.push(CitiesScreen(effect.countryId))
+
+        is Effect.ShowPurchaseScreen -> Unit
       }
+    }
+
+    LaunchedEffect(Unit) {
+      viewModel.fetchData()
     }
 
     CountriesScreenStateless(
       state = state,
       navigateBack = viewModel::onBackClick,
       onItemClick = viewModel::onCountryClick,
+      onPull2Refresh = viewModel::onPull2Refresh,
       onTryAgainClick = viewModel::onTryAgainClick,
     )
   }
@@ -79,6 +89,7 @@ fun CountriesScreenStateless(
   state: State,
   navigateBack: () -> Unit,
   onItemClick: (CountryUi) -> Unit,
+  onPull2Refresh: () -> Unit,
   onTryAgainClick: () -> Unit,
 ) {
   Scaffold(
@@ -94,6 +105,7 @@ fun CountriesScreenStateless(
         paddingValues = paddingValues,
         state = state,
         onItemClick = onItemClick,
+        onPull2Refresh = onPull2Refresh,
         onTryAgainClick = onTryAgainClick,
       )
     },
@@ -105,6 +117,7 @@ fun Content(
   paddingValues: PaddingValues,
   state: State,
   onItemClick: (CountryUi) -> Unit,
+  onPull2Refresh: () -> Unit,
   onTryAgainClick: () -> Unit,
 ) {
   Box(
@@ -125,22 +138,36 @@ fun Content(
         onButtonClick = onTryAgainClick,
       )
 
-      is Status.Data -> Data(state, onItemClick)
+      is Status.Data -> Data(
+        state = state,
+        onItemClick = onItemClick,
+        onPull2Refresh = onPull2Refresh,
+      )
     }
   }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Data(
   state: State,
   onItemClick: (CountryUi) -> Unit,
+  onPull2Refresh: () -> Unit,
 ) {
-  LazyColumn(
+  PullToRefreshBox(
+    isRefreshing = state.isRefreshing,
+    onRefresh = onPull2Refresh,
     modifier = Modifier.fillMaxSize(),
   ) {
-    items(state.countries) { country ->
-      CountryRow(country, onItemClick)
-      Divider(color = BasedAppColor.Divider)
+    LazyColumn(
+      modifier = Modifier.fillMaxSize(),
+    ) {
+      items(state.countries) { country ->
+        CountryRow(country, onItemClick)
+      }
+      item {
+        NavigationSpacer()
+      }
     }
   }
 }

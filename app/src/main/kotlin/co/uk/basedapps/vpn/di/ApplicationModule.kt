@@ -16,6 +16,8 @@ import io.norselabs.vpn.based.viewModel.split_tunneling.NetworkApp
 import io.norselabs.vpn.common_logger.logger.FileLogTree
 import io.norselabs.vpn.common_logger.logger.NonFatalReportTree
 import io.norselabs.vpn.common_net_apps.AppManagerUtil
+import io.norselabs.vpn.common_purchases.PurchasesManager
+import io.norselabs.vpn.common_purchases.PurchasesManagerStub
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -93,5 +95,11 @@ class ApplicationModule {
     return object : DnsRequests {
       override val version: String = "update.independentdvpn.com"
     }
+  }
+
+  @Provides
+  @Singleton
+  fun providePurchasesManager(): PurchasesManager {
+    return PurchasesManagerStub()
   }
 }

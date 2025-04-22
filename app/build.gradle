@@ -78,8 +78,9 @@ dependencies {
     implementation libs.android.appcompat
     implementation libs.kotlin.collection.immutable
     implementation libs.coil
-    implementation libs.core.vpn
+//    implementation libs.core.vpn
     implementation libs.common
+    implementation libs.common.compose
 //    implementation libs.common.map
     implementation libs.common.flags
     implementation libs.common.logger
@@ -90,8 +91,9 @@ dependencies {
     implementation(name: "libv2ray", ext: "aar")
 
     implementation project(path: ':based_vpn')
-//    implementation project(path: ':core_vpn')
+    implementation project(path: ':core_vpn')
     implementation project(path: ':common_map')
 //    implementation project(path: ':common_logger')
     implementation project(path: ':common_referral')
+    implementation project(path: ':common_purchases')
 }

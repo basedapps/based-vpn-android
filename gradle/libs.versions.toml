@@ -23,6 +23,7 @@ appcompat = "1.7.0"
 composeActivity = "1.10.1"
 voyager = "1.1.0-beta03"
 ktor = "2.3.11"
+revenuecat = "8.16.0"
 
 [libraries]
 # Android
@@ -101,15 +102,22 @@ voyager-hilt = { module = "cafe.adriel.voyager:voyager-hilt", version.ref = "voy
 branch = { module = "io.branch.sdk.android:library", version = "5.15.1" }
 ads-identifier-google = { module = "com.google.android.gms:play-services-ads-identifier", version = "18.2.0" }
 
+# Purchases
+purchases = { module = "com.revenuecat.purchases:purchases", version.ref = "revenuecat" }
+purchases-ui = { module = "com.revenuecat.purchases:purchases-ui", version.ref = "revenuecat" }
+
 # Norselabs
 vpn-v2ray = { module = "io.norselabs.vpn:v2ray", version = "0.0.10" }
 dvpn-sdk = { module = "io.norselabs.vpn:dvpn_sdk", version = "0.0.4" }
 core-vpn = { module = "io.norselabs.vpn:core_vpn", version = "0.1.2" }
-common = { module = "io.norselabs.vpn:common", version = "0.0.2" }
+common = { module = "io.norselabs.vpn:common", version = "0.0.3" }
+common-compose = { module = "io.norselabs.vpn:common_compose", version = "0.0.1" }
 common-map = { module = "io.norselabs.vpn:common_map", version = "0.0.4" }
 common-flags = { module = "io.norselabs.vpn:common_flags", version = "0.0.2" }
 common-logger = { module = "io.norselabs.vpn:common_logger", version = "0.0.4" }
 common-net-apps = { module = "io.norselabs.vpn:common_net_apps", version = "0.0.1" }
+common-purchases = { module = "io.norselabs.vpn:common_purchases", version = "0.0.2" }
+common-purchases-ui = { module = "io.norselabs.vpn:common_purchases_ui", version = "0.0.2" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

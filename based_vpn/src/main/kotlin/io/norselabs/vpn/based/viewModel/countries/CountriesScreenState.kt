@@ -14,8 +14,10 @@ constructor() : ViewStateHolder<CountriesScreenState, CountriesScreenEffect>(
 )
 
 data class CountriesScreenState(
-  val status: Status = Status.Data,
+  val status: Status = Status.Loading,
   val countries: PersistentList<CountryUi> = persistentListOf(),
+  val isSubscribed: Boolean = false,
+  val isRefreshing: Boolean = false,
 )
 
 data class CountryUi(
@@ -29,4 +31,5 @@ data class CountryUi(
 sealed interface CountriesScreenEffect {
   data object GoBack : CountriesScreenEffect
   data class ShowCitiesScreen(val countryId: String) : CountriesScreenEffect
+  data object ShowPurchaseScreen : CountriesScreenEffect
 }

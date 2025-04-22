@@ -30,4 +30,7 @@ include ':app',
         ':common_flags',
         ':common_map',
         ':common_net_apps',
-        ':common_referral'
+        ':common_referral',
+        ':common_purchases',
+        ':common_purchases_ui',
+        ':common_compose'

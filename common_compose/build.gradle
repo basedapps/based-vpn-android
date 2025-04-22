@@ -1,11 +1,12 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.compose.compiler)
     id 'maven-publish'
 }
 
 android {
-    namespace 'io.norselabs.vpn.common'
+    namespace 'io.norselabs.vpn.common_compose'
 
     defaultConfig {
         minSdk libs.versions.minSdk.get().toInteger()
@@ -29,14 +30,17 @@ android {
     kotlinOptions {
         jvmTarget = '17'
     }
+    buildFeatures {
+        compose true
+    }
 }
 
 publishing {
     publications {
         release(MavenPublication) {
             groupId = 'io.norselabs.vpn'
-            artifactId = 'common'
-            version = '0.0.3'
+            artifactId = 'common_compose'
+            version = '0.0.1'
 
             afterEvaluate {
                 from components.release
@@ -56,7 +60,6 @@ publishing {
 }
 
 dependencies {
-    implementation libs.coroutines.core
-    implementation libs.timber
-    implementation libs.arrow.core
+    implementation libs.compose.foundation
+    implementation libs.common.purchases
 }

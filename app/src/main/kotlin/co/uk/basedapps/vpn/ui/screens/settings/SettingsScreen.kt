@@ -66,7 +66,7 @@ class SettingsScreen : Screen {
       onDnsDialogDismissClick = viewModel::onDnsDialogDismissClick,
       onProtocolRowClick = viewModel::onProtocolRowClick,
       onProtocolDialogConfirmClick = viewModel::onProtocolSelected,
-      onProtocolDialogClearClick = viewModel::onProtocolDialogClearClick,
+      onProtocolDialogDismissClick = viewModel::onProtocolDialogDismissClick,
       onSplitTunnelingClick = viewModel::onSplitTunnelClick,
       onLogsRowClick = viewModel::onLogsRowClick,
     )
@@ -81,8 +81,8 @@ fun SettingsScreenStateless(
   onDnsDialogConfirmClick: (DdsConfigurator.Dns) -> Unit,
   onDnsDialogDismissClick: () -> Unit,
   onProtocolRowClick: () -> Unit,
-  onProtocolDialogConfirmClick: (Protocol) -> Unit,
-  onProtocolDialogClearClick: () -> Unit,
+  onProtocolDialogConfirmClick: (Protocol?) -> Unit,
+  onProtocolDialogDismissClick: () -> Unit,
   onSplitTunnelingClick: () -> Unit,
   onLogsRowClick: () -> Unit,
 ) {
@@ -103,7 +103,7 @@ fun SettingsScreenStateless(
         onDnsDialogDismissClick = onDnsDialogDismissClick,
         onProtocolRowClick = onProtocolRowClick,
         onProtocolDialogConfirmClick = onProtocolDialogConfirmClick,
-        onProtocolDialogClearClick = onProtocolDialogClearClick,
+        onProtocolDialogDismissClick = onProtocolDialogDismissClick,
         onSplitTunnelingClick = onSplitTunnelingClick,
         onLogsRowClick = onLogsRowClick,
       )
@@ -119,8 +119,8 @@ fun Content(
   onDnsDialogConfirmClick: (DdsConfigurator.Dns) -> Unit,
   onDnsDialogDismissClick: () -> Unit,
   onProtocolRowClick: () -> Unit,
-  onProtocolDialogConfirmClick: (Protocol) -> Unit,
-  onProtocolDialogClearClick: () -> Unit,
+  onProtocolDialogConfirmClick: (Protocol?) -> Unit,
+  onProtocolDialogDismissClick: () -> Unit,
   onSplitTunnelingClick: () -> Unit,
   onLogsRowClick: () -> Unit,
 ) {
@@ -172,8 +172,7 @@ fun Content(
       ProtocolDialog(
         state = state,
         onConfirmClick = onProtocolDialogConfirmClick,
-        onClearClick = onProtocolDialogClearClick,
-        onDismissRequest = onProtocolDialogClearClick,
+        onDismissRequest = onProtocolDialogDismissClick,
       )
     }
   }
@@ -207,9 +206,7 @@ private fun SettingsRow(
       maxLines = 1,
       fontSize = 16.sp,
       color = BasedAppColor.TextSecondary,
-      modifier = Modifier
-        .weight(1f),
-
+      modifier = Modifier.weight(1f),
     )
   }
 }

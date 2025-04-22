@@ -73,8 +73,8 @@ class SettingsScreenViewModel
     }
   }
 
-  fun onProtocolDialogClearClick() {
-    onProtocolSelected(null)
+  fun onProtocolDialogDismissClick() {
+    stateHolder.updateState { copy(isProtocolSelectorVisible = false) }
   }
 
   fun onSplitTunnelClick() {

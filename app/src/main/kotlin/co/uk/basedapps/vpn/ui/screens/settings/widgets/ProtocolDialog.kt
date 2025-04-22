@@ -30,8 +30,7 @@ import io.norselabs.vpn.core_vpn.vpn.Protocol
 @Composable
 fun ProtocolDialog(
   state: SettingsScreenState,
-  onConfirmClick: (Protocol) -> Unit,
-  onClearClick: () -> Unit,
+  onConfirmClick: (Protocol?) -> Unit,
   onDismissRequest: () -> Unit = {},
 ) {
   var radioState by remember { mutableStateOf(state.currentProtocol) }
@@ -74,7 +73,7 @@ fun ProtocolDialog(
       ) { Text(stringResource(R.string.common_ok)) }
     },
     dismissButton = {
-      Button(onClick = onClearClick) {
+      Button(onClick = { onConfirmClick(null) }) {
         Text(stringResource(R.string.common_clear))
       }
     },
@@ -89,7 +88,6 @@ private fun ProtocolDialogPreview() {
       currentProtocol = Protocol.WIREGUARD,
     ),
     onConfirmClick = {},
-    onClearClick = {},
     onDismissRequest = {},
   )
 }

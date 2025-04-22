@@ -42,12 +42,12 @@ import co.uk.basedapps.vpn.ui.screens.cities.CitiesScreen
 import co.uk.basedapps.vpn.ui.theme.BasedAppColor
 import co.uk.basedapps.vpn.ui.widget.ErrorScreen
 import co.uk.basedapps.vpn.ui.widget.TopBar
-import io.norselabs.vpn.based.compose.EffectHandler
 import io.norselabs.vpn.based.viewModel.countries.CountriesScreenEffect as Effect
 import io.norselabs.vpn.based.viewModel.countries.CountriesScreenState as State
 import io.norselabs.vpn.based.viewModel.countries.CountriesScreenViewModel
 import io.norselabs.vpn.based.viewModel.countries.CountryUi
 import io.norselabs.vpn.common.state.Status
+import io.norselabs.vpn.common_compose.EffectHandler
 import io.norselabs.vpn.common_compose.NavigationSpacer
 
 class CountriesScreen : Screen {

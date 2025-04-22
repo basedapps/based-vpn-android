@@ -35,11 +35,11 @@ import co.uk.basedapps.vpn.ui.theme.BasedAppColor
 import co.uk.basedapps.vpn.ui.widget.Dropdown
 import co.uk.basedapps.vpn.ui.widget.TopBar
 import coil.compose.AsyncImage
-import io.norselabs.vpn.based.compose.EffectHandler
 import io.norselabs.vpn.based.viewModel.split_tunneling.NetworkApp
 import io.norselabs.vpn.based.viewModel.split_tunneling.SplitTunnelingScreenEffect as Effect
 import io.norselabs.vpn.based.viewModel.split_tunneling.SplitTunnelingScreenState as State
 import io.norselabs.vpn.based.viewModel.split_tunneling.SplitTunnelingScreenViewModel
+import io.norselabs.vpn.common_compose.EffectHandler
 import io.norselabs.vpn.core_vpn.vpn.split_tunneling.SplitTunnelingStatus
 import kotlinx.collections.immutable.persistentListOf
 

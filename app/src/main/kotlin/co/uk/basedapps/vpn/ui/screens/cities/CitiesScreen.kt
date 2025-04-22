@@ -35,12 +35,12 @@ import co.uk.basedapps.vpn.R
 import co.uk.basedapps.vpn.ui.theme.BasedAppColor
 import co.uk.basedapps.vpn.ui.widget.ErrorScreen
 import co.uk.basedapps.vpn.ui.widget.TopBar
-import io.norselabs.vpn.based.compose.EffectHandler
 import io.norselabs.vpn.based.viewModel.cities.CitiesScreenEffect as Effect
 import io.norselabs.vpn.based.viewModel.cities.CitiesScreenState as State
 import io.norselabs.vpn.based.viewModel.cities.CitiesScreenViewModel
 import io.norselabs.vpn.based.viewModel.cities.CityUi
 import io.norselabs.vpn.common.state.Status
+import io.norselabs.vpn.common_compose.EffectHandler
 
 class CitiesScreen(
   private val countryId: String,

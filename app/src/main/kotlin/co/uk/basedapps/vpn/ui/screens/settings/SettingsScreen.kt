@@ -32,11 +32,11 @@ import co.uk.basedapps.vpn.ui.screens.settings.widgets.ProtocolDialog
 import co.uk.basedapps.vpn.ui.screens.split_tunneling.SplitTunnelingScreen
 import co.uk.basedapps.vpn.ui.theme.BasedAppColor
 import co.uk.basedapps.vpn.ui.widget.TopBar
-import io.norselabs.vpn.based.compose.EffectHandler
 import io.norselabs.vpn.based.viewModel.settings.SettingsScreenEffect as Effect
 import io.norselabs.vpn.based.viewModel.settings.SettingsScreenState as State
 import io.norselabs.vpn.based.viewModel.settings.SettingsScreenViewModel
 import io.norselabs.vpn.based.vpn.DdsConfigurator
+import io.norselabs.vpn.common_compose.EffectHandler
 import io.norselabs.vpn.core_vpn.vpn.Protocol
 
 class SettingsScreen : Screen {

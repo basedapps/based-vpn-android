@@ -61,7 +61,6 @@ import co.uk.basedapps.vpn.ui.widget.BasedAlertDialog
 import co.uk.basedapps.vpn.ui.widget.BasedButton
 import co.uk.basedapps.vpn.ui.widget.ButtonStyle
 import co.uk.basedapps.vpn.ui.widget.ErrorScreen
-import io.norselabs.vpn.based.compose.EffectHandler
 import io.norselabs.vpn.based.viewModel.dashboard.DashboardScreenEffect as Effect
 import io.norselabs.vpn.based.viewModel.dashboard.DashboardScreenState as State
 import io.norselabs.vpn.based.viewModel.dashboard.DashboardScreenViewModel
@@ -72,6 +71,7 @@ import io.norselabs.vpn.based.vpn.getVpnPermissionRequest
 import io.norselabs.vpn.common.ext.goToGooglePlay
 import io.norselabs.vpn.common.ext.mailTo
 import io.norselabs.vpn.common.state.Status
+import io.norselabs.vpn.common_compose.EffectHandler
 import io.norselabs.vpn.common_flags.mapToFlag
 import io.norselabs.vpn.common_map.WorldMap
 import io.norselabs.vpn.core_vpn.user.UserStatus

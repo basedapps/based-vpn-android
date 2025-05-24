@@ -11,7 +11,6 @@ import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.firstOrNull
@@ -49,12 +48,13 @@ class UserInitializer(
     }
   }
 
-  fun hasDeviceToken(): Flow<Boolean> {
-    return status.map { it.order > UserStatus.HasToken.order }
+  suspend fun waitForDeviceToken() {
+    status.map { it.order > UserStatus.HasToken.order }
+      .firstOrNull { it }
   }
 
   suspend fun getDeviceToken(): String {
-    hasDeviceToken().firstOrNull { it }
+    waitForDeviceToken()
     return coreStorage.getToken()
   }
 

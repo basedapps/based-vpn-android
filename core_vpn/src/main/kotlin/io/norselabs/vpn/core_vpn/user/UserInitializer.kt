@@ -14,6 +14,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -48,8 +49,13 @@ class UserInitializer(
     }
   }
 
-  fun hasToken(): Flow<Boolean> {
+  fun hasDeviceToken(): Flow<Boolean> {
     return status.map { it.order > UserStatus.HasToken.order }
+  }
+
+  suspend fun getDeviceToken(): String {
+    hasDeviceToken().firstOrNull { it }
+    return coreStorage.getToken()
   }
 
   private suspend fun isUpdateRequired(): Either<UserStatus, Unit> {

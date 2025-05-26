@@ -11,6 +11,8 @@ interface PreferenceDelegate<T> {
   var value: T
 
   val observe: Flow<T>
+
+  fun clear()
 }
 
 @Suppress("NOTHING_TO_INLINE")
@@ -109,4 +111,11 @@ private class SimpleTypePreference<T : Any>(
       trySend(value)
       awaitClose { preferences.unregisterOnSharedPreferenceChangeListener(listener) }
     }
+
+  override fun clear() {
+    with(preferences.edit()) {
+      remove(key)
+      commit()
+    }
+  }
 }

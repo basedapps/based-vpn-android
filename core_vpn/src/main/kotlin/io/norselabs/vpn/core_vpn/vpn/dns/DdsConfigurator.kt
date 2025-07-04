@@ -1,6 +1,6 @@
 package io.norselabs.vpn.core_vpn.vpn.dns
 
-import com.v2ray.ang.util.DnsServers
+import com.v2ray.ang.util.models.DnsServers
 import io.norselabs.vpn.v2ray.repo.V2RayRepository
 
 class DnsConfigurator(

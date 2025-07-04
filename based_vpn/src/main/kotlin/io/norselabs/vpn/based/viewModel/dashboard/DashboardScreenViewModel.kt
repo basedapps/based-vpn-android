@@ -27,7 +27,6 @@ import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
 import timber.log.Timber
@@ -144,7 +143,7 @@ class DashboardScreenViewModel
   }
 
   private suspend fun updateNetworkInfo(isNetworkChanged: Boolean) {
-    userInitializer.hasToken().firstOrNull { it }
+    userInitializer.waitForDeviceToken()
     stateHolder.updateState { copy(retryAttempt = state.retryAttempt + 1) }
     dvpnClient.getIpData()
       .flatMap { data ->

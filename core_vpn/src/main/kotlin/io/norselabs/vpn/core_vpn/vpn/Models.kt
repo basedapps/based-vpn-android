@@ -1,7 +1,6 @@
 package io.norselabs.vpn.core_vpn.vpn
 
 import com.google.gson.annotations.SerializedName
-import io.norselabs.vpn.core_vpn.vpn.Protocol.entries
 
 sealed interface Credentials {
 
@@ -36,6 +35,22 @@ enum class Protocol(val strValue: String) {
 
 sealed interface Destination {
 
+  data object Random : Destination {
+    override val isPersistable: Boolean = true
+    override val countryCode: String? = null
+  }
+
+  data class Country(
+    @SerializedName("countryId")
+    val countryId: String,
+    @SerializedName("countryName")
+    val countryName: String,
+    @SerializedName("countryCode")
+    override val countryCode: String?,
+  ) : Destination {
+    override val isPersistable: Boolean = true
+  }
+
   data class City(
     @SerializedName("cityId")
     val cityId: String,
@@ -46,7 +61,7 @@ sealed interface Destination {
     @SerializedName("countryName")
     val countryName: String,
     @SerializedName("countryCode")
-    val countryCode: String?,
+    override val countryCode: String?,
   ) : Destination {
     override val isPersistable: Boolean = true
   }
@@ -65,7 +80,7 @@ sealed interface Destination {
     @SerializedName("countryName")
     val countryName: String,
     @SerializedName("countryCode")
-    val countryCode: String,
+    override val countryCode: String,
   ) : Destination {
     override val isPersistable: Boolean = true
   }
@@ -74,7 +89,9 @@ sealed interface Destination {
     val url: String,
   ) : Destination {
     override val isPersistable: Boolean = false
+    override val countryCode: String? = null
   }
 
   val isPersistable: Boolean
+  val countryCode: String?
 }

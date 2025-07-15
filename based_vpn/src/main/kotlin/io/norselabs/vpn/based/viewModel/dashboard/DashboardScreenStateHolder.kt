@@ -18,7 +18,6 @@ data class DashboardScreenState(
   val networkData: NetworkDataUi? = null,
   val destination: Destination? = null,
   val retryAttempt: Int = 0,
-  val isDestinationLoading: Boolean = false,
   val isErrorAlertVisible: Boolean = false,
   val isRatingAlertVisible: Boolean = false,
 )
@@ -41,20 +40,12 @@ sealed interface DashboardScreenEffect {
 
 sealed interface VpnStatus {
   data object Disconnected : VpnStatus
-  data class Connecting(override val isQuick: Boolean) : VpnStatus, Quickable
-  data class Connected(override val isQuick: Boolean) : VpnStatus, Quickable
-}
-
-interface Quickable {
-  val isQuick: Boolean
+  data object Connecting : VpnStatus
+  data object Connected : VpnStatus
 }
 
 enum class RatingClick {
   Positive,
   Negative,
   Dismiss,
-}
-
-fun VpnStatus.isQuick(): Boolean {
-  return (this as? Quickable)?.isQuick == true
 }

@@ -10,6 +10,7 @@ import dagger.multibindings.IntoMap
 import io.norselabs.vpn.based.viewModel.cities.CitiesScreenViewModel
 import io.norselabs.vpn.based.viewModel.countries.CountriesScreenViewModel
 import io.norselabs.vpn.based.viewModel.dashboard.DashboardScreenViewModel
+import io.norselabs.vpn.based.viewModel.servers.ServersScreenViewModel
 import io.norselabs.vpn.based.viewModel.settings.SettingsScreenViewModel
 import io.norselabs.vpn.based.viewModel.split_tunneling.SplitTunnelingScreenViewModel
 
@@ -36,6 +37,11 @@ abstract class ViewModelsModule {
   @IntoMap
   @ScreenModelKey(CitiesScreenViewModel::class)
   internal abstract fun bindCitiesScreenViewModel(impl: CitiesScreenViewModel): ScreenModel
+
+  @Binds
+  @IntoMap
+  @ScreenModelKey(ServersScreenViewModel::class)
+  internal abstract fun bindServersScreenViewModel(impl: ServersScreenViewModel): ScreenModel
 
   @Binds
   @IntoMap

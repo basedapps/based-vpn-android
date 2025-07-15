@@ -8,8 +8,7 @@ import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
 
 class CountriesScreenStateHolder
-@Inject
-constructor() : ViewStateHolder<CountriesScreenState, CountriesScreenEffect>(
+@Inject constructor() : ViewStateHolder<CountriesScreenState, CountriesScreenEffect>(
   CountriesScreenState(),
 )
 

@@ -28,17 +28,23 @@ class DestinationStorage(
   }
 
   fun getLast(): Destination? {
-    return parse(destinationPref)
+    return when (destinationPref.isNotBlank()) {
+      true -> parse(destinationPref)
+      else -> null
+    }
   }
 
   private fun parse(json: String): Destination? {
     return try {
-      val isServer = json.contains("server")
       val clazz = when {
-        isServer -> Destination.Server::class.java
-        else -> Destination.City::class.java
+        json.contains("server") -> Destination.Server::class.java
+        json.contains("city") -> Destination.City::class.java
+        json.contains("country") -> Destination.Country::class.java
+        else -> null
       }
-      gson.fromJson(json, clazz)
+      clazz?.let {
+        gson.fromJson(json, clazz)
+      } ?: Destination.Random
     } catch (e: Exception) {
       Timber.d("Destination parsing failed")
       null

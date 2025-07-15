@@ -11,6 +11,7 @@ import io.norselabs.vpn.core_vpn.vpn.Protocol
 import io.norselabs.vpn.core_vpn.vpn.utils.ProfileDecoder
 import io.norselabs.vpn.sdk.common.SdkError
 import io.norselabs.vpn.sdk.dvpn_client.DVPNClient
+import io.norselabs.vpn.sdk.services.connection.CredentialsResponse
 import timber.log.Timber
 
 class VPNConnector(
@@ -24,7 +25,10 @@ class VPNConnector(
     if (interactor.isVpnConnected()) disconnect()
     return when (destination) {
       is Destination.Deeplink -> parseDeeplink(destination)
-      else -> getCredentials(destination)
+      is Destination.Country -> getCountryCredentials(destination)
+      is Destination.City -> getCityCredentials(destination)
+      is Destination.Server -> getServerCredentials(destination)
+      is Destination.Random -> getQuickCredentials()
     }.flatMap { connectVpn(it) }
   }
 
@@ -33,46 +37,68 @@ class VPNConnector(
     coreStorage.setCurrentServerId("")
   }
 
-  private suspend fun getCredentials(destination: Destination): Either<Error, Credentials> {
+  private suspend fun getCountryCredentials(
+    country: Destination.Country,
+  ): Either<Error, Credentials> {
+    return getCredentials { protocol ->
+      dvpn.getCountryCredentials(country.countryId, protocol)
+    }
+  }
+
+  private suspend fun getCityCredentials(
+    city: Destination.City,
+  ): Either<Error, Credentials> {
+    return getCredentials { protocol ->
+      dvpn.getCityCredentials(city.cityId, protocol)
+    }
+  }
+
+  private suspend fun getServerCredentials(
+    server: Destination.Server,
+  ): Either<Error, Credentials> {
+    return getCredentials { protocol ->
+      dvpn.getServerCredentials(server.serverId)
+    }
+  }
+
+  private suspend fun getQuickCredentials(): Either<Error, Credentials> {
+    return getCredentials { protocol ->
+      dvpn.getQuickCredentials(protocol)
+    }
+  }
+
+  private suspend fun getCredentials(
+    credentialsRequest: suspend (String?) -> Either<SdkError, CredentialsResponse>,
+  ): Either<Error, Credentials> {
     val protocol = coreStorage.getVpnProtocol()
-    return getCredentials(
-      destination = destination,
-      protocol = protocol,
-    )
+    return credentialsRequest(protocol?.strValue)
+      .flatMap(::parseCredentials)
       .mapLeft { parseError(it) }
   }
 
-  suspend fun getCredentials(
-    destination: Destination,
-    protocol: Protocol?,
-  ): Either<SdkError, Credentials> {
-    val city = (destination as? Destination.City)
-      ?: return Either.Left(SdkError.Unknown("Destination.Server is not supported yet"))
-    return dvpn.getCredentials(city.cityId, protocol?.strValue)
-      .flatMap { data ->
-        val protocol = data.protocol
-        val privateKey = data.privateKey
-        val uid = data.uid
-        when {
-          protocol == Protocol.WIREGUARD.strValue && privateKey != null ->
-            Credentials.Wireguard(
-              payload = data.payload,
-              privateKey = privateKey,
-              serverId = data.server.id,
-            )
+  private fun parseCredentials(data: CredentialsResponse): Either<SdkError, Credentials> {
+    val protocol = data.protocol
+    val privateKey = data.privateKey
+    val uid = data.uid
+    return when {
+      protocol == Protocol.WIREGUARD.strValue && privateKey != null ->
+        Credentials.Wireguard(
+          payload = data.payload,
+          privateKey = privateKey,
+          serverId = data.server.id,
+        )
 
-          protocol == Protocol.V2RAY.strValue && uid != null ->
-            Credentials.V2Ray(
-              payload = data.payload,
-              uid = uid,
-              serverId = data.server.id,
-            )
+      protocol == Protocol.V2RAY.strValue && uid != null ->
+        Credentials.V2Ray(
+          payload = data.payload,
+          uid = uid,
+          serverId = data.server.id,
+        )
 
-          else -> null
-        }
-          ?.let { credentials -> Either.Right(credentials) }
-          ?: Either.Left(SdkError.Unknown("Unknown protocol"))
-      }
+      else -> null
+    }
+      ?.let { credentials -> Either.Right(credentials) }
+      ?: Either.Left(SdkError.Unknown("Unknown protocol"))
   }
 
   private fun parseDeeplink(deeplink: Destination.Deeplink): Either<Error, Credentials> {

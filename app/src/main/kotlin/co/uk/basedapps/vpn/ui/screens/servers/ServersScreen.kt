@@ -1,34 +1,25 @@
-package co.uk.basedapps.vpn.ui.screens.countries
+package co.uk.basedapps.vpn.ui.screens.servers
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -38,48 +29,45 @@ import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import co.uk.basedapps.vpn.R
-import co.uk.basedapps.vpn.ui.screens.cities.CitiesScreen
 import co.uk.basedapps.vpn.ui.theme.BasedAppColor
 import co.uk.basedapps.vpn.ui.widget.ErrorScreen
 import co.uk.basedapps.vpn.ui.widget.RandomServerRow
 import co.uk.basedapps.vpn.ui.widget.TopBar
-import io.norselabs.vpn.based.viewModel.countries.CountriesScreenEffect as Effect
-import io.norselabs.vpn.based.viewModel.countries.CountriesScreenState as State
-import io.norselabs.vpn.based.viewModel.countries.CountriesScreenViewModel
-import io.norselabs.vpn.based.viewModel.countries.CountryUi
+import io.norselabs.vpn.based.viewModel.servers.ServerUi
+import io.norselabs.vpn.based.viewModel.servers.ServersScreenEffect as Effect
+import io.norselabs.vpn.based.viewModel.servers.ServersScreenState as State
+import io.norselabs.vpn.based.viewModel.servers.ServersScreenViewModel
 import io.norselabs.vpn.common.state.Status
 import io.norselabs.vpn.common_compose.EffectHandler
-import io.norselabs.vpn.common_compose.NavigationSpacer
 
-class CountriesScreen : Screen {
+class ServersScreen(
+  private val countryId: String,
+  private val cityId: String,
+) : Screen {
 
   @Composable
   override fun Content() {
-    val viewModel = getScreenModel<CountriesScreenViewModel>()
+    val viewModel = getScreenModel<ServersScreenViewModel>()
     val state by viewModel.stateHolder.state.collectAsState()
 
     val navigator = LocalNavigator.currentOrThrow
+
+    LaunchedEffect(countryId) {
+      viewModel.setData(countryId = countryId, cityId = cityId)
+    }
 
     EffectHandler(viewModel.stateHolder.effects) { effect ->
       when (effect) {
         is Effect.GoBack -> navigator.pop()
 
-        is Effect.ShowCitiesScreen ->
-          navigator.push(CitiesScreen(effect.countryId))
-
-        is Effect.ShowPurchaseScreen -> Unit
+        is Effect.GoBackToRoot -> navigator.popUntilRoot()
       }
     }
 
-    LaunchedEffect(Unit) {
-      viewModel.fetchData()
-    }
-
-    CountriesScreenStateless(
+    ServersScreenStateless(
       state = state,
       navigateBack = viewModel::onBackClick,
-      onItemClick = viewModel::onCountryClick,
-      onPull2Refresh = viewModel::onPull2Refresh,
+      onItemClick = viewModel::onServerClick,
       onQuickConnectClick = viewModel::onQuickConnectClick,
       onTryAgainClick = viewModel::onTryAgainClick,
     )
@@ -87,11 +75,10 @@ class CountriesScreen : Screen {
 }
 
 @Composable
-fun CountriesScreenStateless(
+fun ServersScreenStateless(
   state: State,
   navigateBack: () -> Unit,
-  onItemClick: (CountryUi) -> Unit,
-  onPull2Refresh: () -> Unit,
+  onItemClick: (ServerUi) -> Unit,
   onQuickConnectClick: () -> Unit,
   onTryAgainClick: () -> Unit,
 ) {
@@ -99,7 +86,7 @@ fun CountriesScreenStateless(
     containerColor = BasedAppColor.Background,
     topBar = {
       TopBar(
-        title = stringResource(R.string.countries_title),
+        title = stringResource(R.string.servers_title),
         navigateBack = navigateBack,
       )
     },
@@ -108,7 +95,6 @@ fun CountriesScreenStateless(
         paddingValues = paddingValues,
         state = state,
         onItemClick = onItemClick,
-        onPull2Refresh = onPull2Refresh,
         onQuickConnectClick = onQuickConnectClick,
         onTryAgainClick = onTryAgainClick,
       )
@@ -117,11 +103,10 @@ fun CountriesScreenStateless(
 }
 
 @Composable
-fun Content(
+private fun Content(
   paddingValues: PaddingValues,
   state: State,
-  onItemClick: (CountryUi) -> Unit,
-  onPull2Refresh: () -> Unit,
+  onItemClick: (ServerUi) -> Unit,
   onQuickConnectClick: () -> Unit,
   onTryAgainClick: () -> Unit,
 ) {
@@ -147,74 +132,45 @@ fun Content(
         state = state,
         onItemClick = onItemClick,
         onQuickConnectClick = onQuickConnectClick,
-        onPull2Refresh = onPull2Refresh,
       )
     }
   }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Data(
   state: State,
-  onItemClick: (CountryUi) -> Unit,
-  onPull2Refresh: () -> Unit,
+  onItemClick: (ServerUi) -> Unit,
   onQuickConnectClick: () -> Unit,
 ) {
-  PullToRefreshBox(
-    isRefreshing = state.isRefreshing,
-    onRefresh = onPull2Refresh,
+  LazyColumn(
     modifier = Modifier.fillMaxSize(),
   ) {
-    LazyColumn(
-      modifier = Modifier.fillMaxSize(),
-    ) {
-      item {
-        RandomServerRow(onClick = onQuickConnectClick)
-      }
-      items(state.countries) { country ->
-        CountryRow(country, onItemClick)
-      }
-      item {
-        NavigationSpacer()
-      }
+    item {
+      RandomServerRow(onClick = onQuickConnectClick)
+      HorizontalDivider(color = BasedAppColor.Divider)
+    }
+    items(state.servers) { country ->
+      ServerRow(country, onItemClick)
+      HorizontalDivider(color = BasedAppColor.Divider)
     }
   }
 }
 
 @Composable
-private fun CountryRow(
-  country: CountryUi,
-  onItemClick: (CountryUi) -> Unit,
+private fun ServerRow(
+  server: ServerUi,
+  onItemClick: (ServerUi) -> Unit,
 ) {
   Row(
     modifier = Modifier
-      .clickable(onClick = { onItemClick(country) })
+      .clickable(onClick = { onItemClick(server) })
       .heightIn(min = 60.dp)
       .padding(16.dp)
       .fillMaxWidth(),
   ) {
-    val flagRes = country.flag?.res
-    if (flagRes != null) {
-      Image(
-        painter = painterResource(flagRes),
-        contentDescription = null,
-        contentScale = ContentScale.Crop,
-        modifier = Modifier
-          .size(width = 36.dp, height = 24.dp)
-          .clip(RoundedCornerShape(4.dp)),
-      )
-    } else {
-      Box(
-        modifier = Modifier
-          .background(BasedAppColor.Divider)
-          .size(width = 36.dp, height = 24.dp)
-          .clip(RoundedCornerShape(4.dp)),
-      )
-    }
-    Spacer(modifier = Modifier.size(16.dp))
     Text(
-      text = country.name,
+      text = server.name,
       overflow = TextOverflow.Ellipsis,
       maxLines = 1,
       fontSize = 18.sp,

@@ -8,8 +8,7 @@ import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
 
 class CitiesScreenStateHolder
-@Inject
-constructor() : ViewStateHolder<CitiesScreenState, CitiesScreenEffect>(
+@Inject constructor() : ViewStateHolder<CitiesScreenState, CitiesScreenEffect>(
   CitiesScreenState(),
 )
 
@@ -30,4 +29,5 @@ data class CityUi(
 sealed interface CitiesScreenEffect {
   data object GoBack : CitiesScreenEffect
   data object GoBackToRoot : CitiesScreenEffect
+  data class ShowServersScreen(val countryId: String, val cityId: String) : CitiesScreenEffect
 }

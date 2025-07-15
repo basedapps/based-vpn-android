@@ -20,6 +20,8 @@
     <string name="cities_title">Choose city</string>
     <string name="cities_servers_number">%d servers available</string>
 
+    <string name="servers_title">Choose server</string>
+
     <string name="settings_title">@string/common_settings</string>
     <string name="settings_row_dns">DNS Server</string>
     <string name="settings_row_protocol">VPN protocol</string>

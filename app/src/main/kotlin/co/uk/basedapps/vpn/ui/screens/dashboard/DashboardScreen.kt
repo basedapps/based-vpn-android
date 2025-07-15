@@ -39,6 +39,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -376,14 +377,11 @@ fun BottomBar(
         .padding(top = 24.dp, bottom = 16.dp)
         .navigationBarsPadding(),
     ) {
-      val destination = state.destination as? Destination.City
-      if (destination != null) {
-        SelectedCityRow(
-          destination = destination,
-          onClick = onSelectServerClick,
-        )
-        Spacer(modifier = Modifier.size(16.dp))
-      }
+      DestinationRow(
+        destination = state.destination,
+        onClick = onSelectServerClick,
+      )
+      Spacer(modifier = Modifier.size(16.dp))
       Row {
         BasedButton(
           text = stringResource(
@@ -439,8 +437,8 @@ private fun QuickConnectButton(onClick: () -> Unit) {
 }
 
 @Composable
-fun SelectedCityRow(
-  destination: Destination.City,
+fun DestinationRow(
+  destination: Destination?,
   onClick: () -> Unit,
 ) {
   Row(
@@ -452,7 +450,7 @@ fun SelectedCityRow(
       .padding(16.dp)
       .fillMaxWidth(),
   ) {
-    val flagRes = mapToFlag(destination.countryCode)?.res
+    val flagRes = mapToFlag(destination?.countryCode)?.res
     if (flagRes != null) {
       Image(
         painter = painterResource(flagRes),
@@ -471,20 +469,34 @@ fun SelectedCityRow(
       )
     }
     Spacer(modifier = Modifier.size(16.dp))
-    Text(
-      text = buildAnnotatedString {
-        withStyle(style = SpanStyle(BasedAppColor.TextPrimary)) {
-          append(destination.countryName)
+    val destinationLabel = remember(destination) {
+      when (destination) {
+        is Destination.Random -> AnnotatedString("Random!")
+
+        is Destination.Country -> AnnotatedString(destination.countryName)
+
+        is Destination.City -> buildAnnotatedString {
+          withStyle(style = SpanStyle(BasedAppColor.TextPrimary)) {
+            append(destination.countryName)
+          }
+          withStyle(style = SpanStyle(BasedAppColor.TextSecondary)) {
+            append(" • ")
+            append(destination.cityName)
+          }
         }
-        withStyle(style = SpanStyle(BasedAppColor.TextSecondary)) {
-          append(" • ")
-          append(destination.cityName)
-        }
-      },
-      overflow = TextOverflow.Ellipsis,
-      maxLines = 1,
-      fontSize = 18.sp,
-    )
+
+        is Destination.Server -> AnnotatedString(destination.serverName)
+        else -> null
+      }
+    }
+    if (destinationLabel != null) {
+      Text(
+        text = destinationLabel,
+        overflow = TextOverflow.Ellipsis,
+        maxLines = 1,
+        fontSize = 18.sp,
+      )
+    }
   }
 }
 

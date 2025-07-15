@@ -7,6 +7,8 @@ import io.norselabs.vpn.common.state.Status
 import io.norselabs.vpn.common_flags.mapToFlag
 import io.norselabs.vpn.common_purchases.PurchasesManager
 import io.norselabs.vpn.core_vpn.storage.CoreStorage
+import io.norselabs.vpn.core_vpn.vpn.Destination
+import io.norselabs.vpn.core_vpn.vpn.destination.DestinationStorage
 import io.norselabs.vpn.sdk.dvpn_client.DVPNClient
 import javax.inject.Inject
 import kotlinx.collections.immutable.toPersistentList
@@ -19,6 +21,7 @@ class CountriesScreenViewModel
   private val dvpnClient: DVPNClient,
   private val coreStorage: CoreStorage,
   private val purchasesManager: PurchasesManager,
+  private val destinationStorage: DestinationStorage,
 ) : ScreenModel {
 
   private val state: CountriesScreenState
@@ -67,6 +70,11 @@ class CountriesScreenViewModel
         )
       }
     }
+  }
+
+  fun onQuickConnectClick() {
+    destinationStorage.storeDestination(Destination.Random)
+    stateHolder.sendEffect(Effect.GoBack)
   }
 
   fun onCountryClick(country: CountryUi) {

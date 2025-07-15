@@ -12,7 +12,6 @@ import io.norselabs.vpn.common_logger.share.LogsSender
 import io.norselabs.vpn.common_purchases.PurchasesManager
 import io.norselabs.vpn.core_vpn.connectivity.NetworkState
 import io.norselabs.vpn.core_vpn.connectivity.NetworkStateMonitor
-import io.norselabs.vpn.core_vpn.storage.CoreStorage
 import io.norselabs.vpn.core_vpn.user.UserInitializer
 import io.norselabs.vpn.core_vpn.user.UserStatus
 import io.norselabs.vpn.core_vpn.vpn.Destination
@@ -20,7 +19,6 @@ import io.norselabs.vpn.core_vpn.vpn.connector.VPNConnector
 import io.norselabs.vpn.core_vpn.vpn.destination.DestinationStorage
 import io.norselabs.vpn.sdk.dvpn_client.DVPNClient
 import io.norselabs.vpn.sdk.services.connection.NetworkData
-import io.norselabs.vpn.sdk.services.destination.CitiesRequest
 import io.norselabs.vpn.v2ray.repo.V2RayRepository
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
@@ -36,7 +34,6 @@ class DashboardScreenViewModel
   val stateHolder: DashboardScreenStateHolder,
   private val dvpnClient: DVPNClient,
   private val appStorage: AppStorage,
-  private val coreStorage: CoreStorage,
   private val connector: VPNConnector,
   private val vpnRepo: V2RayRepository,
   private val userInitializer: UserInitializer,
@@ -73,10 +70,9 @@ class DashboardScreenViewModel
     screenModelScope.launch {
       vpnRepo.isConnected
         .collect { isConnected ->
-          val isQuick = state.vpnStatus.isQuick()
           setVpnStatus(
             when (isConnected) {
-              true -> VpnStatus.Connected(isQuick)
+              true -> VpnStatus.Connected
               false -> VpnStatus.Disconnected
             },
           )
@@ -111,8 +107,7 @@ class DashboardScreenViewModel
         if (previousDestination != null && previousDestination != destination) {
           connectJob?.cancelAndJoin()
           connector.disconnect()
-          val isQuick = state.vpnStatus.isQuick()
-          initConnection(isQuick)
+          initConnection()
         }
       }
     }
@@ -188,7 +183,7 @@ class DashboardScreenViewModel
   fun onConnectClick() {
     if (state.vpnStatus is VpnStatus.Disconnected) {
       Timber.tag(TAG).d("Connect clicked")
-      initConnection(isQuick = false)
+      initConnection()
     }
   }
 
@@ -196,10 +191,8 @@ class DashboardScreenViewModel
     if (state.vpnStatus is VpnStatus.Disconnected) {
       Timber.tag(TAG).d("Quick Connect clicked")
       screenModelScope.launch {
-        stateHolder.updateState { copy(isDestinationLoading = true) }
         selectRandomDestination()
-        stateHolder.updateState { copy(isDestinationLoading = false) }
-        initConnection(isQuick = true)
+        initConnection()
       }
     }
   }
@@ -211,7 +204,7 @@ class DashboardScreenViewModel
     }
   }
 
-  private fun initConnection(isQuick: Boolean) {
+  private fun initConnection() {
     if (state.userStatus != UserStatus.Enrolled) {
       // todo: show error
       return
@@ -220,7 +213,7 @@ class DashboardScreenViewModel
       onSelectServerClick()
       return
     }
-    setVpnStatus(VpnStatus.Connecting(isQuick))
+    setVpnStatus(VpnStatus.Connecting)
     stateHolder.sendEffect(Effect.CheckVpnPermission)
   }
 
@@ -252,24 +245,8 @@ class DashboardScreenViewModel
     }
   }
 
-  private suspend fun selectRandomDestination() {
-    val protocol = coreStorage.getVpnProtocol()
-    val countries = dvpnClient.getCountries(protocol = protocol?.strValue, isFresh = false).getOrNull()
-    val country = countries?.randomOrNull() ?: return
-    val cities = dvpnClient.getCities(
-      request = CitiesRequest(country.id, protocol?.strValue),
-      isFresh = false,
-    ).getOrNull()
-    val city = cities?.randomOrNull() ?: return
-    destinationStorage.storeDestination(
-      Destination.City(
-        cityId = city.id,
-        cityName = city.name,
-        countryId = country.id,
-        countryName = country.name,
-        countryCode = country.code,
-      ),
-    )
+  private fun selectRandomDestination() {
+    destinationStorage.storeDestination(Destination.Random)
   }
 
   private fun stopVpn() {

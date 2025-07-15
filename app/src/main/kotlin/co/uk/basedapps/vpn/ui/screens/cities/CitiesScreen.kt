@@ -11,7 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,8 +32,10 @@ import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import co.uk.basedapps.vpn.R
+import co.uk.basedapps.vpn.ui.screens.servers.ServersScreen
 import co.uk.basedapps.vpn.ui.theme.BasedAppColor
 import co.uk.basedapps.vpn.ui.widget.ErrorScreen
+import co.uk.basedapps.vpn.ui.widget.RandomServerRow
 import co.uk.basedapps.vpn.ui.widget.TopBar
 import io.norselabs.vpn.based.viewModel.cities.CitiesScreenEffect as Effect
 import io.norselabs.vpn.based.viewModel.cities.CitiesScreenState as State
@@ -62,6 +64,13 @@ class CitiesScreen(
         is Effect.GoBack -> navigator.pop()
 
         is Effect.GoBackToRoot -> navigator.popUntilRoot()
+
+        is Effect.ShowServersScreen -> navigator.push(
+          item = ServersScreen(
+            countryId = effect.countryId,
+            cityId = effect.cityId,
+          ),
+        )
       }
     }
 
@@ -69,6 +78,7 @@ class CitiesScreen(
       state = state,
       navigateBack = viewModel::onBackClick,
       onItemClick = viewModel::onCityClick,
+      onQuickConnectClick = viewModel::onQuickConnectClick,
       onTryAgainClick = viewModel::onTryAgainClick,
     )
   }
@@ -79,6 +89,7 @@ fun CitiesScreenStateless(
   state: State,
   navigateBack: () -> Unit,
   onItemClick: (CityUi) -> Unit,
+  onQuickConnectClick: () -> Unit,
   onTryAgainClick: () -> Unit,
 ) {
   Scaffold(
@@ -94,6 +105,7 @@ fun CitiesScreenStateless(
         paddingValues = paddingValues,
         state = state,
         onItemClick = onItemClick,
+        onQuickConnectClick = onQuickConnectClick,
         onTryAgainClick = onTryAgainClick,
       )
     },
@@ -105,6 +117,7 @@ private fun Content(
   paddingValues: PaddingValues,
   state: State,
   onItemClick: (CityUi) -> Unit,
+  onQuickConnectClick: () -> Unit,
   onTryAgainClick: () -> Unit,
 ) {
   Box(
@@ -125,7 +138,11 @@ private fun Content(
         onButtonClick = onTryAgainClick,
       )
 
-      is Status.Data -> Data(state, onItemClick)
+      is Status.Data -> Data(
+        state = state,
+        onItemClick = onItemClick,
+        onQuickConnectClick = onQuickConnectClick,
+      )
     }
   }
 }
@@ -134,13 +151,18 @@ private fun Content(
 private fun Data(
   state: State,
   onItemClick: (CityUi) -> Unit,
+  onQuickConnectClick: () -> Unit,
 ) {
   LazyColumn(
     modifier = Modifier.fillMaxSize(),
   ) {
+    item {
+      RandomServerRow(onClick = onQuickConnectClick)
+      HorizontalDivider(color = BasedAppColor.Divider)
+    }
     items(state.cities) { country ->
       CityRow(country, onItemClick)
-      Divider(color = BasedAppColor.Divider)
+      HorizontalDivider(color = BasedAppColor.Divider)
     }
   }
 }

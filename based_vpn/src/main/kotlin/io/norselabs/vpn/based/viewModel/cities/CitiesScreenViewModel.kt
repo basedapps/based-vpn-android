@@ -55,18 +55,25 @@ class CitiesScreenViewModel
     }
   }
 
-  fun onCityClick(city: CityUi) {
+  fun onQuickConnectClick() {
     val country = state.country ?: return
     destinationStorage.storeDestination(
-      Destination.City(
-        cityId = city.id,
-        cityName = city.name,
+      Destination.Country(
         countryId = country.id,
         countryName = country.name,
         countryCode = country.code,
       ),
     )
     stateHolder.sendEffect(Effect.GoBackToRoot)
+  }
+
+  fun onCityClick(city: CityUi) {
+    stateHolder.sendEffect(
+      Effect.ShowServersScreen(
+        countryId = city.countryId,
+        cityId = city.id,
+      ),
+    )
   }
 
   fun onBackClick() {

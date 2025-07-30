@@ -1,4 +1,4 @@
-package io.norselabs.vpn.based.di
+package co.uk.basedapps.vpn.di
 
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.hilt.ScreenModelKey
@@ -10,6 +10,7 @@ import dagger.multibindings.IntoMap
 import io.norselabs.vpn.based.viewModel.cities.CitiesScreenViewModel
 import io.norselabs.vpn.based.viewModel.countries.CountriesScreenViewModel
 import io.norselabs.vpn.based.viewModel.dashboard.DashboardScreenViewModel
+import io.norselabs.vpn.based.viewModel.fragment.FragmentScreenViewModel
 import io.norselabs.vpn.based.viewModel.servers.ServersScreenViewModel
 import io.norselabs.vpn.based.viewModel.settings.SettingsScreenViewModel
 import io.norselabs.vpn.based.viewModel.split_tunneling.SplitTunnelingScreenViewModel
@@ -47,4 +48,9 @@ abstract class ViewModelsModule {
   @IntoMap
   @ScreenModelKey(SplitTunnelingScreenViewModel::class)
   internal abstract fun bindSplitTunnelingScreenViewModel(impl: SplitTunnelingScreenViewModel): ScreenModel
+
+  @Binds
+  @IntoMap
+  @ScreenModelKey(FragmentScreenViewModel::class)
+  internal abstract fun bindFragmentScreenViewModel(impl: FragmentScreenViewModel): ScreenModel
 }

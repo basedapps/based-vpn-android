@@ -43,7 +43,7 @@ publishing {
         release(MavenPublication) {
             groupId = 'io.norselabs.vpn'
             artifactId = 'based'
-            version = '1.0.2'
+            version = '1.1.1'
 
             afterEvaluate {
                 from components.release
@@ -72,16 +72,16 @@ dependencies {
     implementation libs.bundles.voyager
     implementation libs.gson
     implementation libs.arrow.core
-    implementation libs.vpn.v2ray
-    implementation libs.common
-    implementation libs.dvpn.sdk
-    implementation libs.common.flags
-    implementation libs.common.logger
-    implementation libs.common.purchases
-    implementation libs.core.vpn
     implementation libs.compose.runtime
     implementation libs.android.appcompat
     implementation libs.kotlin.collection.immutable
+
+    api libs.vpn.v2ray
+    api libs.dvpn.sdk
+    api libs.core.vpn
+    api libs.common
+    api libs.common.logger
+    api libs.common.purchases
 
     kapt libs.hilt.compiler
 }

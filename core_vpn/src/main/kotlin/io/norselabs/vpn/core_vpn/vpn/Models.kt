@@ -37,6 +37,7 @@ sealed interface Destination {
 
   data object Random : Destination {
     override val isPersistable: Boolean = true
+    override val name: String? = null
     override val countryCode: String? = null
   }
 
@@ -48,6 +49,7 @@ sealed interface Destination {
     @SerializedName("countryCode")
     override val countryCode: String?,
   ) : Destination {
+    override val name: String = countryName
     override val isPersistable: Boolean = true
   }
 
@@ -63,6 +65,7 @@ sealed interface Destination {
     @SerializedName("countryCode")
     override val countryCode: String?,
   ) : Destination {
+    override val name: String = cityName
     override val isPersistable: Boolean = true
   }
 
@@ -82,6 +85,7 @@ sealed interface Destination {
     @SerializedName("countryCode")
     override val countryCode: String,
   ) : Destination {
+    override val name: String = serverName
     override val isPersistable: Boolean = true
   }
 
@@ -89,9 +93,11 @@ sealed interface Destination {
     val url: String,
   ) : Destination {
     override val isPersistable: Boolean = false
+    override val name: String? = null
     override val countryCode: String? = null
   }
 
   val isPersistable: Boolean
+  val name: String?
   val countryCode: String?
 }

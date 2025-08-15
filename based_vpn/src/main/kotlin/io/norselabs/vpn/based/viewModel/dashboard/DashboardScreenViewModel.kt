@@ -18,7 +18,7 @@ import io.norselabs.vpn.core_vpn.vpn.Destination
 import io.norselabs.vpn.core_vpn.vpn.connector.VPNConnector
 import io.norselabs.vpn.core_vpn.vpn.destination.DestinationStorage
 import io.norselabs.vpn.sdk.dvpn_client.DVPNClient
-import io.norselabs.vpn.sdk.services.connection.NetworkData
+import io.norselabs.vpn.sdk.services.connection.api.NetworkData
 import io.norselabs.vpn.v2ray.repo.V2RayRepository
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds

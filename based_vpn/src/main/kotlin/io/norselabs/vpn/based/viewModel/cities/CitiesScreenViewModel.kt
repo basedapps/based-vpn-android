@@ -8,7 +8,7 @@ import io.norselabs.vpn.core_vpn.storage.CoreStorage
 import io.norselabs.vpn.core_vpn.vpn.Destination
 import io.norselabs.vpn.core_vpn.vpn.destination.DestinationStorage
 import io.norselabs.vpn.sdk.dvpn_client.DVPNClient
-import io.norselabs.vpn.sdk.services.destination.CitiesRequest
+import io.norselabs.vpn.sdk.services.destination.api.CitiesRequest
 import javax.inject.Inject
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.launch

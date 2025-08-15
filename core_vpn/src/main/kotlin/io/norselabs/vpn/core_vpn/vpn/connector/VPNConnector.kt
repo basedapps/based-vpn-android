@@ -11,7 +11,7 @@ import io.norselabs.vpn.core_vpn.vpn.Protocol
 import io.norselabs.vpn.core_vpn.vpn.utils.ProfileDecoder
 import io.norselabs.vpn.sdk.common.SdkError
 import io.norselabs.vpn.sdk.dvpn_client.DVPNClient
-import io.norselabs.vpn.sdk.services.connection.CredentialsResponse
+import io.norselabs.vpn.sdk.services.connection.api.CredentialsResponse
 import timber.log.Timber
 
 class VPNConnector(

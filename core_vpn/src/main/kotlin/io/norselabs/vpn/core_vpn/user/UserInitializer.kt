@@ -6,7 +6,7 @@ import io.norselabs.vpn.common.utils.VersionComparator
 import io.norselabs.vpn.core_vpn.storage.CoreStorage
 import io.norselabs.vpn.sdk.common.SdkError
 import io.norselabs.vpn.sdk.dvpn_client.DVPNClient
-import io.norselabs.vpn.sdk.services.device.TokenModel
+import io.norselabs.vpn.sdk.services.device.api.TokenModel
 import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job

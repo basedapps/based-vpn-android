@@ -6,6 +6,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import io.norselabs.vpn.based.app_config.AppConfig
 import io.norselabs.vpn.core_vpn.storage.CoreStorage
+import io.norselabs.vpn.sdk.common.config.DVPNConfigStorage
 import io.norselabs.vpn.sdk.common.device_token.DeviceTokenStorage
 import io.norselabs.vpn.sdk.common.logger.DvpnLogger
 import io.norselabs.vpn.sdk.dvpn_client.DVPNClient
@@ -36,17 +37,36 @@ class DvpnModule {
 
   @Provides
   @Singleton
+  fun provideDVPNConfigStorage(
+    storage: CoreStorage,
+  ): DVPNConfigStorage {
+    return object : DVPNConfigStorage {
+      override fun isAlternativeRouting(): Boolean {
+        return storage.isAlternativeRouting()
+      }
+
+      override fun setAlternativeRouting(isEnabled: Boolean) {
+        storage.setAlternativeRouting(isEnabled)
+      }
+    }
+  }
+
+  @Provides
+  @Singleton
   fun provideDVPN(
     config: AppConfig,
     tokenStorage: DeviceTokenStorage,
+    configStorage: DVPNConfigStorage,
   ): DVPNClient {
     return DVPNClient(
       appToken = config.getAppToken(),
-      deviceTokenStorage = tokenStorage,
-      baseUrl = config.getBaseUrl(),
+      tokenStorage = tokenStorage,
+      configStorage = configStorage,
+      baseRestUrl = config.getBaseUrl(),
+      dnsDomain = config.getDnsDomain(),
       logger = object : DvpnLogger {
-        override fun log(message: String) {
-          Timber.tag("DvpnHttpClient").d(message)
+        override fun log(tag: String, message: String) {
+          Timber.tag(tag).d(message)
         }
       },
     )

@@ -17,6 +17,8 @@ class CoreStorage(
 
   private var currentServerIdPref = prefs.delegate("last_server_id", "")
 
+  private var alternativeRoutingPref = prefs.delegate("alternative_routing", false)
+
   fun setToken(token: String) {
     tokenPref.value = token
   }
@@ -49,14 +51,27 @@ class CoreStorage(
     currentServerIdPref.value = serverId.orEmpty()
   }
 
-  fun getCurrentServerId(): String = currentServerIdPref.value
+  fun getCurrentServerId(): String {
+    return currentServerIdPref.value
+  }
 
-  fun observeCurrentServerId(): Flow<String> = currentServerIdPref.observe
+  fun observeCurrentServerId(): Flow<String> {
+    return currentServerIdPref.observe
+  }
+
+  fun isAlternativeRouting(): Boolean {
+    return alternativeRoutingPref.value
+  }
+
+  fun setAlternativeRouting(isEnabled: Boolean) {
+    alternativeRoutingPref.value = isEnabled
+  }
 
   fun clearUserData() {
     tokenPref.clear()
     userIdPref.clear()
     protocolPref.clear()
     currentServerIdPref.clear()
+    alternativeRoutingPref.clear()
   }
 }

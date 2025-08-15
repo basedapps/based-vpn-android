@@ -82,6 +82,7 @@ dependencies {
     api libs.common
     api libs.common.logger
     api libs.common.purchases
+    api libs.common.flags
 
     kapt libs.hilt.compiler
 }

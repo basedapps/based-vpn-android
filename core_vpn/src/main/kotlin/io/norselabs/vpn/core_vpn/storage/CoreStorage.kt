@@ -59,12 +59,16 @@ class CoreStorage(
     return currentServerIdPref.observe
   }
 
+  fun setAlternativeRouting(isEnabled: Boolean) {
+    alternativeRoutingPref.value = isEnabled
+  }
+
   fun isAlternativeRouting(): Boolean {
     return alternativeRoutingPref.value
   }
 
-  fun setAlternativeRouting(isEnabled: Boolean) {
-    alternativeRoutingPref.value = isEnabled
+  fun observeAlternativeRouting(): Flow<Boolean> {
+    return alternativeRoutingPref.observe
   }
 
   fun clearUserData() {

@@ -10,6 +10,9 @@ import io.norselabs.vpn.sdk.common.config.DVPNConfigStorage
 import io.norselabs.vpn.sdk.common.device_token.DeviceTokenStorage
 import io.norselabs.vpn.sdk.common.logger.DvpnLogger
 import io.norselabs.vpn.sdk.dvpn_client.DVPNClient
+import io.norselabs.vpn.sdk.dvpn_client.DvpnLogLevel
+import java.net.InetSocketAddress
+import java.net.Proxy
 import javax.inject.Singleton
 import timber.log.Timber
 
@@ -64,10 +67,15 @@ class DvpnModule {
       configStorage = configStorage,
       baseRestUrl = config.getBaseUrl(),
       dnsDomain = config.getDnsDomain(),
+      logLevel = DvpnLogLevel.BODY,
       logger = object : DvpnLogger {
         override fun log(tag: String, message: String) {
           Timber.tag(tag).d(message)
         }
+      },
+      proxy = config.getProxy()?.let { url ->
+        val (host, port) = url.split(":")
+        Proxy(Proxy.Type.HTTP, InetSocketAddress(host, port.toInt()))
       },
     )
   }

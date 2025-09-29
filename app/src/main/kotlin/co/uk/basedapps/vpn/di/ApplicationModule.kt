@@ -34,6 +34,7 @@ class ApplicationModule {
     override fun getPackage() = "co.uk.basedapps.vpn"
     override fun getBaseUrl() = "https://api.dvpnsdk.com"
     override fun getDnsDomain() = "i.dvpnsdk.com"
+    override fun getProxy() = "127.0.0.1:10808"
     override fun getAppToken(): String = "d03xozoa1yiiojofx19fs3mhbmyy2lre"
   }
 

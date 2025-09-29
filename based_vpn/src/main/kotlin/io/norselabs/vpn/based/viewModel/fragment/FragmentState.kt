@@ -1,6 +1,6 @@
 package io.norselabs.vpn.based.viewModel.fragment
 
-import com.v2ray.ang.util.models.FragmentConfig
+import com.v2ray.ang.dto.FragmentConfig
 import io.norselabs.vpn.common.state.ViewStateHolder
 import io.norselabs.vpn.v2ray.repo.V2RayRepository
 import javax.inject.Inject

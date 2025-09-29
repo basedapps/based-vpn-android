@@ -6,5 +6,6 @@ interface AppConfig {
   fun getPackage(): String
   fun getBaseUrl(): String
   fun getDnsDomain(): String
+  fun getProxy(): String?
   fun getAppToken(): String
 }

@@ -1,8 +1,8 @@
 package io.norselabs.vpn.based.viewModel.fragment
 
 import cafe.adriel.voyager.core.model.ScreenModel
-import com.v2ray.ang.util.models.FragmentConfig
-import com.v2ray.ang.util.models.FragmentPackets
+import com.v2ray.ang.dto.FragmentConfig
+import com.v2ray.ang.dto.FragmentPackets
 import io.norselabs.vpn.based.viewModel.fragment.FragmentScreenEffect as Effect
 import io.norselabs.vpn.v2ray.repo.V2RayRepository
 import javax.inject.Inject

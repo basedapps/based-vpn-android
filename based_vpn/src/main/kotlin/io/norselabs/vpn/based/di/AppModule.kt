@@ -46,9 +46,11 @@ class AppModule {
   @Provides
   @Singleton
   fun provideVPNConnectorInteractor(
+    dvpnClient: DVPNClient,
     v2RayRepository: V2RayRepository,
   ): VPNInteractor {
     return VPNInteractorImpl(
+      dvpnClient = dvpnClient,
       v2RayRepository = v2RayRepository,
     )
   }

@@ -35,6 +35,7 @@ class VPNConnector(
   fun disconnect() {
     interactor.stopVpn()
     coreStorage.setCurrentServerId("")
+    interactor.resetNetworkClient()
   }
 
   private suspend fun getCountryCredentials(
@@ -142,7 +143,7 @@ class VPNConnector(
 
     coreStorage.setCurrentServerId(credentials.serverId)
 
-    interactor.resetConnection()
+    interactor.resetNetworkClient()
 
     return Either.Right(Unit)
   }

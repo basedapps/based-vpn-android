@@ -4,6 +4,7 @@ import android.content.SharedPreferences
 import io.norselabs.vpn.common.preferences.delegate
 import io.norselabs.vpn.core_vpn.vpn.Protocol
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 class CoreStorage(
   private val prefs: SharedPreferences,
@@ -45,6 +46,10 @@ class CoreStorage(
 
   fun getVpnProtocol(): Protocol? {
     return Protocol.fromString(protocolPref.value)
+  }
+
+  fun observeVpnProtocol(): Flow<Protocol?> {
+    return protocolPref.observe.map(Protocol::fromString)
   }
 
   fun setCurrentServerId(serverId: String?) {

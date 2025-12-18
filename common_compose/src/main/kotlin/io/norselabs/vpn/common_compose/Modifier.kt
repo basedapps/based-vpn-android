@@ -17,3 +17,8 @@ fun Modifier.animateBackground(getColor: () -> Color): Modifier {
   }
   return this.background(color = colorState.value)
 }
+
+inline fun Modifier.applyIf(
+  condition: Boolean,
+  block: Modifier.() -> Modifier,
+): Modifier = if (condition) block() else this

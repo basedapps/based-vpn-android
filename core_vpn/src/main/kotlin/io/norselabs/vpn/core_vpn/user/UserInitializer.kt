@@ -58,6 +58,11 @@ class UserInitializer(
     return coreStorage.getToken()
   }
 
+  suspend fun getDeviceId(): String {
+    waitForDeviceToken()
+    return coreStorage.getDeviceId()
+  }
+
   private suspend fun isUpdateRequired(): Either<UserStatus, Unit> {
     Timber.tag(TAG).d("Check version")
     val minVersion = dvpn.getVersion().getOrNull() ?: "0.0.0"

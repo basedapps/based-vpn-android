@@ -83,7 +83,7 @@ class UserInitializer(
       .onRight { model ->
         Timber.tag(TAG).d("Token has been updated")
         coreStorage.setToken(model.token)
-        coreStorage.setUserId(model.id)
+        coreStorage.setDeviceId(model.id)
       }
       .mapLeft { UserStatus.Failed }
   }

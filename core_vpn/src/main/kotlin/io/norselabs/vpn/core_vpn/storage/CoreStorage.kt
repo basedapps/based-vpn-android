@@ -12,7 +12,7 @@ class CoreStorage(
 
   private var tokenPref = prefs.delegate("device_token", "")
 
-  private var userIdPref = prefs.delegate("user_id", "")
+  private var deviceIdPref = prefs.delegate("user_id", "")
 
   private var protocolPref = prefs.delegate("selected_protocol", "")
 
@@ -28,12 +28,12 @@ class CoreStorage(
     return tokenPref.value
   }
 
-  fun setUserId(userId: String) {
-    userIdPref.value = userId
+  fun setDeviceId(deviceId: String) {
+    deviceIdPref.value = deviceId
   }
 
-  fun getUserId(): String {
-    return userIdPref.value
+  fun getDeviceId(): String {
+    return deviceIdPref.value
   }
 
   fun wasVpnProtocolSelected(): Boolean {
@@ -78,7 +78,7 @@ class CoreStorage(
 
   fun clearUserData() {
     tokenPref.clear()
-    userIdPref.clear()
+    deviceIdPref.clear()
     protocolPref.clear()
     currentServerIdPref.clear()
     alternativeRoutingPref.clear()

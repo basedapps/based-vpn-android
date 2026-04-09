@@ -18,8 +18,6 @@ class CoreStorage(
 
   private var currentServerIdPref = prefs.delegate("last_server_id", "")
 
-  private var alternativeRoutingPref = prefs.delegate("alternative_routing", false)
-
   fun setToken(token: String) {
     tokenPref.value = token
   }
@@ -64,23 +62,10 @@ class CoreStorage(
     return currentServerIdPref.observe
   }
 
-  fun setAlternativeRouting(isEnabled: Boolean) {
-    alternativeRoutingPref.value = isEnabled
-  }
-
-  fun isAlternativeRouting(): Boolean {
-    return alternativeRoutingPref.value
-  }
-
-  fun observeAlternativeRouting(): Flow<Boolean> {
-    return alternativeRoutingPref.observe
-  }
-
   fun clearUserData() {
     tokenPref.clear()
     deviceIdPref.clear()
     protocolPref.clear()
     currentServerIdPref.clear()
-    alternativeRoutingPref.clear()
   }
 }

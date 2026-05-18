@@ -135,9 +135,9 @@ class VPNConnector(
 
   private fun parseError(error: SdkError): Error {
     Timber.tag(TAG).d("Credentials creation failed: $error")
-    val code = (error as? SdkError.HttpError)?.code
-    return when (code) {
-      401, 403, 425 -> Error.UserToken
+    val httpError = error as? SdkError.HttpError
+    return when (httpError?.code) {
+      401, 403, 425 -> Error.UserToken(httpError)
       else -> Error.GetCredentials(error)
     }
   }
@@ -168,7 +168,7 @@ class VPNConnector(
   sealed interface Error {
     data class GetCredentials(val error: SdkError) : Error
     data object ParseCredentials : Error
-    data object UserToken : Error
+    data class UserToken(val error: SdkError.HttpError) : Error
     data object StartV2Ray : Error
   }
 

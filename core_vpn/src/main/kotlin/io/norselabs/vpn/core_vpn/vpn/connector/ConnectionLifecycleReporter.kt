@@ -89,9 +89,17 @@ internal class ConnectionLifecycleReporter(
   }
 
   private fun classify(error: VPNConnector.Error): CredentialsError = when (error) {
-    VPNConnector.Error.UserToken -> CredentialsError.Auth
+    is VPNConnector.Error.UserToken -> CredentialsError.Auth(
+      httpCode = error.error.code,
+      errorCode = error.error.error,
+      message = error.error.reason,
+    )
     is VPNConnector.Error.GetCredentials -> when (val sdkError = error.error) {
-      is SdkError.HttpError -> CredentialsError.ServerError(sdkError.code)
+      is SdkError.HttpError -> CredentialsError.ServerError(
+        httpCode = sdkError.code,
+        errorCode = sdkError.error,
+        message = sdkError.reason,
+      )
       else -> CredentialsError.Other(RuntimeException(sdkError.toString()))
     }
     VPNConnector.Error.ParseCredentials -> CredentialsError.Other(IllegalStateException("ParseCredentials"))

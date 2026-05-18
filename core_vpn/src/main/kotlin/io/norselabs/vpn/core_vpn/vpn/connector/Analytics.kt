@@ -15,7 +15,6 @@ value class AttemptId(val value: String) {
 sealed interface DisconnectReason {
   data object UserRequested : DisconnectReason
   data object HealthCheckFailed : DisconnectReason
-  data object NetworkLost : DisconnectReason
   data object InvalidProfile : DisconnectReason
   data class TunnelEstablishFailed(val error: V2RayError) : DisconnectReason
   data class SdkInitiated(val cause: String) : DisconnectReason
@@ -23,10 +22,18 @@ sealed interface DisconnectReason {
 }
 
 sealed interface CredentialsError {
-  data object NetworkUnavailable : CredentialsError
-  data class ServerError(val httpCode: Int) : CredentialsError
-  data object Auth : CredentialsError
-  data object Timeout : CredentialsError
+  data class ServerError(
+    val httpCode: Int,
+    val errorCode: String?,
+    val message: String?,
+  ) : CredentialsError
+
+  data class Auth(
+    val httpCode: Int,
+    val errorCode: String?,
+    val message: String?,
+  ) : CredentialsError
+
   data class Other(val throwable: Throwable) : CredentialsError
 }
 

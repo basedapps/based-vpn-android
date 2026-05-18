@@ -75,7 +75,7 @@ class VPNConnectorTest {
     assertTrue(result.isRight())
 
     clock.advance(2_000)
-    connector.disconnect()
+    connector.disconnect(DisconnectReason.UserRequested)
 
     assertEquals(3, interactor.events.size)
     val started = interactor.events[0] as ConnectStartedEvent
@@ -111,7 +111,10 @@ class VPNConnectorTest {
 
     assertEquals(started.attemptId, failed.attemptId)
     assertEquals(100L, failed.durationMs)
-    assertEquals(CredentialsError.ServerError(500), failed.error)
+    assertEquals(
+      CredentialsError.ServerError(httpCode = 500, errorCode = "err", message = "reason"),
+      failed.error,
+    )
   }
 
   @Test

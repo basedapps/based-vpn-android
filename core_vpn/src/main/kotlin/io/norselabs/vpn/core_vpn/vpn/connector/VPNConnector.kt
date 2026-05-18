@@ -12,67 +12,74 @@ import io.norselabs.vpn.core_vpn.vpn.utils.ProfileDecoder
 import io.norselabs.vpn.sdk.common.SdkError
 import io.norselabs.vpn.sdk.dvpn_client.DVPNClient
 import io.norselabs.vpn.sdk.services.connection.api.CredentialsResponse
+import kotlinx.coroutines.CancellationException
 import timber.log.Timber
 
 class VPNConnector(
   private val gson: Gson,
   private val dvpn: DVPNClient,
   private val coreStorage: CoreStorage,
-  private val interactor: VPNInteractor,
+  private val driver: VPNDriver,
+  listener: ConnectionLifecycleListener,
+  clock: () -> Long = { System.currentTimeMillis() },
 ) {
 
+  private val reporter = ConnectionLifecycleReporter(listener, clock)
+
   suspend fun connect(destination: Destination): Either<Error, Unit> {
-    if (interactor.isVpnConnected()) disconnect()
+    if (driver.isVpnConnected()) disconnect(DisconnectReason.SdkInitiated("reconnect"))
+
+    val protocol = coreStorage.getVpnProtocol()
+    val attemptId = reporter.start(destination, protocol)
+
+    return try {
+      fetchCredentials(destination, protocol)
+        .onLeft { error -> reporter.credentialsFailed(error) }
+        .flatMap { credentials ->
+          reporter.credentialsReceived(credentials.serverId)
+          connectVpn(credentials, attemptId)
+        }
+    } catch (ce: CancellationException) {
+      reporter.cancelled(ce)
+      throw ce
+    }
+  }
+
+  fun disconnect(reason: DisconnectReason) {
+    driver.stopVpn(reason)
+    coreStorage.setCurrentServerId("")
+    driver.resetNetworkClient()
+    reporter.disconnect(reason)
+  }
+
+  private suspend fun fetchCredentials(
+    destination: Destination,
+    protocol: Protocol?,
+  ): Either<Error, Credentials> {
     return when (destination) {
       is Destination.Deeplink -> parseDeeplink(destination)
-      is Destination.Country -> getCountryCredentials(destination)
-      is Destination.City -> getCityCredentials(destination)
-      is Destination.Server -> getServerCredentials(destination)
-      is Destination.Random -> getQuickCredentials()
-    }.flatMap { connectVpn(it) }
-  }
+      is Destination.Country -> getCredentials {
+        dvpn.getCountryCredentials(destination.countryId, protocol?.strValue)
+      }
 
-  fun disconnect() {
-    interactor.stopVpn()
-    coreStorage.setCurrentServerId("")
-    interactor.resetNetworkClient()
-  }
+      is Destination.City -> getCredentials {
+        dvpn.getCityCredentials(destination.cityId, protocol?.strValue)
+      }
 
-  private suspend fun getCountryCredentials(
-    country: Destination.Country,
-  ): Either<Error, Credentials> {
-    return getCredentials { protocol ->
-      dvpn.getCountryCredentials(country.countryId, protocol)
-    }
-  }
+      is Destination.Server -> getCredentials {
+        dvpn.getServerCredentials(destination.serverId)
+      }
 
-  private suspend fun getCityCredentials(
-    city: Destination.City,
-  ): Either<Error, Credentials> {
-    return getCredentials { protocol ->
-      dvpn.getCityCredentials(city.cityId, protocol)
-    }
-  }
-
-  private suspend fun getServerCredentials(
-    server: Destination.Server,
-  ): Either<Error, Credentials> {
-    return getCredentials { protocol ->
-      dvpn.getServerCredentials(server.serverId)
-    }
-  }
-
-  private suspend fun getQuickCredentials(): Either<Error, Credentials> {
-    return getCredentials { protocol ->
-      dvpn.getQuickCredentials(protocol)
+      is Destination.Random -> getCredentials {
+        dvpn.getQuickCredentials(protocol?.strValue)
+      }
     }
   }
 
   private suspend fun getCredentials(
-    credentialsRequest: suspend (String?) -> Either<SdkError, CredentialsResponse>,
+    request: suspend () -> Either<SdkError, CredentialsResponse>,
   ): Either<Error, Credentials> {
-    val protocol = coreStorage.getVpnProtocol()
-    return credentialsRequest(protocol?.strValue)
+    return request()
       .flatMap(::parseCredentials)
       .mapLeft { parseError(it) }
   }
@@ -81,15 +88,15 @@ class VPNConnector(
     val protocol = data.protocol
     val privateKey = data.privateKey
     val uid = data.uid
-    return when {
-      protocol == Protocol.WIREGUARD.strValue && privateKey != null ->
+    return when (protocol) {
+      Protocol.WIREGUARD.strValue if privateKey != null ->
         Credentials.Wireguard(
           payload = data.payload,
           privateKey = privateKey,
           serverId = data.server.id,
         )
 
-      protocol == Protocol.V2RAY.strValue && uid != null ->
+      Protocol.V2RAY.strValue if uid != null ->
         Credentials.V2Ray(
           payload = data.payload,
           uid = uid,
@@ -135,17 +142,27 @@ class VPNConnector(
     }
   }
 
-  private suspend fun connectVpn(credentials: Credentials): Either<Error, Unit> {
-    ProfileDecoder.decode(credentials)?.let { profile ->
-      interactor.startVpn(profile).getOrNull()
+  private suspend fun connectVpn(
+    credentials: Credentials,
+    attemptId: AttemptId,
+  ): Either<Error, Unit> {
+    val profile = ProfileDecoder.decode(credentials)
+    if (profile == null) {
+      reporter.disconnect(DisconnectReason.InvalidProfile)
+      return Either.Left(Error.StartV2Ray)
     }
-      ?: return Either.Left(Error.StartV2Ray)
-
-    coreStorage.setCurrentServerId(credentials.serverId)
-
-    interactor.resetNetworkClient()
-
-    return Either.Right(Unit)
+    return driver.startVpn(profile, attemptId).fold(
+      ifLeft = { error ->
+        reporter.disconnect(DisconnectReason.TunnelEstablishFailed(error))
+        Either.Left(Error.StartV2Ray)
+      },
+      ifRight = {
+        reporter.tunnelUp()
+        coreStorage.setCurrentServerId(credentials.serverId)
+        driver.resetNetworkClient()
+        Either.Right(Unit)
+      },
+    )
   }
 
   sealed interface Error {

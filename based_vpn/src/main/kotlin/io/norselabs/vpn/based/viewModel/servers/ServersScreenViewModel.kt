@@ -55,7 +55,6 @@ class ServersScreenViewModel
         request = ServersRequest(
           cityId = cityId,
           protocol = protocol,
-          isSortedByLoad = true,
         ),
       ).getOrNull()
 

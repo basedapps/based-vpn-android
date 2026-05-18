@@ -1,0 +1,9 @@
+-keep class io.norselabs.vpn.core_vpn.vpn.connector.AttemptId { *; }
+-keep class io.norselabs.vpn.core_vpn.vpn.connector.ConnectStartedEvent { *; }
+-keep class io.norselabs.vpn.core_vpn.vpn.connector.CredentialsReceivedEvent { *; }
+-keep class io.norselabs.vpn.core_vpn.vpn.connector.CredentialsFailedEvent { *; }
+-keep class io.norselabs.vpn.core_vpn.vpn.connector.DisconnectEvent { *; }
+-keep class io.norselabs.vpn.core_vpn.vpn.connector.DisconnectReason { *; }
+-keep class io.norselabs.vpn.core_vpn.vpn.connector.DisconnectReason$* { *; }
+-keep class io.norselabs.vpn.core_vpn.vpn.connector.CredentialsError { *; }
+-keep class io.norselabs.vpn.core_vpn.vpn.connector.CredentialsError$* { *; }

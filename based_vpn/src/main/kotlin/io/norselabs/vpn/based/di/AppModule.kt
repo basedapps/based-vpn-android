@@ -16,7 +16,6 @@ import io.norselabs.vpn.core_vpn.connectivity.NetworkStateMonitor
 import io.norselabs.vpn.core_vpn.storage.CoreStorage
 import io.norselabs.vpn.core_vpn.user.UserInitializer
 import io.norselabs.vpn.core_vpn.vpn.connector.VPNConnector
-import io.norselabs.vpn.core_vpn.vpn.connector.VPNInteractor
 import io.norselabs.vpn.core_vpn.vpn.destination.DestinationStorage
 import io.norselabs.vpn.core_vpn.vpn.split_tunneling.SplitTunnelingConfigurator
 import io.norselabs.vpn.sdk.dvpn_client.DVPNClient
@@ -48,7 +47,7 @@ class AppModule {
   fun provideVPNConnectorInteractor(
     dvpnClient: DVPNClient,
     v2RayRepository: V2RayRepository,
-  ): VPNInteractor {
+  ): VPNInteractorImpl {
     return VPNInteractorImpl(
       dvpnClient = dvpnClient,
       v2RayRepository = v2RayRepository,
@@ -61,13 +60,14 @@ class AppModule {
     gson: Gson,
     coreStorage: CoreStorage,
     dvpnClient: DVPNClient,
-    interactor: VPNInteractor,
+    interactor: VPNInteractorImpl,
   ): VPNConnector {
     return VPNConnector(
       gson = gson,
       dvpn = dvpnClient,
       coreStorage = coreStorage,
-      interactor = interactor,
+      driver = interactor,
+      listener = interactor,
     )
   }
 

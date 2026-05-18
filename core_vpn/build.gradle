@@ -29,6 +29,10 @@ android {
     kotlinOptions {
         jvmTarget = '17'
     }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
 }
 
 publishing {
@@ -36,7 +40,7 @@ publishing {
         release(MavenPublication) {
             groupId = 'io.norselabs.vpn'
             artifactId = 'core_vpn'
-            version = '1.1.0'
+            version = '1.2.1'
 
             afterEvaluate {
                 from components.release
@@ -63,4 +67,8 @@ dependencies {
     implementation libs.common
     implementation libs.gson
     implementation libs.dvpn.sdk
+
+    testImplementation libs.junit
+    testImplementation libs.mockk
+    testImplementation libs.coroutines.test
 }

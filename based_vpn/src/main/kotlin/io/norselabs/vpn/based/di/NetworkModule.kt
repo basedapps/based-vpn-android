@@ -1,18 +1,17 @@
 package io.norselabs.vpn.based.di
 
+import android.content.Context
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import io.norselabs.vpn.based.app_config.AppConfig
 import io.norselabs.vpn.core_vpn.storage.CoreStorage
-import io.norselabs.vpn.sdk.common.config.DVPNConfigStorage
 import io.norselabs.vpn.sdk.common.device_token.DeviceTokenStorage
 import io.norselabs.vpn.sdk.common.logger.DvpnLogger
 import io.norselabs.vpn.sdk.dvpn_client.DVPNClient
 import io.norselabs.vpn.sdk.dvpn_client.DvpnLogLevel
-import java.net.InetSocketAddress
-import java.net.Proxy
 import javax.inject.Singleton
 import timber.log.Timber
 
@@ -40,43 +39,22 @@ class DvpnModule {
 
   @Provides
   @Singleton
-  fun provideDVPNConfigStorage(
-    storage: CoreStorage,
-  ): DVPNConfigStorage {
-    return object : DVPNConfigStorage {
-      override fun isAlternativeRouting(): Boolean {
-        return storage.isAlternativeRouting()
-      }
-
-      override fun setAlternativeRouting(isEnabled: Boolean) {
-        storage.setAlternativeRouting(isEnabled)
-      }
-    }
-  }
-
-  @Provides
-  @Singleton
   fun provideDVPN(
     config: AppConfig,
     tokenStorage: DeviceTokenStorage,
-    configStorage: DVPNConfigStorage,
+    @ApplicationContext context: Context,
   ): DVPNClient {
     return DVPNClient(
+      context = context,
       appToken = config.getAppToken(),
       tokenStorage = tokenStorage,
-      configStorage = configStorage,
-      baseRestUrl = config.getBaseUrl(),
-      dnsDomain = config.getDnsDomain(),
-      logLevel = DvpnLogLevel.BODY,
+      configUrls = emptyList(),
       logger = object : DvpnLogger {
         override fun log(tag: String, message: String) {
           Timber.tag(tag).d(message)
         }
       },
-      proxy = config.getProxy()?.let { url ->
-        val (host, port) = url.split(":")
-        Proxy(Proxy.Type.HTTP, InetSocketAddress(host, port.toInt()))
-      },
+      logLevel = DvpnLogLevel.BODY,
     )
   }
 }

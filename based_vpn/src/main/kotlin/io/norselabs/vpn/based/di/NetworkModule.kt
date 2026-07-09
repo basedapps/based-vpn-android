@@ -48,7 +48,14 @@ class DvpnModule {
       context = context,
       appToken = config.getAppToken(),
       tokenStorage = tokenStorage,
-      configUrls = emptyList(),
+      defaultUrl = config.getBaseUrl(),
+      configUrls = listOf(
+        "https://api.dvpnsdk.com/mirrors",
+        "https://storage.yandexcloud.net/dvpn-sdk/mirrors.json",
+        "https://dvpn-sdk-1327780557.cos.ap-guangzhou.myqcloud.com/mirrors.json",
+        "https://storage.googleapis.com/dvpn-sdk/mirrors.json",
+        "https://dvpn-sdk.s3.us-east-2.amazonaws.com/mirrors.json",
+      ),
       logger = object : DvpnLogger {
         override fun log(tag: String, message: String) {
           Timber.tag(tag).d(message)

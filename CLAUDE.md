@@ -1,0 +1,109 @@
+# CLAUDE.md
+
+Guidance for Claude Code (and other coding agents) working in this repository.
+This is the canonical agent doc. For deeper reference see [`docs/`](docs/).
+
+## Project
+
+- **BasedVPN Android** — a monorepo of reusable, independently-published Android
+  modules forming the NorseLabs VPN platform's high/mid layers.
+- Every library module publishes to the private NorseLabs Nexus under
+  `io.norselabs.vpn:*`; the shipping apps (bagmisiz, DVPN) consume them.
+- Tech stack: Kotlin, Jetpack Compose, Hilt/KAPT, Voyager navigation, Ktor,
+  Arrow, RevenueCat, Branch, Timber, and the sibling Norse VPN libraries
+  (`io.norselabs.vpn:v2ray`, `io.norselabs.vpn:dvpn_sdk`).
+- Android config: compileSdk 36, minSdk 26, JVM 17.
+- **Gradle DSL is Groovy** (`build.gradle`, not `.kts`). Dependency versions live
+  in the version catalog [gradle/libs.versions.toml](gradle/libs.versions.toml),
+  referenced via `libs.*`.
+
+## Modules & published versions
+
+| Gradle module | Artifact | Version | Role |
+|---|---|---|---|
+| `:based_vpn` | `based` | 1.4.1 | High-level reuse layer: ViewModels, Hilt DI, `AppConfig` |
+| `:core_vpn` | `core_vpn` | 1.2.2 | Low-level VPN orchestration |
+| `:common` | `common` | 0.0.4 | Utils, preferences, state holders |
+| `:common_logger` | `common_logger` | 0.0.4 | Timber + file logging + upload |
+| `:common_flags` | `common_flags` | 0.0.2 | Country flag assets |
+| `:common_map` | `common_map` | 0.0.4 | Compose map components |
+| `:common_net_apps` | `common_net_apps` | 0.0.1 | Installed-apps utilities |
+| `:common_referral` | `common_referral` | 0.0.4 | Branch + Ads referral |
+| `:common_purchases` | `common_purchases` | 0.0.2 | RevenueCat logic |
+| `:common_purchases_ui` | `common_purchases_ui` | 0.0.3 | RevenueCat paywall UI |
+| `:common_compose` | `common_compose` | 1.0.0 | Reusable Compose components |
+| `:app` | `co.uk.basedapps:vpn` | _not published_ | Original BasedVPN reference app |
+
+Each module's version lives in the `publishing { }` block of its `build.gradle`.
+Versions are independent — bump only what changed.
+
+## Commands
+
+Use the Gradle **wrapper**.
+
+```bash
+# Build a module / the reference app
+./gradlew :based_vpn:assembleDebug
+./gradlew :app:assembleDebug
+
+# Publish a library
+./gradlew :based_vpn:publishToMavenLocal   # local ~/.m2 (test consumers)
+./gradlew :based_vpn:publish               # private Nexus (release)
+```
+
+Publish in dependency order — see [docs/integration.md](docs/integration.md).
+
+## Required environment
+
+| Variable | Purpose |
+|---|---|
+| `NORSELABS_REPO_LOGIN` | Nexus username (read deps + publish) |
+| `NORSELABS_REPO_PASSWORD` | Nexus password |
+
+Nexus: `https://nexus.norselabs.dev/repository/maven-releases/`. The reference
+`:app` module additionally needs its own app config/secrets to run, like any
+wrapper app.
+
+## Architecture at a glance
+
+Two internal layers over the foundation libraries:
+
+- **`core_vpn`** — the engine room: `VPNConnector`, `VPNDriver`, `DnsConfigurator`,
+  `SplitTunnelingConfigurator`, `UserInitializer`, `NetworkStateMonitor`,
+  `DestinationStorage`, `CoreStorage`. Depends on `v2ray` + `dvpn_sdk` + `common`.
+- **`based`** (module `:based_vpn`) — the high-level layer apps build on. Contains
+  Voyager `ScreenModel` ViewModels (`viewModel/{dashboard,settings,countries,`
+  `cities,servers,split_tunneling,fragment}`), Hilt DI modules (`di/`), the
+  `AppConfig` contract (`app_config/`), `VPNDriverImpl` (`core_impl/vpn/` —
+  the bridge between `dvpn_sdk` credentials and the `v2ray` tunnel), storage,
+  language, and network helpers. `api`-exposes `v2ray`, `dvpn_sdk`, `core_vpn`,
+  `common`, `common_logger`, `common_purchases`, `common_flags`.
+
+The extension contract: a wrapper app implements `AppConfig` and provides it as a
+Hilt singleton; `based` supplies the rest of the graph and the ViewModels. Full
+detail in [docs/architecture.md](docs/architecture.md).
+
+## Conventions
+
+- Code style: **ktlint** with the `android_studio` style, enforced via
+  [.editorconfig](.editorconfig). Match surrounding code.
+- DI: Hilt with constructor injection; `@Provides`/`@Binds` in `di/` modules
+  installed in `SingletonComponent`.
+- UI/state: Voyager `ScreenModel` ViewModels; Compose.
+- Networking/results: Ktor + Arrow `Either`; `kotlinx.serialization`.
+- New libraries go in the version catalog, referenced via `libs.*`.
+
+More in [docs/conventions.md](docs/conventions.md).
+
+## Gotchas
+
+- **`based` re-exports foundation libs with `api`.** Bumping `v2ray` / `dvpn_sdk`
+  / `core_vpn` ripples up through `core_vpn` → `based` and is exposed transitively
+  to consumers — republish `core_vpn` and `based` after such a bump.
+- **This repo pins `v2ray` at 1.1.0** in the catalog while `io.norselabs.vpn:v2ray`
+  is published at **2.0.0**. A 2.0.0 rollout starts here.
+- **The reference `:app` bundles the native engine** (`app/libs/libv2ray*.aar` +
+  `libhev-socks5-tunnel.so`) — an integration requirement of `v2ray`, separate
+  from the `v2ray` library version.
+- **Publish order matters** (commons → core_vpn → based); publishing out of order
+  resolves stale transitive versions.

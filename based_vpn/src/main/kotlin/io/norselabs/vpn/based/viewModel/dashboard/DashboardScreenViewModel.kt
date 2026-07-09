@@ -15,6 +15,7 @@ import io.norselabs.vpn.core_vpn.connectivity.NetworkStateMonitor
 import io.norselabs.vpn.core_vpn.user.UserInitializer
 import io.norselabs.vpn.core_vpn.user.UserStatus
 import io.norselabs.vpn.core_vpn.vpn.Destination
+import io.norselabs.vpn.core_vpn.vpn.connector.DisconnectReason
 import io.norselabs.vpn.core_vpn.vpn.connector.VPNConnector
 import io.norselabs.vpn.core_vpn.vpn.destination.DestinationStorage
 import io.norselabs.vpn.sdk.dvpn_client.DVPNClient
@@ -106,7 +107,7 @@ class DashboardScreenViewModel
         stateHolder.updateState { copy(destination = destination) }
         if (previousDestination != null && previousDestination != destination) {
           connectJob?.cancelAndJoin()
-          connector.disconnect()
+          connector.disconnect(DisconnectReason.UserRequested)
           initConnection()
         }
       }
@@ -251,7 +252,7 @@ class DashboardScreenViewModel
 
   private fun stopVpn() {
     connectJob?.cancel()
-    connector.disconnect()
+    connector.disconnect(DisconnectReason.UserRequested)
     setVpnStatus(VpnStatus.Disconnected)
     if (state.destination is Destination.Deeplink) {
       stateHolder.updateState {

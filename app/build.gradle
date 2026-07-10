@@ -81,8 +81,8 @@ dependencies {
     implementation libs.arrow.core
     implementation libs.vpn.v2ray
 //    implementation libs.core.vpn
-    implementation libs.common
-    implementation libs.common.compose
+//    implementation libs.common
+//    implementation libs.common.compose
 //    implementation libs.common.map
     implementation libs.common.flags
     implementation libs.common.logger
@@ -94,6 +94,7 @@ dependencies {
 
     implementation project(path: ':based_vpn')
     implementation project(path: ':core_vpn')
+    implementation project(path: ':common')
     implementation project(path: ':common_map')
     implementation project(path: ':common_compose')
 //    implementation project(path: ':common_logger')

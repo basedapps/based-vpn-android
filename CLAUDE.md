@@ -31,7 +31,7 @@ This is the canonical agent doc. For deeper reference see [`docs/`](docs/).
 | `:common_referral` | `common_referral` | 0.0.4 | Branch + Ads referral |
 | `:common_purchases` | `common_purchases` | 0.0.2 | RevenueCat logic |
 | `:common_purchases_ui` | `common_purchases_ui` | 0.0.3 | RevenueCat paywall UI |
-| `:common_compose` | `common_compose` | 1.2.0 | Reusable Compose components (StatusCard) |
+| `:common_compose` | `common_compose` | 1.2.1 | Reusable Compose components (StatusCard) |
 | `:app` | `co.uk.basedapps:vpn` | _not published_ | Original BasedVPN reference app |
 
 Each module's version lives in the `publishing { }` block of its `build.gradle`.

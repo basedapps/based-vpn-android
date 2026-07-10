@@ -63,7 +63,7 @@ how **bagmisiz-vpn-android** is built.
 dependencies {
     implementation 'io.norselabs.vpn:based:1.4.2'
     // optional extra UI commons used directly:
-    implementation 'io.norselabs.vpn:common_compose:1.2.0'
+    implementation 'io.norselabs.vpn:common_compose:1.2.1'
     implementation 'io.norselabs.vpn:common_map:0.0.4'
 }
 ```

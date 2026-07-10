@@ -3,7 +3,6 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias libs.plugins.kotlin.kapt
     alias libs.plugins.dagger.hilt
-    alias libs.plugins.compose.compiler
     id 'maven-publish'
 }
 
@@ -31,9 +30,6 @@ android {
     }
     kotlinOptions {
         jvmTarget = '17'
-    }
-    buildFeatures {
-        compose true
     }
     sourceSets.main.res.srcDirs += 'src/main/res-flags'
 }
@@ -72,7 +68,6 @@ dependencies {
     implementation libs.bundles.voyager
     implementation libs.gson
     implementation libs.arrow.core
-    implementation libs.compose.runtime
     implementation libs.android.appcompat
     implementation libs.kotlin.collection.immutable
 

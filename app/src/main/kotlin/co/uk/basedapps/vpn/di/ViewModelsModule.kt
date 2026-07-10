@@ -2,6 +2,7 @@ package co.uk.basedapps.vpn.di
 
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.hilt.ScreenModelKey
+import co.uk.basedapps.vpn.ui.screens.demo.StatusCardDemoViewModel
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -53,4 +54,9 @@ abstract class ViewModelsModule {
   @IntoMap
   @ScreenModelKey(FragmentScreenViewModel::class)
   internal abstract fun bindFragmentScreenViewModel(impl: FragmentScreenViewModel): ScreenModel
+
+  @Binds
+  @IntoMap
+  @ScreenModelKey(StatusCardDemoViewModel::class)
+  internal abstract fun bindStatusCardDemoViewModel(impl: StatusCardDemoViewModel): ScreenModel
 }

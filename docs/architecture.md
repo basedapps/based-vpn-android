@@ -28,7 +28,7 @@ graph TD
     CORE --> V2RAY
     CORE --> SDK
     CPUI --> CPUR
-    CCOMPOSE --> CPUR
+    CCOMPOSE --> COMMON
     CPUR --> COMMON
 ```
 

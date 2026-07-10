@@ -20,11 +20,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Build
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -55,6 +58,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import co.uk.basedapps.vpn.R
 import co.uk.basedapps.vpn.ui.screens.countries.CountriesScreen
+import co.uk.basedapps.vpn.ui.screens.demo.StatusCardDemoScreen
 import co.uk.basedapps.vpn.ui.screens.settings.SettingsScreen
 import co.uk.basedapps.vpn.ui.theme.BasedAppColor
 import co.uk.basedapps.vpn.ui.theme.BasedVPNTheme
@@ -134,6 +138,7 @@ class DashboardScreen : Screen {
       onAlertConfirmClick = viewModel::onAlertConfirmClick,
       onAlertDismissRequest = viewModel::onAlertDismissRequest,
       onRatingClick = viewModel::onRatingClick,
+      onDemoClick = { navigator.push(StatusCardDemoScreen()) },
     )
   }
 }
@@ -151,6 +156,7 @@ fun DashboardScreenStateless(
   onAlertConfirmClick: () -> Unit,
   onAlertDismissRequest: () -> Unit,
   onRatingClick: (RatingClick) -> Unit,
+  onDemoClick: () -> Unit,
 ) {
   when (state.status) {
     is Status.Error -> {
@@ -192,6 +198,7 @@ fun DashboardScreenStateless(
       onAlertConfirmClick = onAlertConfirmClick,
       onAlertDismissRequest = onAlertDismissRequest,
       onRatingClick = onRatingClick,
+      onDemoClick = onDemoClick,
     )
   }
 }
@@ -207,6 +214,7 @@ private fun Content(
   onAlertConfirmClick: () -> Unit,
   onAlertDismissRequest: () -> Unit,
   onRatingClick: (RatingClick) -> Unit,
+  onDemoClick: () -> Unit,
 ) {
   Box(
     modifier = Modifier
@@ -221,13 +229,28 @@ private fun Content(
         is VpnStatus.Connected -> Color(0xFF09D1BC)
         else -> Color(0xFFF0A83E)
       }
-      WorldMap(
-        lat = state.networkData?.lat ?: 0.0,
-        long = state.networkData?.long ?: 0.0,
-        mapColor = color.copy(alpha = 0.15f),
-        dotColor = color,
-        modifier = Modifier.weight(1f),
-      )
+      Box(modifier = Modifier.weight(1f)) {
+        WorldMap(
+          lat = state.networkData?.lat ?: 0.0,
+          long = state.networkData?.long ?: 0.0,
+          mapColor = color.copy(alpha = 0.15f),
+          dotColor = color,
+          modifier = Modifier.fillMaxSize(),
+        )
+        FloatingActionButton(
+          onClick = onDemoClick,
+          containerColor = BasedAppColor.ButtonPrimary,
+          contentColor = BasedAppColor.ButtonPrimaryText,
+          modifier = Modifier
+            .align(Alignment.BottomEnd)
+            .padding(16.dp),
+        ) {
+          Icon(
+            imageVector = Icons.Default.Build,
+            contentDescription = "StatusCard demo",
+          )
+        }
+      }
       BottomBar(
         state = state,
         onConnectClick = onConnectClick,
@@ -529,6 +552,7 @@ fun DashboardScreenPreview() {
       onAlertConfirmClick = {},
       onAlertDismissRequest = {},
       onRatingClick = {},
+      onDemoClick = {},
     )
   }
 }

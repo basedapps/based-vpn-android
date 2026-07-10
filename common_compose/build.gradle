@@ -40,7 +40,7 @@ publishing {
         release(MavenPublication) {
             groupId = 'io.norselabs.vpn'
             artifactId = 'common_compose'
-            version = '1.0.0'
+            version = '1.2.0'
 
             afterEvaluate {
                 from components.release
@@ -60,6 +60,12 @@ publishing {
 }
 
 dependencies {
+    api libs.common
+
+    implementation libs.coroutines.core
     implementation libs.compose.foundation
-    implementation libs.common.purchases
+    implementation libs.compose.material3
+    implementation libs.compose.ui.tooling.preview
+
+    debugImplementation libs.compose.ui.tooling
 }

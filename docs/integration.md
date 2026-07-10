@@ -28,8 +28,8 @@ depends on:
 
 ```
 1. :common  :common_logger  :common_flags  :common_map  :common_net_apps  :common_referral
-2. :common_purchases                         # needs :common
-3. :common_purchases_ui  :common_compose      # need :common_purchases
+2. :common_purchases  :common_compose        # need :common
+3. :common_purchases_ui                       # needs :common_purchases
 4. :core_vpn                                  # needs :common + v2ray + dvpn_sdk
 5. :based_vpn  (artifact `based`)             # needs :core_vpn + commons + v2ray + dvpn_sdk
 ```
@@ -61,9 +61,9 @@ how **bagmisiz-vpn-android** is built.
 
 ```groovy
 dependencies {
-    implementation 'io.norselabs.vpn:based:1.4.1'
+    implementation 'io.norselabs.vpn:based:1.4.2'
     // optional extra UI commons used directly:
-    implementation 'io.norselabs.vpn:common_compose:1.0.0'
+    implementation 'io.norselabs.vpn:common_compose:1.2.0'
     implementation 'io.norselabs.vpn:common_map:0.0.4'
 }
 ```

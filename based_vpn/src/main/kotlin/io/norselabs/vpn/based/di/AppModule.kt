@@ -11,6 +11,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import io.norselabs.vpn.based.app_config.AppConfig
 import io.norselabs.vpn.based.core_impl.vpn.VPNDriverImpl
+import io.norselabs.vpn.common.status_card.StatusCardController
 import io.norselabs.vpn.common_logger.logger.FileLogTree
 import io.norselabs.vpn.common_logger.share.LogsSender
 import io.norselabs.vpn.core_vpn.connectivity.NetworkStateMonitor
@@ -31,6 +32,10 @@ import kotlinx.coroutines.SupervisorJob
 @Module
 @InstallIn(SingletonComponent::class)
 class AppModule {
+
+  @Provides
+  @Singleton
+  fun provideStatusCardController(): StatusCardController = StatusCardController()
 
   @Provides
   @Singleton

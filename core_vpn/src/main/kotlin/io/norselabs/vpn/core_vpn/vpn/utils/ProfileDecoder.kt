@@ -2,6 +2,7 @@ package io.norselabs.vpn.core_vpn.vpn.utils
 
 import android.util.Base64
 import io.norselabs.vpn.core_vpn.vpn.Credentials
+import io.norselabs.vpn.v2ray.model.VmessTransport
 import io.norselabs.vpn.v2ray.model.VpnProfile
 
 object ProfileDecoder {
@@ -29,17 +30,17 @@ object ProfileDecoder {
         if (bytes.size != 7) return null
         val address = "${bytes[0].toUByte()}.${bytes[1].toUByte()}.${bytes[2].toUByte()}.${bytes[3].toUByte()}"
         val port = bytesToUnsignedShort(bytes[4], bytes[5]).toString()
-        val hex = String.format("0x%02x", (bytes[6].toInt() and 0xFF))
-        val transport: String = when (hex) {
-          "0x01" -> "tcp"
-          "0x02" -> "mkcp"
-          "0x03" -> "websocket"
-          "0x04" -> "http"
-          "0x05" -> "domainsocket"
-          "0x06" -> "quic"
-          "0x07" -> "gun"
-          "0x08" -> "grpc"
-          else -> ""
+        // Unsupported types return null instead of silently falling back to TCP:
+        // 0x02 mkcp — UDP: the TLS probe can't reach it and cert pinning needs the node cert SHA-256 from the backend; enable once the backend sends it
+        // 0x05 domainsocket — removed from Xray-core
+        // 0x06 quic — removed from Xray-core 26
+        // 0x07 gun — obsolete gRPC alias, not sent by the backend
+        val transport: VmessTransport = when (bytes[6].toInt() and 0xFF) {
+          0x01 -> VmessTransport.TCP
+          0x03 -> VmessTransport.WS
+          0x04 -> VmessTransport.H2
+          0x08 -> VmessTransport.GRPC
+          else -> return null
         }
 
         VpnProfile.Vmess(

@@ -2,7 +2,7 @@ package io.norselabs.vpn.core_vpn.vpn.connector
 
 import io.norselabs.vpn.core_vpn.vpn.Destination
 import io.norselabs.vpn.core_vpn.vpn.Protocol
-import io.norselabs.vpn.v2ray.error.V2RayError
+import io.norselabs.vpn.v2ray.model.V2RayStartError
 import java.util.UUID
 
 @JvmInline
@@ -16,7 +16,7 @@ sealed interface DisconnectReason {
   data object UserRequested : DisconnectReason
   data object HealthCheckFailed : DisconnectReason
   data object InvalidProfile : DisconnectReason
-  data class TunnelEstablishFailed(val error: V2RayError) : DisconnectReason
+  data class TunnelEstablishFailed(val error: V2RayStartError) : DisconnectReason
   data class SdkInitiated(val cause: String) : DisconnectReason
   data object Unknown : DisconnectReason
 }

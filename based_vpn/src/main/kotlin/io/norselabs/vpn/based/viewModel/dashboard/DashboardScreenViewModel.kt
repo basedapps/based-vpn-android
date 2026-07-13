@@ -20,6 +20,7 @@ import io.norselabs.vpn.core_vpn.vpn.connector.VPNConnector
 import io.norselabs.vpn.core_vpn.vpn.destination.DestinationStorage
 import io.norselabs.vpn.sdk.dvpn_client.DVPNClient
 import io.norselabs.vpn.sdk.services.connection.api.NetworkData
+import io.norselabs.vpn.v2ray.model.VpnConnection
 import io.norselabs.vpn.v2ray.repo.V2RayRepository
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
@@ -69,12 +70,15 @@ class DashboardScreenViewModel
 
   private fun observeConnectionState() {
     screenModelScope.launch {
-      vpnRepo.isConnected
-        .collect { isConnected ->
+      vpnRepo.connectionState
+        .collect { state ->
           setVpnStatus(
-            when (isConnected) {
-              true -> VpnStatus.Connected
-              false -> VpnStatus.Disconnected
+            when (state) {
+              is VpnConnection.Connected -> VpnStatus.Connected
+              VpnConnection.Connecting,
+              VpnConnection.CoreStarted,
+              -> VpnStatus.Connecting
+              VpnConnection.Disconnected -> VpnStatus.Disconnected
             },
           )
         }

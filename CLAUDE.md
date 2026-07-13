@@ -22,7 +22,7 @@ This is the canonical agent doc. For deeper reference see [`docs/`](docs/).
 | Gradle module | Artifact | Version | Role |
 |---|---|---|---|
 | `:based_vpn` | `based` | 1.4.2 | High-level reuse layer: ViewModels, Hilt DI, `AppConfig` |
-| `:core_vpn` | `core_vpn` | 1.2.2 | Low-level VPN orchestration |
+| `:core_vpn` | `core_vpn` | 1.2.3 (mavenLocal; Nexus has 1.2.2) | Low-level VPN orchestration |
 | `:common` | `common` | 1.0.0 | Utils, preferences, state holders, StatusCardController |
 | `:common_logger` | `common_logger` | 0.0.4 | Timber + file logging + upload |
 | `:common_flags` | `common_flags` | 0.0.2 | Country flag assets |
@@ -100,10 +100,17 @@ More in [docs/conventions.md](docs/conventions.md).
 - **`based` re-exports foundation libs with `api`.** Bumping `v2ray` / `dvpn_sdk`
   / `core_vpn` ripples up through `core_vpn` → `based` and is exposed transitively
   to consumers — republish `core_vpn` and `based` after such a bump.
-- **This repo pins `v2ray` at 1.1.0** in the catalog while `io.norselabs.vpn:v2ray`
-  is published at **2.0.0**. A 2.0.0 rollout starts here.
+- **`v2ray` 2.1.0 adopted from mavenLocal.** The catalog pins v2ray 2.1.0 and
+  core_vpn 1.2.3, both published to **mavenLocal only** so far (Nexus: 2.0.0 /
+  1.2.2). Migration done: `VPNDriver`/`Analytics`/`VPNDriverImpl` use
+  `V2RayStartError` (the 1.x `V2RayError` is gone), `ProfileDecoder` maps the
+  `VmessTransport` enum (tcp/ws/h2/grpc; unsupported → `null`), dashboard VM
+  observes `connectionState` instead of the removed `isConnected` flow. Publish
+  `v2ray` + `core_vpn` + `based` 1.4.3 to Nexus before releasing consumers.
 - **The reference `:app` bundles the native engine** (`app/libs/libv2ray*.aar` +
   `libhev-socks5-tunnel.so`) — an integration requirement of `v2ray`, separate
-  from the `v2ray` library version.
+  from the `v2ray` library version. `app/libs` is **git-ignored** (same policy as
+  `vpn-v2ray`): binaries are not committed — copy them from `vpn-v2ray/app/libs/`
+  after cloning, matching the version in `app/build.gradle` (26.5.9).
 - **Publish order matters** (commons → core_vpn → based); publishing out of order
   resolves stale transitive versions.

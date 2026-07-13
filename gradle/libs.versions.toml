@@ -109,9 +109,9 @@ purchases = { module = "com.revenuecat.purchases:purchases", version.ref = "reve
 purchases-ui = { module = "com.revenuecat.purchases:purchases-ui", version.ref = "revenuecat" }
 
 # Norselabs
-vpn-v2ray = { module = "io.norselabs.vpn:v2ray", version = "1.1.0" }
+vpn-v2ray = { module = "io.norselabs.vpn:v2ray", version = "2.1.0" }
 dvpn-sdk = { module = "io.norselabs.vpn:dvpn_sdk", version = "2.2.0" }
-core-vpn = { module = "io.norselabs.vpn:core_vpn", version = "1.2.2" }
+core-vpn = { module = "io.norselabs.vpn:core_vpn", version = "1.2.3" }
 common = { module = "io.norselabs.vpn:common", version = "1.0.0" }
 common-compose = { module = "io.norselabs.vpn:common_compose", version = "1.2.1" }
 common-map = { module = "io.norselabs.vpn:common_map", version = "0.0.4" }

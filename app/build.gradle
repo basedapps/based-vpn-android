@@ -90,7 +90,7 @@ dependencies {
 
     kapt libs.hilt.compiler
 
-    implementation(name: "libv2ray", ext: "aar")
+    implementation(name: "libv2ray", version: "26.5.9", ext: "aar")
 
     implementation project(path: ':based_vpn')
     implementation project(path: ':core_vpn')

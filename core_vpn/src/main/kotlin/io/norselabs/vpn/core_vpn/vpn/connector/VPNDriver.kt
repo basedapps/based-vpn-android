@@ -1,7 +1,7 @@
 package io.norselabs.vpn.core_vpn.vpn.connector
 
 import arrow.core.Either
-import io.norselabs.vpn.v2ray.error.V2RayError
+import io.norselabs.vpn.v2ray.model.V2RayStartError
 import io.norselabs.vpn.v2ray.model.VpnProfile
 
 /**
@@ -32,7 +32,7 @@ interface VPNDriver {
   suspend fun startVpn(
     vpnProfile: VpnProfile,
     attemptId: AttemptId,
-  ): Either<V2RayError, Unit>
+  ): Either<V2RayStartError, Unit>
 
   /**
    * Tears down the v2ray tunnel.

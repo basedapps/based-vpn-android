@@ -17,7 +17,7 @@ import io.norselabs.vpn.sdk.common.SdkError
 import io.norselabs.vpn.sdk.dvpn_client.DVPNClient
 import io.norselabs.vpn.sdk.services.connection.api.CredentialsResponse
 import io.norselabs.vpn.sdk.services.connection.api.ServerShort
-import io.norselabs.vpn.v2ray.error.V2RayError
+import io.norselabs.vpn.v2ray.model.V2RayStartError
 import io.norselabs.vpn.v2ray.model.VpnProfile
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -130,7 +130,7 @@ class VPNConnectorTest {
     assertTrue(result.isRight())
 
     clock.advance(3_000)
-    connector.disconnect(DisconnectReason.TunnelEstablishFailed(V2RayError.StartV2Ray))
+    connector.disconnect(DisconnectReason.TunnelEstablishFailed(V2RayStartError.CoreStartFailed))
 
     assertEquals(3, interactor.events.size)
     val started = interactor.events[0] as ConnectStartedEvent
@@ -139,7 +139,7 @@ class VPNConnectorTest {
 
     assertEquals(started.attemptId, received.attemptId)
     assertEquals(started.attemptId, disconnected.attemptId)
-    assertEquals(DisconnectReason.TunnelEstablishFailed(V2RayError.StartV2Ray), disconnected.reason)
+    assertEquals(DisconnectReason.TunnelEstablishFailed(V2RayStartError.CoreStartFailed), disconnected.reason)
     assertEquals(3_000L, disconnected.sessionDurationMs)
   }
 
@@ -169,7 +169,7 @@ class VPNConnectorTest {
   }
 
   private class RecordingInteractor : VPNDriver, ConnectionLifecycleListener {
-    var startVpnResult: Either<V2RayError, Unit> = Either.Right(Unit)
+    var startVpnResult: Either<V2RayStartError, Unit> = Either.Right(Unit)
     var lastStartAttemptId: AttemptId? = null
     var lastStopReason: DisconnectReason? = null
     private var connected = false
@@ -178,7 +178,7 @@ class VPNConnectorTest {
     override suspend fun startVpn(
       vpnProfile: VpnProfile,
       attemptId: AttemptId,
-    ): Either<V2RayError, Unit> {
+    ): Either<V2RayStartError, Unit> {
       lastStartAttemptId = attemptId
       val r = startVpnResult
       if (r.isRight()) connected = true

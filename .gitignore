@@ -10,6 +10,7 @@
 .externalNativeBuild
 .cxx
 local.properties
+app/libs
 app/release
 app/debug
 app/google-services.json

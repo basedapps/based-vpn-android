@@ -5,7 +5,7 @@ import io.norselabs.vpn.core_vpn.vpn.connector.AttemptId
 import io.norselabs.vpn.core_vpn.vpn.connector.DisconnectReason
 import io.norselabs.vpn.core_vpn.vpn.connector.VPNDriver
 import io.norselabs.vpn.sdk.dvpn_client.DVPNClient
-import io.norselabs.vpn.v2ray.error.V2RayError
+import io.norselabs.vpn.v2ray.model.V2RayStartError
 import io.norselabs.vpn.v2ray.model.VpnProfile
 import io.norselabs.vpn.v2ray.repo.V2RayRepository
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -21,7 +21,7 @@ class VPNDriverImpl(
   override suspend fun startVpn(
     vpnProfile: VpnProfile,
     attemptId: AttemptId,
-  ): Either<V2RayError, Unit> {
+  ): Either<V2RayStartError, Unit> {
     return v2RayRepository.startV2Ray(vpnProfile)
   }
 

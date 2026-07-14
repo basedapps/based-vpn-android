@@ -21,7 +21,7 @@ This is the canonical agent doc. For deeper reference see [`docs/`](docs/).
 
 | Gradle module | Artifact | Version | Role |
 |---|---|---|---|
-| `:based_vpn` | `based` | 1.4.2 | High-level reuse layer: ViewModels, Hilt DI, `AppConfig` |
+| `:based_vpn` | `based` | 1.5.0 (mavenLocal; Nexus has 1.4.2) | High-level reuse layer: ViewModels, Hilt DI, `AppConfig` |
 | `:core_vpn` | `core_vpn` | 1.2.3 (mavenLocal; Nexus has 1.2.2) | Low-level VPN orchestration |
 | `:common` | `common` | 1.0.0 | Utils, preferences, state holders, StatusCardController |
 | `:common_logger` | `common_logger` | 0.0.4 | Timber + file logging + upload |
@@ -106,7 +106,7 @@ More in [docs/conventions.md](docs/conventions.md).
   `V2RayStartError` (the 1.x `V2RayError` is gone), `ProfileDecoder` maps the
   `VmessTransport` enum (tcp/ws/h2/grpc; unsupported → `null`), dashboard VM
   observes `connectionState` instead of the removed `isConnected` flow. Publish
-  `v2ray` + `core_vpn` + `based` 1.4.3 to Nexus before releasing consumers.
+  `v2ray` + `core_vpn` + `based` 1.5.0 to Nexus before releasing consumers.
 - **The reference `:app` bundles the native engine** (`app/libs/libv2ray*.aar` +
   `libhev-socks5-tunnel.so`) — an integration requirement of `v2ray`, separate
   from the `v2ray` library version. `app/libs` is **git-ignored** (same policy as

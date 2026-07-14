@@ -28,7 +28,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withTimeout
 import timber.log.Timber
 
 class DashboardScreenViewModel
@@ -123,23 +122,6 @@ class DashboardScreenViewModel
     stateHolder.updateState {
       copy(vpnStatus = vpnStatus)
     }
-  }
-
-  // todo: show an error if check connection is failed instead of disconnection VPN
-  private suspend fun checkConnection(): Boolean {
-    repeat(MAX_ATTEMPTS) {
-      val isConnected = try {
-        withTimeout(3000) {
-          dvpnClient.checkConnection()
-            .isRight()
-            .also { Timber.tag(TAG).d("Connection check: $it") }
-        }
-      } catch (e: Exception) {
-        false
-      }
-      if (isConnected) return true
-    }
-    return false
   }
 
   private suspend fun updateNetworkInfo(isNetworkChanged: Boolean) {

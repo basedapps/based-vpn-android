@@ -66,6 +66,7 @@ import co.uk.basedapps.vpn.ui.widget.BasedAlertDialog
 import co.uk.basedapps.vpn.ui.widget.BasedButton
 import co.uk.basedapps.vpn.ui.widget.ButtonStyle
 import co.uk.basedapps.vpn.ui.widget.ErrorScreen
+import io.norselabs.vpn.based.viewModel.dashboard.ConnectionCardState
 import io.norselabs.vpn.based.viewModel.dashboard.DashboardScreenEffect as Effect
 import io.norselabs.vpn.based.viewModel.dashboard.DashboardScreenState as State
 import io.norselabs.vpn.based.viewModel.dashboard.DashboardScreenViewModel
@@ -75,7 +76,9 @@ import io.norselabs.vpn.based.viewModel.dashboard.VpnStatus
 import io.norselabs.vpn.common.ext.goToGooglePlay
 import io.norselabs.vpn.common.ext.mailTo
 import io.norselabs.vpn.common.state.Status
+import io.norselabs.vpn.common.status_card.StatusCardState
 import io.norselabs.vpn.common_compose.EffectHandler
+import io.norselabs.vpn.common_compose.status_card.StatusCardHost
 import io.norselabs.vpn.common_flags.mapToFlag
 import io.norselabs.vpn.common_map.WorldMap
 import io.norselabs.vpn.core_vpn.user.UserStatus
@@ -135,8 +138,6 @@ class DashboardScreen : Screen {
       onSettingsClick = viewModel::onSettingsClick,
       onTryAgainClick = viewModel::onTryAgainClick,
       onUpdateClick = viewModel::onUpdateClick,
-      onAlertConfirmClick = viewModel::onAlertConfirmClick,
-      onAlertDismissRequest = viewModel::onAlertDismissRequest,
       onRatingClick = viewModel::onRatingClick,
       onDemoClick = { navigator.push(StatusCardDemoScreen()) },
     )
@@ -153,50 +154,37 @@ fun DashboardScreenStateless(
   onSettingsClick: () -> Unit,
   onTryAgainClick: () -> Unit,
   onUpdateClick: () -> Unit,
-  onAlertConfirmClick: () -> Unit,
-  onAlertDismissRequest: () -> Unit,
   onRatingClick: (RatingClick) -> Unit,
   onDemoClick: () -> Unit,
 ) {
-  when (state.status) {
-    is Status.Error -> {
-      when (state.userStatus) {
-        UserStatus.VersionOutdated -> {
-          ErrorScreen(
-            title = stringResource(R.string.update_required_title),
-            description = stringResource(R.string.update_required_description),
-            buttonLabel = stringResource(R.string.update_required_button),
-            imageResId = R.drawable.ic_update,
-            onButtonClick = onUpdateClick,
-          )
-        }
+  val isFullScreenError = state.status is Status.Error &&
+    (state.userStatus == UserStatus.Banned || state.userStatus == UserStatus.VersionOutdated)
 
-        UserStatus.Banned -> {
-          ErrorScreen(
-            title = null,
-            description = stringResource(R.string.error_banned_title),
-            onButtonClick = null,
-          )
-        }
+  if (isFullScreenError) {
+    when (state.userStatus) {
+      UserStatus.VersionOutdated -> ErrorScreen(
+        title = stringResource(R.string.update_required_title),
+        description = stringResource(R.string.update_required_description),
+        buttonLabel = stringResource(R.string.update_required_button),
+        imageResId = R.drawable.ic_update,
+        onButtonClick = onUpdateClick,
+      )
 
-        else -> {
-          ErrorScreen(
-            isLoading = (state.status as Status.Error).isLoading,
-            onButtonClick = onTryAgainClick,
-          )
-        }
-      }
+      else -> ErrorScreen(
+        title = null,
+        description = stringResource(R.string.error_banned_title),
+        onButtonClick = null,
+      )
     }
-
-    else -> Content(
+  } else {
+    Content(
       state = state,
       onConnectClick = onConnectClick,
       onDisconnectClick = onDisconnectClick,
       onQuickConnectClick = onQuickConnectClick,
       onSelectServerClick = onSelectServerClick,
       onSettingsClick = onSettingsClick,
-      onAlertConfirmClick = onAlertConfirmClick,
-      onAlertDismissRequest = onAlertDismissRequest,
+      onTryAgainClick = onTryAgainClick,
       onRatingClick = onRatingClick,
       onDemoClick = onDemoClick,
     )
@@ -211,8 +199,7 @@ private fun Content(
   onQuickConnectClick: () -> Unit,
   onSelectServerClick: () -> Unit,
   onSettingsClick: () -> Unit,
-  onAlertConfirmClick: () -> Unit,
-  onAlertDismissRequest: () -> Unit,
+  onTryAgainClick: () -> Unit,
   onRatingClick: (RatingClick) -> Unit,
   onDemoClick: () -> Unit,
 ) {
@@ -250,6 +237,10 @@ private fun Content(
             contentDescription = "StatusCard demo",
           )
         }
+        StatusCardHost(
+          state = state.cardState?.toStatusCardState(),
+          onRetry = onTryAgainClick,
+        )
       }
       BottomBar(
         state = state,
@@ -262,14 +253,6 @@ private fun Content(
     if (state.status is Status.Loading) {
       LoadingOverlay()
     }
-    if (state.isErrorAlertVisible) {
-      BasedAlertDialog(
-        title = stringResource(R.string.dashboard_error_connection_title),
-        description = stringResource(R.string.dashboard_error_connection_description),
-        onConfirmClick = onAlertConfirmClick,
-        onDismissRequest = onAlertDismissRequest,
-      )
-    }
     if (state.isRatingAlertVisible) {
       BasedAlertDialog(
         title = stringResource(R.string.dashboard_rating),
@@ -279,6 +262,34 @@ private fun Content(
       )
     }
   }
+}
+
+@Composable
+private fun ConnectionCardState.toStatusCardState(): StatusCardState = when (this) {
+  is ConnectionCardState.Loading.MirrorDiscovery -> StatusCardState.Loading(
+    title = stringResource(R.string.dashboard_connecting) +
+      if (total > 0) " ($attempt/$total)" else "",
+  )
+
+  ConnectionCardState.Loading.UserEnrollment -> StatusCardState.Loading(
+    title = stringResource(R.string.dashboard_loading),
+  )
+
+  ConnectionCardState.Success -> StatusCardState.Success(
+    title = stringResource(R.string.dashboard_status_success_title),
+  )
+
+  ConnectionCardState.Error -> StatusCardState.Error(
+    title = stringResource(R.string.error_generic_title),
+    subtitle = stringResource(R.string.error_generic_description_short),
+    retryable = true,
+  )
+
+  ConnectionCardState.ConnectionError -> StatusCardState.Error(
+    title = stringResource(R.string.error_connection_title),
+    subtitle = stringResource(R.string.error_connection_description),
+    retryable = false,
+  )
 }
 
 @Composable
@@ -549,8 +560,6 @@ fun DashboardScreenPreview() {
       onSettingsClick = {},
       onTryAgainClick = {},
       onUpdateClick = {},
-      onAlertConfirmClick = {},
-      onAlertDismissRequest = {},
       onRatingClick = {},
       onDemoClick = {},
     )

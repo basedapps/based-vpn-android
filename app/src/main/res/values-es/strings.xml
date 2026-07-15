@@ -7,8 +7,11 @@
     <string name="dashboard_loading">Preparando tu cuenta…</string>
     <string name="dashboard_connect_to_vpn">Conectar a VPN</string>
     <string name="dashboard_disconnect_from_vpn">Desconectar</string>
-    <string name="dashboard_error_connection_title">No se puede conectar al servidor</string>
-    <string name="dashboard_error_connection_description">Por favor, elige otro servidor o intenta nuevamente más tarde</string>
+    <string name="error_connection_title">No se pudo conectar</string>
+    <string name="error_connection_description">Prueba con otro servidor.</string>
+    <string name="dashboard_connecting">Conectando…</string>
+    <string name="dashboard_status_success_title">Cuenta preparada</string>
+    <string name="error_generic_description_short">Revisa tu conexión.</string>
     <string name="dashboard_menu_settings">@string/common_settings</string>
 
     <string name="countries_title">Elegir país</string>

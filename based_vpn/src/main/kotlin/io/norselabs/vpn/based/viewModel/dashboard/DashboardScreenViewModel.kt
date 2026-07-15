@@ -45,6 +45,8 @@ class DashboardScreenViewModel
 ) : ScreenModel {
 
   private var connectJob: Job? = null
+  private var successCardDismissJob: Job? = null
+  private var connectionErrorJob: Job? = null
 
   private val state: DashboardScreenState
     get() = stateHolder.state.value
@@ -53,6 +55,7 @@ class DashboardScreenViewModel
     observeNetworkState()
     observeConnectionState()
     observeUserStatus()
+    observeInitStatus()
     observeDestination()
   }
 
@@ -88,6 +91,7 @@ class DashboardScreenViewModel
     screenModelScope.launch {
       userInitializer.status.collect { userStatus ->
         Timber.tag(TAG).d("User Status: $userStatus")
+        val previousUserStatus = state.userStatus
         stateHolder.updateState { copy(userStatus = userStatus) }
         val screenStatus = when (userStatus) {
           UserStatus.Enrolled,
@@ -99,6 +103,33 @@ class DashboardScreenViewModel
           else -> Status.Error()
         }
         stateHolder.updateState { copy(status = screenStatus) }
+        handleSuccessCardOnUserStatusChange(previousUserStatus, userStatus)
+      }
+    }
+  }
+
+  private fun handleSuccessCardOnUserStatusChange(
+    previous: UserStatus,
+    current: UserStatus,
+  ) {
+    if (current == UserStatus.Enrolled && previous != UserStatus.Enrolled) {
+      successCardDismissJob?.cancel()
+      stateHolder.updateState { copy(successCardDismissed = false) }
+      successCardDismissJob = screenModelScope.launch {
+        delay(SUCCESS_CARD_VISIBLE_MS)
+        stateHolder.updateState { copy(successCardDismissed = true) }
+      }
+    } else if (current != UserStatus.Enrolled && previous == UserStatus.Enrolled) {
+      successCardDismissJob?.cancel()
+      successCardDismissJob = null
+    }
+  }
+
+  private fun observeInitStatus() {
+    screenModelScope.launch {
+      dvpnClient.status.collect { initStatus ->
+        Timber.tag(TAG).d("Init Status: $initStatus")
+        stateHolder.updateState { copy(clientInitStatus = initStatus) }
       }
     }
   }
@@ -159,12 +190,24 @@ class DashboardScreenViewModel
       updateNetworkInfo(isNetworkChanged)
     } else {
       stateHolder.updateState { copy(retryAttempt = 0) }
-      displayConnectionError()
     }
   }
 
-  private fun displayConnectionError() {
-    // todo
+  private fun showConnectionError() {
+    connectionErrorJob?.cancel()
+    stateHolder.updateState { copy(connectionErrorVisible = true) }
+    connectionErrorJob = screenModelScope.launch {
+      delay(CONNECTION_ERROR_VISIBLE_MS)
+      stateHolder.updateState { copy(connectionErrorVisible = false) }
+    }
+  }
+
+  private fun hideConnectionError() {
+    connectionErrorJob?.cancel()
+    connectionErrorJob = null
+    if (state.connectionErrorVisible) {
+      stateHolder.updateState { copy(connectionErrorVisible = false) }
+    }
   }
 
   fun onConnectClick() {
@@ -193,13 +236,13 @@ class DashboardScreenViewModel
 
   private fun initConnection() {
     if (state.userStatus != UserStatus.Enrolled) {
-      // todo: show error
       return
     }
     if (state.destination == null) {
       onSelectServerClick()
       return
     }
+    hideConnectionError()
     setVpnStatus(VpnStatus.Connecting)
     stateHolder.sendEffect(Effect.CheckVpnPermission)
   }
@@ -227,7 +270,10 @@ class DashboardScreenViewModel
     val destination = state.destination ?: return
     connectJob = screenModelScope.launch {
       connector.connect(destination)
-        .onLeft { setVpnStatus(VpnStatus.Disconnected) }
+        .onLeft {
+          setVpnStatus(VpnStatus.Disconnected)
+          showConnectionError()
+        }
         .onRight { checkAppRatingRequest() }
     }
   }
@@ -249,7 +295,7 @@ class DashboardScreenViewModel
 
   fun onTryAgainClick() {
     stateHolder.updateState {
-      copy(status = Status.Error(isLoading = true))
+      copy(status = Status.Loading)
     }
     userInitializer.enroll()
   }
@@ -268,14 +314,6 @@ class DashboardScreenViewModel
 
   fun onShareLogsClick() {
     logsSender.shareLogs()
-  }
-
-  fun onAlertConfirmClick() {
-    stateHolder.updateState { copy(isErrorAlertVisible = false) }
-  }
-
-  fun onAlertDismissRequest() {
-    stateHolder.updateState { copy(isErrorAlertVisible = false) }
   }
 
   private fun checkAppRatingRequest() {
@@ -315,5 +353,7 @@ class DashboardScreenViewModel
   companion object {
     const val TAG = "Dashboard"
     const val MAX_ATTEMPTS = 3
+    const val SUCCESS_CARD_VISIBLE_MS = 2_000L
+    const val CONNECTION_ERROR_VISIBLE_MS = 3_000L
   }
 }

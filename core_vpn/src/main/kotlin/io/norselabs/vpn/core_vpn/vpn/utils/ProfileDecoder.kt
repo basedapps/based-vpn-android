@@ -32,13 +32,13 @@ object ProfileDecoder {
         val port = bytesToUnsignedShort(bytes[4], bytes[5]).toString()
         // Unsupported types return null instead of silently falling back to TCP:
         // 0x02 mkcp — UDP: the TLS probe can't reach it and cert pinning needs the node cert SHA-256 from the backend; enable once the backend sends it
+        // 0x04 h2 — removed from Xray-core (v24.12.18), migrated to XHTTP; needs xhttp node inbounds + a backend transport code
         // 0x05 domainsocket — removed from Xray-core
         // 0x06 quic — removed from Xray-core 26
         // 0x07 gun — obsolete gRPC alias, not sent by the backend
         val transport: VmessTransport = when (bytes[6].toInt() and 0xFF) {
           0x01 -> VmessTransport.TCP
           0x03 -> VmessTransport.WS
-          0x04 -> VmessTransport.H2
           0x08 -> VmessTransport.GRPC
           else -> return null
         }

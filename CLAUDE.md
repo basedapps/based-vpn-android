@@ -100,13 +100,14 @@ More in [docs/conventions.md](docs/conventions.md).
 - **`based` re-exports foundation libs with `api`.** Bumping `v2ray` / `dvpn_sdk`
   / `core_vpn` ripples up through `core_vpn` → `based` and is exposed transitively
   to consumers — republish `core_vpn` and `based` after such a bump.
-- **`v2ray` 2.1.0 adopted from mavenLocal.** The catalog pins v2ray 2.1.0 and
-  core_vpn 1.2.3, both published to **mavenLocal only** so far (Nexus: 2.0.0 /
-  1.2.2). Migration done: `VPNDriver`/`Analytics`/`VPNDriverImpl` use
+- **`v2ray` 2.1.0 adopted.** The catalog pins v2ray 2.1.0 and core_vpn 1.2.3.
+  v2ray 2.1.0 is on **Nexus** (2026-07-14); core_vpn 1.2.3 is **mavenLocal only**
+  so far (Nexus has 1.2.2). Migration done: `VPNDriver`/`Analytics`/`VPNDriverImpl` use
   `V2RayStartError` (the 1.x `V2RayError` is gone), `ProfileDecoder` maps the
-  `VmessTransport` enum (tcp/ws/h2/grpc; unsupported → `null`), dashboard VM
+  `VmessTransport` enum (tcp/ws/grpc; unsupported — incl. h2, removed from Xray-core in favor
+  of XHTTP — → `null`), dashboard VM
   observes `connectionState` instead of the removed `isConnected` flow. Publish
-  `v2ray` + `core_vpn` + `based` 1.5.0 to Nexus before releasing consumers.
+  `core_vpn` + `based` 1.5.0 to Nexus before releasing consumers.
 - **The reference `:app` bundles the native engine** (`app/libs/libv2ray*.aar` +
   `libhev-socks5-tunnel.so`) — an integration requirement of `v2ray`, separate
   from the `v2ray` library version. `app/libs` is **git-ignored** (same policy as

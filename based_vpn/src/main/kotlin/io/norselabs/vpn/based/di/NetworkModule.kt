@@ -7,11 +7,13 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import io.norselabs.vpn.based.app_config.AppConfig
+import io.norselabs.vpn.based.core_impl.vpn.V2RayTunnelStateProvider
 import io.norselabs.vpn.core_vpn.storage.CoreStorage
 import io.norselabs.vpn.sdk.common.device_token.DeviceTokenStorage
 import io.norselabs.vpn.sdk.common.logger.DvpnLogger
 import io.norselabs.vpn.sdk.dvpn_client.DVPNClient
 import io.norselabs.vpn.sdk.dvpn_client.DvpnLogLevel
+import io.norselabs.vpn.v2ray.repo.V2RayRepository
 import javax.inject.Singleton
 import timber.log.Timber
 
@@ -42,6 +44,7 @@ class DvpnModule {
   fun provideDVPN(
     config: AppConfig,
     tokenStorage: DeviceTokenStorage,
+    v2RayRepository: V2RayRepository,
     @ApplicationContext context: Context,
   ): DVPNClient {
     return DVPNClient(
@@ -62,6 +65,7 @@ class DvpnModule {
         }
       },
       logLevel = DvpnLogLevel.BODY,
+      tunnelStateProvider = V2RayTunnelStateProvider(v2RayRepository),
     )
   }
 }

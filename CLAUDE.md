@@ -21,8 +21,8 @@ This is the canonical agent doc. For deeper reference see [`docs/`](docs/).
 
 | Gradle module | Artifact | Version | Role |
 |---|---|---|---|
-| `:based_vpn` | `based` | 1.5.0 (mavenLocal; Nexus has 1.4.2) | High-level reuse layer: ViewModels, Hilt DI, `AppConfig` |
-| `:core_vpn` | `core_vpn` | 1.2.3 (mavenLocal; Nexus has 1.2.2) | Low-level VPN orchestration |
+| `:based_vpn` | `based` | 1.5.0 (Nexus) | High-level reuse layer: ViewModels, Hilt DI, `AppConfig` |
+| `:core_vpn` | `core_vpn` | 1.2.3 (Nexus) | Low-level VPN orchestration |
 | `:common` | `common` | 1.0.0 | Utils, preferences, state holders, StatusCardController |
 | `:common_logger` | `common_logger` | 0.0.4 | Timber + file logging + upload |
 | `:common_flags` | `common_flags` | 0.0.2 | Country flag assets |
@@ -100,9 +100,16 @@ More in [docs/conventions.md](docs/conventions.md).
 - **`based` re-exports foundation libs with `api`.** Bumping `v2ray` / `dvpn_sdk`
   / `core_vpn` ripples up through `core_vpn` → `based` and is exposed transitively
   to consumers — republish `core_vpn` and `based` after such a bump.
-- **`v2ray` 2.1.0 adopted.** The catalog pins v2ray 2.1.0 and core_vpn 1.2.3.
-  v2ray 2.1.0 is on **Nexus** (2026-07-14); core_vpn 1.2.3 is **mavenLocal only**
-  so far (Nexus has 1.2.2). Migration done: `VPNDriver`/`Analytics`/`VPNDriverImpl` use
+- **`dvpn_sdk` 2.3.0 adopted (Nexus): `getIpData()` tunnel routing.** `DvpnModule.provideDVPN`
+  passes a `V2RayTunnelStateProvider` (`core_impl/vpn/`, wraps `V2RayRepository.isConnected()` +
+  `getSocksProxyPort()`) into the `DVPNClient(...)` factory, so `getIpData()` egresses through the
+  tunnel's local SOCKS5 proxy while connected. Requires `defaultUrl` (already passed from
+  `AppConfig.getBaseUrl()`). The never-consumed `AppConfig.getProxy()` hook is removed (breaking
+  vs `based` 1.4.2) — the SOCKS port comes from `V2RayRepository.getSocksProxyPort()`, not config.
+  See `SolarLabs/docs/tunnel-routing-policy.md`.
+- **`v2ray` 2.1.0 adopted.** The catalog pins v2ray 2.1.0 and core_vpn 1.2.3;
+  v2ray 2.1.0, core_vpn 1.2.3 and based 1.5.0 are all on **Nexus** (2026-07-14).
+  Migration done: `VPNDriver`/`Analytics`/`VPNDriverImpl` use
   `V2RayStartError` (the 1.x `V2RayError` is gone), `ProfileDecoder` maps the
   `VmessTransport` enum (tcp/ws/grpc; unsupported — incl. h2, removed from Xray-core in favor
   of XHTTP — → `null`), dashboard VM

@@ -43,10 +43,12 @@ class AppModule {
     config: AppConfig,
     dvpnClient: DVPNClient,
     coreStorage: CoreStorage,
+    networkMonitor: NetworkStateMonitor,
   ): UserInitializer = UserInitializer(
     scope = CoroutineScope(SupervisorJob() + Dispatchers.IO),
     coreStorage = coreStorage,
     dvpn = dvpnClient,
+    networkMonitor = networkMonitor,
     appVersion = config.getAppVersion(),
   )
 

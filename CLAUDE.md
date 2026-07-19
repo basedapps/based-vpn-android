@@ -22,7 +22,7 @@ This is the canonical agent doc. For deeper reference see [`docs/`](docs/).
 | Gradle module | Artifact | Version | Role |
 |---|---|---|---|
 | `:based_vpn` | `based` | 1.5.1 (mavenLocal; ⚠️ pending Nexus, 1.5.0 latest there) | High-level reuse layer: ViewModels, Hilt DI, `AppConfig` |
-| `:core_vpn` | `core_vpn` | 1.2.3 (Nexus) | Low-level VPN orchestration |
+| `:core_vpn` | `core_vpn` | 1.2.4 (mavenLocal; ⚠️ pending Nexus, 1.2.3 latest there) | Low-level VPN orchestration |
 | `:common` | `common` | 1.0.0 | Utils, preferences, state holders, StatusCardController |
 | `:common_logger` | `common_logger` | 0.0.4 | Timber + file logging + upload |
 | `:common_flags` | `common_flags` | 0.0.2 | Country flag assets |
@@ -121,6 +121,12 @@ More in [docs/conventions.md](docs/conventions.md).
   (mirror discovery / enrollment / error). The transient Success card is exempt (Enrolled + Connected
   already, so connecting stays available). Additive vs 1.5.0. Built + `publishToMavenLocal` only —
   **not on Nexus**; publish it and bump consumers before release.
+- **Auto-retry enrollment on network restore (`core_vpn` 1.2.4, mavenLocal only).**
+  `UserInitializer` takes a `NetworkStateMonitor` (breaking constructor change; constructed only in
+  `based`'s `AppModule`) and re-runs `enroll()` when the network reconnects while `status` is
+  `Failed` / `NotEnrolled` — the dashboard error card self-heals. `Banned` / `VersionOutdated` are
+  deliberately not retried. Verified on the reference `:app`; `based` 1.5.1 is republished to
+  mavenLocal against core_vpn 1.2.4 (`bagmisiz` rebuilt). Publish both to Nexus after approval.
 - **The reference `:app` bundles the native engine** (`app/libs/libv2ray*.aar` +
   `libhev-socks5-tunnel.so`) — an integration requirement of `v2ray`, separate
   from the `v2ray` library version. `app/libs` is **git-ignored** (same policy as

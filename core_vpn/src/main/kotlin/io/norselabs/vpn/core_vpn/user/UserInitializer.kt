@@ -3,6 +3,8 @@ package io.norselabs.vpn.core_vpn.user
 import arrow.core.Either
 import arrow.core.flatMap
 import io.norselabs.vpn.common.utils.VersionComparator
+import io.norselabs.vpn.core_vpn.connectivity.NetworkState
+import io.norselabs.vpn.core_vpn.connectivity.NetworkStateMonitor
 import io.norselabs.vpn.core_vpn.storage.CoreStorage
 import io.norselabs.vpn.sdk.common.SdkError
 import io.norselabs.vpn.sdk.dvpn_client.DVPNClient
@@ -22,6 +24,7 @@ class UserInitializer(
   private val scope: CoroutineScope,
   private val coreStorage: CoreStorage,
   private val dvpn: DVPNClient,
+  private val networkMonitor: NetworkStateMonitor,
   private val appVersion: String,
 ) {
 
@@ -32,6 +35,26 @@ class UserInitializer(
   private var enrolmentAttempt = 0
 
   private var job: Job? = null
+
+  init {
+    retryEnrollmentOnNetworkRestore()
+  }
+
+  // Enrollment that died without network (Failed / NotEnrolled) can only be
+  // revived by a retry; do it automatically when connectivity comes back.
+  // Banned / VersionOutdated are not network-related, so they stay as is.
+  private fun retryEnrollmentOnNetworkRestore() {
+    scope.launch {
+      networkMonitor.networkState.collect { network ->
+        val isRetryable = _status.value == UserStatus.Failed ||
+          _status.value == UserStatus.NotEnrolled
+        if (network is NetworkState.Connected && isRetryable) {
+          Timber.tag(TAG).d("Network is back, retrying enrollment")
+          enroll()
+        }
+      }
+    }
+  }
 
   fun enroll() {
     job?.cancel()

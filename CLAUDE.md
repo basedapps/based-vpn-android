@@ -21,8 +21,8 @@ This is the canonical agent doc. For deeper reference see [`docs/`](docs/).
 
 | Gradle module | Artifact | Version | Role |
 |---|---|---|---|
-| `:based_vpn` | `based` | 1.5.1 (mavenLocal; ⚠️ pending Nexus, 1.5.0 latest there) | High-level reuse layer: ViewModels, Hilt DI, `AppConfig` |
-| `:core_vpn` | `core_vpn` | 1.2.4 (mavenLocal; ⚠️ pending Nexus, 1.2.3 latest there) | Low-level VPN orchestration |
+| `:based_vpn` | `based` | 1.5.1 (Nexus) | High-level reuse layer: ViewModels, Hilt DI, `AppConfig` |
+| `:core_vpn` | `core_vpn` | 1.2.4 (Nexus) | Low-level VPN orchestration |
 | `:common` | `common` | 1.0.0 | Utils, preferences, state holders, StatusCardController |
 | `:common_logger` | `common_logger` | 0.0.4 | Timber + file logging + upload |
 | `:common_flags` | `common_flags` | 0.0.2 | Country flag assets |
@@ -115,18 +115,19 @@ More in [docs/conventions.md](docs/conventions.md).
   of XHTTP — → `null`), dashboard VM
   observes `connectionState` instead of the removed `isConnected` flow. Publish
   `core_vpn` + `based` 1.5.0 to Nexus before releasing consumers.
-- **Connect gated on readiness (`based` 1.5.1, mavenLocal only).** `DashboardScreenState.isReadyToConnect`
+- **Connect gated on readiness (`based` 1.5.1, Nexus).** `DashboardScreenState.isReadyToConnect`
   (= `cardState == null || cardState is ConnectionCardState.Success`) gates
   `DashboardScreenViewModel.initConnection()`: no connection can start while a busy status card is up
   (mirror discovery / enrollment / error). The transient Success card is exempt (Enrolled + Connected
-  already, so connecting stays available). Additive vs 1.5.0. Built + `publishToMavenLocal` only —
-  **not on Nexus**; publish it and bump consumers before release.
-- **Auto-retry enrollment on network restore (`core_vpn` 1.2.4, mavenLocal only).**
+  already, so connecting stays available). Additive vs 1.5.0. On Nexus since 2026-07-18;
+  `bagmisiz` pins it.
+- **Auto-retry enrollment on network restore (`core_vpn` 1.2.4, Nexus).**
   `UserInitializer` takes a `NetworkStateMonitor` (breaking constructor change; constructed only in
   `based`'s `AppModule`) and re-runs `enroll()` when the network reconnects while `status` is
   `Failed` / `NotEnrolled` — the dashboard error card self-heals. `Banned` / `VersionOutdated` are
-  deliberately not retried. Verified on the reference `:app`; `based` 1.5.1 is republished to
-  mavenLocal against core_vpn 1.2.4 (`bagmisiz` rebuilt). Publish both to Nexus after approval.
+  deliberately not retried; an `InitStatus.Failed` card heals too (mirror discovery re-runs on the
+  next SDK call — `HttpClientInitializer` drops its cached client on failure). core_vpn 1.2.4 and
+  `based` 1.5.1 (built against it) are on Nexus since 2026-07-18.
 - **The reference `:app` bundles the native engine** (`app/libs/libv2ray*.aar` +
   `libhev-socks5-tunnel.so`) — an integration requirement of `v2ray`, separate
   from the `v2ray` library version. `app/libs` is **git-ignored** (same policy as
@@ -134,3 +135,8 @@ More in [docs/conventions.md](docs/conventions.md).
   after cloning, matching the version in `app/build.gradle` (26.5.9).
 - **Publish order matters** (commons → core_vpn → based); publishing out of order
   resolves stale transitive versions.
+- **Planned refactoring: dashboard VM layering.** A review of `DashboardScreenViewModel`
+  (2026-07-18) found four pieces of domain logic to extract (IP-fetch retry policy, rating
+  state machine, ad/subscription gating, destination-change reconnect orchestration) —
+  deferred to the next iteration. Read `SolarLabs/docs/dashboard-vm-review.md` before
+  touching the dashboard VM.

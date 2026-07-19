@@ -235,7 +235,8 @@ class DashboardScreenViewModel
   }
 
   private fun initConnection() {
-    if (state.userStatus != UserStatus.Enrolled) {
+    if (!state.isReadyToConnect) {
+      Timber.tag(TAG).d("Connect ignored: not ready (status card visible)")
       return
     }
     if (state.destination == null) {

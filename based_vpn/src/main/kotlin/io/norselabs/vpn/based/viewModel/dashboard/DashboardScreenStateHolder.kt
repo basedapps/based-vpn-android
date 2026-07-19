@@ -52,6 +52,15 @@ data class DashboardScreenState(
 
     else -> null
   }
+
+  // Connecting is blocked while a "busy" status card is showing — mirror
+  // discovery / user enrollment still in progress, or an error being surfaced.
+  // The Success card is the exception: it only appears once the user is
+  // Enrolled and the client is Connected (no errors), so the readiness
+  // conditions are already met and connecting must stay available while it is
+  // briefly on screen.
+  val isReadyToConnect: Boolean =
+    cardState == null || cardState is ConnectionCardState.Success
 }
 
 sealed interface ConnectionCardState {

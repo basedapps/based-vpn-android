@@ -1,7 +1,5 @@
 package io.norselabs.vpn.based.viewModel.dashboard
 
-import arrow.core.Either
-import arrow.core.flatMap
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import io.norselabs.vpn.based.storage.AppStorage
@@ -10,8 +8,7 @@ import io.norselabs.vpn.based.viewModel.dashboard.DashboardScreenEffect as Effec
 import io.norselabs.vpn.common.state.Status
 import io.norselabs.vpn.common_logger.share.LogsSender
 import io.norselabs.vpn.common_purchases.PurchasesManager
-import io.norselabs.vpn.core_vpn.connectivity.NetworkState
-import io.norselabs.vpn.core_vpn.connectivity.NetworkStateMonitor
+import io.norselabs.vpn.core_vpn.connectivity.NetworkInfoUpdater
 import io.norselabs.vpn.core_vpn.user.UserInitializer
 import io.norselabs.vpn.core_vpn.user.UserStatus
 import io.norselabs.vpn.core_vpn.vpn.Destination
@@ -19,14 +16,13 @@ import io.norselabs.vpn.core_vpn.vpn.connector.DisconnectReason
 import io.norselabs.vpn.core_vpn.vpn.connector.VPNConnector
 import io.norselabs.vpn.core_vpn.vpn.destination.DestinationStorage
 import io.norselabs.vpn.sdk.dvpn_client.DVPNClient
-import io.norselabs.vpn.sdk.services.connection.api.NetworkData
 import io.norselabs.vpn.v2ray.model.VpnConnection
 import io.norselabs.vpn.v2ray.repo.V2RayRepository
 import javax.inject.Inject
-import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -39,7 +35,7 @@ class DashboardScreenViewModel
   private val vpnRepo: V2RayRepository,
   private val userInitializer: UserInitializer,
   private val destinationStorage: DestinationStorage,
-  private val networkMonitor: NetworkStateMonitor,
+  private val networkInfoUpdater: NetworkInfoUpdater,
   private val logsSender: LogsSender,
   private val purchasesManager: PurchasesManager,
 ) : ScreenModel {
@@ -52,19 +48,24 @@ class DashboardScreenViewModel
     get() = stateHolder.state.value
 
   init {
-    observeNetworkState()
+    observeNetworkData()
     observeConnectionState()
     observeUserStatus()
     observeInitStatus()
     observeDestination()
   }
 
-  private fun observeNetworkState() {
+  private fun observeNetworkData() {
     screenModelScope.launch {
-      networkMonitor.networkState.collect { state ->
-        Timber.tag(TAG).d("Network State: $state")
-        if (state is NetworkState.Connected) {
-          updateNetworkInfo(true)
+      networkInfoUpdater.networkData.filterNotNull().collect { data ->
+        stateHolder.updateState {
+          copy(
+            networkData = NetworkDataUi(
+              ip = data.ip,
+              lat = data.info.lat,
+              long = data.info.long,
+            ),
+          )
         }
       }
     }
@@ -152,44 +153,6 @@ class DashboardScreenViewModel
     Timber.tag(TAG).d("Set VPN Status: $vpnStatus")
     stateHolder.updateState {
       copy(vpnStatus = vpnStatus)
-    }
-  }
-
-  private suspend fun updateNetworkInfo(isNetworkChanged: Boolean) {
-    userInitializer.waitForDeviceToken()
-    stateHolder.updateState { copy(retryAttempt = state.retryAttempt + 1) }
-    dvpnClient.getIpData()
-      .flatMap { data ->
-        val currentIp = state.networkData?.ip
-        if (isNetworkChanged && currentIp == data.ip) {
-          Either.Left(Unit)
-        } else {
-          Either.Right(data)
-        }
-      }
-      .onRight(::parseNetworkInfo)
-      .onLeft { handleNetworkInfoError(isNetworkChanged) }
-  }
-
-  private fun parseNetworkInfo(networkData: NetworkData) {
-    stateHolder.updateState {
-      copy(
-        networkData = NetworkDataUi(
-          ip = networkData.ip,
-          lat = networkData.info.lat,
-          long = networkData.info.long,
-        ),
-        retryAttempt = 0,
-      )
-    }
-  }
-
-  private suspend fun handleNetworkInfoError(isNetworkChanged: Boolean) {
-    if (state.retryAttempt < MAX_ATTEMPTS) {
-      delay(1.seconds)
-      updateNetworkInfo(isNetworkChanged)
-    } else {
-      stateHolder.updateState { copy(retryAttempt = 0) }
     }
   }
 
@@ -353,7 +316,6 @@ class DashboardScreenViewModel
 
   companion object {
     const val TAG = "Dashboard"
-    const val MAX_ATTEMPTS = 3
     const val SUCCESS_CARD_VISIBLE_MS = 2_000L
     const val CONNECTION_ERROR_VISIBLE_MS = 3_000L
   }

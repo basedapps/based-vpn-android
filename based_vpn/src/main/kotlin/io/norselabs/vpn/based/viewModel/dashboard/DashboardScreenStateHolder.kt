@@ -18,7 +18,6 @@ data class DashboardScreenState(
   val userStatus: UserStatus = UserStatus.Determining,
   val networkData: NetworkDataUi? = null,
   val destination: Destination? = null,
-  val retryAttempt: Int = 0,
   val clientInitStatus: InitStatus = InitStatus.Connecting(attempt = 0, total = 0),
   val successCardDismissed: Boolean = false,
   val connectionErrorVisible: Boolean = false,

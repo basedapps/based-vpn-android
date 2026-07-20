@@ -47,6 +47,8 @@ Low-level VPN orchestration, no UI. Key components:
 - `SplitTunnelingConfigurator` — per-app routing.
 - `UserInitializer` — device/user bootstrap (registration, version).
 - `NetworkStateMonitor` — connectivity changes.
+- `NetworkInfoUpdater` — external IP/location refresh, triggers synced to the tunnel state
+  (skips fetches while the tunnel is establishing to avoid reporting the real IP).
 - `DestinationStorage`, `CoreStorage` — selected destination + persisted prefs.
 
 Depends on `io.norselabs.vpn:v2ray` (tunnel engine) and `io.norselabs.vpn:dvpn_sdk`

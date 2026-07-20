@@ -21,8 +21,8 @@ This is the canonical agent doc. For deeper reference see [`docs/`](docs/).
 
 | Gradle module | Artifact | Version | Role |
 |---|---|---|---|
-| `:based_vpn` | `based` | 1.5.1 (Nexus) | High-level reuse layer: ViewModels, Hilt DI, `AppConfig` |
-| `:core_vpn` | `core_vpn` | 1.2.4 (Nexus) | Low-level VPN orchestration |
+| `:based_vpn` | `based` | 1.6.0 (Nexus) | High-level reuse layer: ViewModels, Hilt DI, `AppConfig` |
+| `:core_vpn` | `core_vpn` | 1.3.0 (Nexus) | Low-level VPN orchestration |
 | `:common` | `common` | 1.0.0 | Utils, preferences, state holders, StatusCardController |
 | `:common_logger` | `common_logger` | 0.0.4 | Timber + file logging + upload |
 | `:common_flags` | `common_flags` | 0.0.2 | Country flag assets |
@@ -121,6 +121,18 @@ More in [docs/conventions.md](docs/conventions.md).
   (mirror discovery / enrollment / error). The transient Success card is exempt (Enrolled + Connected
   already, so connecting stays available). Additive vs 1.5.0. On Nexus since 2026-07-18;
   `bagmisiz` pins it.
+- **IP/location refresh lives in `NetworkInfoUpdater` (`core_vpn` 1.3.0 / `based` 1.6.0, Nexus).**
+  `core_vpn`'s `connectivity/NetworkInfoUpdater` (UserInitializer-style singleton, provided in
+  `based`'s `AppModule` with its own IO scope) owns *when* `getIpData()` runs: it skips OS network
+  events while the tunnel is establishing (`Connecting`/`CoreStarted` — a fetch then would be routed
+  direct and report the real IP), re-fetches on every arrival at a stable tunnel state
+  (`Connected`/`Disconnected`), and retries only failed fetches (3 × 1s; the first answer is
+  trusted — the connector drops the connection pool on tunnel-up/disconnect and the tunnel-bound
+  client has no keep-alive, so a stale-route answer can't happen). It exposes
+  `StateFlow<NetworkData?>`; the dashboard VM only maps it to `NetworkDataUi`. Breaking vs 1.5.1:
+  VM constructor takes `NetworkInfoUpdater` instead of `NetworkStateMonitor`, `retryAttempt` is
+  gone from `DashboardScreenState`. Don't re-add ad-hoc `getIpData()` triggers to ViewModels.
+  Unit-tested (`core_vpn/src/test/.../connectivity/NetworkInfoUpdaterTest.kt`).
 - **Auto-retry enrollment on network restore (`core_vpn` 1.2.4, Nexus).**
   `UserInitializer` takes a `NetworkStateMonitor` (breaking constructor change; constructed only in
   `based`'s `AppModule`) and re-runs `enroll()` when the network reconnects while `status` is
@@ -136,7 +148,7 @@ More in [docs/conventions.md](docs/conventions.md).
 - **Publish order matters** (commons → core_vpn → based); publishing out of order
   resolves stale transitive versions.
 - **Planned refactoring: dashboard VM layering.** A review of `DashboardScreenViewModel`
-  (2026-07-18) found four pieces of domain logic to extract (IP-fetch retry policy, rating
-  state machine, ad/subscription gating, destination-change reconnect orchestration) —
-  deferred to the next iteration. Read `SolarLabs/docs/dashboard-vm-review.md` before
-  touching the dashboard VM.
+  (2026-07-18) found four pieces of domain logic to extract; #1 (IP-fetch retry policy) shipped
+  as `NetworkInfoUpdater` in `core_vpn` 1.3.0 (see above). Still pending: rating state machine,
+  ad/subscription gating, destination-change reconnect orchestration. Read
+  `SolarLabs/docs/dashboard-vm-review.md` before touching the dashboard VM.

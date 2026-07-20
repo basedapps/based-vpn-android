@@ -14,6 +14,7 @@ import io.norselabs.vpn.based.core_impl.vpn.VPNDriverImpl
 import io.norselabs.vpn.common.status_card.StatusCardController
 import io.norselabs.vpn.common_logger.logger.FileLogTree
 import io.norselabs.vpn.common_logger.share.LogsSender
+import io.norselabs.vpn.core_vpn.connectivity.NetworkInfoUpdater
 import io.norselabs.vpn.core_vpn.connectivity.NetworkStateMonitor
 import io.norselabs.vpn.core_vpn.storage.CoreStorage
 import io.norselabs.vpn.core_vpn.user.UserInitializer
@@ -50,6 +51,21 @@ class AppModule {
     dvpn = dvpnClient,
     networkMonitor = networkMonitor,
     appVersion = config.getAppVersion(),
+  )
+
+  @Provides
+  @Singleton
+  fun provideNetworkInfoUpdater(
+    dvpnClient: DVPNClient,
+    v2RayRepository: V2RayRepository,
+    networkMonitor: NetworkStateMonitor,
+    userInitializer: UserInitializer,
+  ): NetworkInfoUpdater = NetworkInfoUpdater(
+    scope = CoroutineScope(SupervisorJob() + Dispatchers.IO),
+    dvpn = dvpnClient,
+    vpnRepo = v2RayRepository,
+    networkMonitor = networkMonitor,
+    userInitializer = userInitializer,
   )
 
   @Provides

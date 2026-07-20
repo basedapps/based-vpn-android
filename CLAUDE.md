@@ -21,7 +21,7 @@ This is the canonical agent doc. For deeper reference see [`docs/`](docs/).
 
 | Gradle module | Artifact | Version | Role |
 |---|---|---|---|
-| `:based_vpn` | `based` | 1.6.0 (Nexus) | High-level reuse layer: ViewModels, Hilt DI, `AppConfig` |
+| `:based_vpn` | `based` | 1.6.1 (Nexus) | High-level reuse layer: ViewModels, Hilt DI, `AppConfig` |
 | `:core_vpn` | `core_vpn` | 1.3.0 (Nexus) | Low-level VPN orchestration |
 | `:common` | `common` | 1.0.0 | Utils, preferences, state holders, StatusCardController |
 | `:common_logger` | `common_logger` | 0.0.4 | Timber + file logging + upload |
@@ -107,8 +107,9 @@ More in [docs/conventions.md](docs/conventions.md).
   `AppConfig.getBaseUrl()`). The never-consumed `AppConfig.getProxy()` hook is removed (breaking
   vs `based` 1.4.2) — the SOCKS port comes from `V2RayRepository.getSocksProxyPort()`, not config.
   See `SolarLabs/docs/tunnel-routing-policy.md`.
-- **`v2ray` 2.1.0 adopted.** The catalog pins v2ray 2.1.0 and core_vpn 1.2.3;
-  v2ray 2.1.0, core_vpn 1.2.3 and based 1.5.0 are all on **Nexus** (2026-07-14).
+- **`v2ray` 2.1.x adopted.** The catalog pins v2ray **2.1.1** (2.1.0 + consumer ProGuard rules —
+  fixes the R8 release crash in `TProxyService`; `based` **1.6.1**, Nexus 2026-07-20, is that dep
+  bump only, see `SolarLabs/docs/versions.md` item 8); the 2.1.0 migration itself landed 2026-07-14.
   Migration done: `VPNDriver`/`Analytics`/`VPNDriverImpl` use
   `V2RayStartError` (the 1.x `V2RayError` is gone), `ProfileDecoder` maps the
   `VmessTransport` enum (tcp/ws/grpc; unsupported — incl. h2, removed from Xray-core in favor

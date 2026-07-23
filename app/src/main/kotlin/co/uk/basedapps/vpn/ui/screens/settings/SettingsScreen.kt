@@ -8,11 +8,14 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,9 +27,11 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.bottomSheet.BottomSheetNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import co.sentinel.based_vpn.R as BasedR
 import co.uk.basedapps.vpn.R
+import co.uk.basedapps.vpn.ui.screens.settings.notifications.NotificationsPopupScreen
 import co.uk.basedapps.vpn.ui.screens.settings.widgets.DnsDialog
 import co.uk.basedapps.vpn.ui.screens.settings.widgets.ProtocolDialog
 import co.uk.basedapps.vpn.ui.screens.split_tunneling.SplitTunnelingScreen
@@ -36,8 +41,13 @@ import io.norselabs.vpn.based.viewModel.settings.SettingsScreenEffect as Effect
 import io.norselabs.vpn.based.viewModel.settings.SettingsScreenState as State
 import io.norselabs.vpn.based.viewModel.settings.SettingsScreenViewModel
 import io.norselabs.vpn.common_compose.EffectHandler
+import io.norselabs.vpn.common_compose.permissions.rememberNotificationPermissionState
 import io.norselabs.vpn.core_vpn.vpn.Protocol
 import io.norselabs.vpn.core_vpn.vpn.dns.DnsProvider
+
+val LocalSettingsScreenViewModel = compositionLocalOf<SettingsScreenViewModel> {
+  error("No SettingsScreenViewModel provided")
+}
 
 class SettingsScreen : Screen {
 
@@ -48,28 +58,45 @@ class SettingsScreen : Screen {
 
     val navigator = LocalNavigator.currentOrThrow
 
-    EffectHandler(viewModel.stateHolder.effects) { effect ->
-      when (effect) {
-        is Effect.GoBack -> navigator.pop()
+    val notificationPermission = rememberNotificationPermissionState(
+      checker = viewModel.notificationPermissionChecker,
+    )
 
-        is Effect.OpenTelegram -> Unit
+    CompositionLocalProvider(LocalSettingsScreenViewModel provides viewModel) {
+      BottomSheetNavigator(
+        sheetShape = RoundedCornerShape(16.dp),
+      ) { bottomSheetNavigator ->
 
-        is Effect.SplitTunneling -> navigator.push(SplitTunnelingScreen())
+        EffectHandler(viewModel.stateHolder.effects) { effect ->
+          when (effect) {
+            is Effect.GoBack -> navigator.pop()
+
+            is Effect.OpenTelegram -> Unit
+
+            is Effect.SplitTunneling -> navigator.push(SplitTunnelingScreen())
+
+            is Effect.ShowNotificationsPopup ->
+              bottomSheetNavigator.show(NotificationsPopupScreen())
+
+            is Effect.RequestNotificationPermission -> notificationPermission.request()
+          }
+        }
+
+        SettingsScreenStateless(
+          state = state,
+          navigateBack = viewModel::onBackClick,
+          onDnsRowClick = viewModel::onDnsRowClick,
+          onDnsDialogConfirmClick = viewModel::onDnsSelected,
+          onDnsDialogDismissClick = viewModel::onDnsDialogDismissClick,
+          onProtocolRowClick = viewModel::onProtocolRowClick,
+          onProtocolDialogConfirmClick = viewModel::onProtocolSelected,
+          onProtocolDialogDismissClick = viewModel::onProtocolDialogDismissClick,
+          onSplitTunnelingClick = viewModel::onSplitTunnelClick,
+          onLogsRowClick = viewModel::onLogsRowClick,
+          onNotificationsRowClick = viewModel::onNotificationsRowClick,
+        )
       }
     }
-
-    SettingsScreenStateless(
-      state = state,
-      navigateBack = viewModel::onBackClick,
-      onDnsRowClick = viewModel::onDnsRowClick,
-      onDnsDialogConfirmClick = viewModel::onDnsSelected,
-      onDnsDialogDismissClick = viewModel::onDnsDialogDismissClick,
-      onProtocolRowClick = viewModel::onProtocolRowClick,
-      onProtocolDialogConfirmClick = viewModel::onProtocolSelected,
-      onProtocolDialogDismissClick = viewModel::onProtocolDialogDismissClick,
-      onSplitTunnelingClick = viewModel::onSplitTunnelClick,
-      onLogsRowClick = viewModel::onLogsRowClick,
-    )
   }
 }
 
@@ -85,6 +112,7 @@ fun SettingsScreenStateless(
   onProtocolDialogDismissClick: () -> Unit,
   onSplitTunnelingClick: () -> Unit,
   onLogsRowClick: () -> Unit,
+  onNotificationsRowClick: () -> Unit,
 ) {
   Scaffold(
     containerColor = BasedAppColor.Background,
@@ -106,6 +134,7 @@ fun SettingsScreenStateless(
         onProtocolDialogDismissClick = onProtocolDialogDismissClick,
         onSplitTunnelingClick = onSplitTunnelingClick,
         onLogsRowClick = onLogsRowClick,
+        onNotificationsRowClick = onNotificationsRowClick,
       )
     },
   )
@@ -123,6 +152,7 @@ fun Content(
   onProtocolDialogDismissClick: () -> Unit,
   onSplitTunnelingClick: () -> Unit,
   onLogsRowClick: () -> Unit,
+  onNotificationsRowClick: () -> Unit,
 ) {
   Box {
     Column(
@@ -156,6 +186,20 @@ fun Content(
         value = "",
         modifier = Modifier
           .clickable(onClick = onLogsRowClick),
+      )
+      HorizontalDivider(color = BasedAppColor.Divider)
+      SettingsRow(
+        title = stringResource(R.string.settings_row_notifications),
+        value = stringResource(
+          when {
+            state.isNotificationsAllowed -> R.string.settings_notifications_on
+            else -> R.string.settings_notifications_off
+          },
+        ),
+        modifier = when {
+          state.isNotificationsAllowed -> Modifier
+          else -> Modifier.clickable(onClick = onNotificationsRowClick)
+        },
       )
       HorizontalDivider(color = BasedAppColor.Divider)
     }

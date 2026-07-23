@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.provider.MediaStore
+import android.provider.Settings
 
 fun Context.goToGooglePlay() {
   try {
@@ -51,6 +52,12 @@ fun Context.startActivitySafe(
   } catch (ex: SecurityException) {
     onActivityNotStarted?.invoke(intent, ex)
   }
+}
+
+fun Context.openNotificationSettings() {
+  val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+    .putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
+  startActivitySafe(intent)
 }
 
 fun Context.openCamera(): Boolean {

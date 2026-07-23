@@ -82,6 +82,8 @@ data class NetworkDataUi(
 sealed interface DashboardScreenEffect {
   data object ShowAd : DashboardScreenEffect
   data object CheckVpnPermission : DashboardScreenEffect
+  data object ShowNotificationsPopup : DashboardScreenEffect
+  data object RequestNotificationPermission : DashboardScreenEffect
   data object ShowSelectServer : DashboardScreenEffect
   data object ShowSettings : DashboardScreenEffect
   data object ShowGooglePlay : DashboardScreenEffect

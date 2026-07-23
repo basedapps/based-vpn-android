@@ -5,6 +5,9 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import io.norselabs.vpn.based.storage.AppStorage
 import io.norselabs.vpn.based.storage.RatingStatus
 import io.norselabs.vpn.based.viewModel.dashboard.DashboardScreenEffect as Effect
+import io.norselabs.vpn.common.permissions.NotificationPermissionChecker
+import io.norselabs.vpn.common.permissions.NotificationPermissionStatus
+import io.norselabs.vpn.common.permissions.NotificationPromptStorage
 import io.norselabs.vpn.common.state.Status
 import io.norselabs.vpn.common_logger.share.LogsSender
 import io.norselabs.vpn.common_purchases.PurchasesManager
@@ -38,6 +41,8 @@ class DashboardScreenViewModel
   private val networkInfoUpdater: NetworkInfoUpdater,
   private val logsSender: LogsSender,
   private val purchasesManager: PurchasesManager,
+  private val notificationPromptStorage: NotificationPromptStorage,
+  val notificationPermissionChecker: NotificationPermissionChecker,
 ) : ScreenModel {
 
   private var connectJob: Job? = null
@@ -206,9 +211,42 @@ class DashboardScreenViewModel
       onSelectServerClick()
       return
     }
+    if (shouldSuggestNotifications()) {
+      stateHolder.sendEffect(Effect.ShowNotificationsPopup)
+      return
+    }
+    proceedConnection()
+  }
+
+  // The "prompt shown" flag is written only on an explicit button tap, so an
+  // accidental swipe/scrim dismiss neither records the prompt nor continues
+  // the flow — the next Connect tap shows the popup again. Confirm: for
+  // Denied (API 33+) the system dialog fires and the connect resumes on its
+  // result; for Disabled (API 26-32) the notification settings screen opens
+  // and the connect flow deliberately stops there.
+  private fun shouldSuggestNotifications(): Boolean {
+    return !notificationPromptStorage.wasPromptShown &&
+      notificationPermissionChecker.refresh() != NotificationPermissionStatus.Granted
+  }
+
+  private fun proceedConnection() {
     hideConnectionError()
     setVpnStatus(VpnStatus.Connecting)
     stateHolder.sendEffect(Effect.CheckVpnPermission)
+  }
+
+  fun onNotificationsPopupConfirm() {
+    notificationPromptStorage.wasPromptShown = true
+    stateHolder.sendEffect(Effect.RequestNotificationPermission)
+  }
+
+  fun onNotificationsPopupDismiss() {
+    notificationPromptStorage.wasPromptShown = true
+    proceedConnection()
+  }
+
+  fun onNotificationPermissionResult() {
+    proceedConnection()
   }
 
   fun onPermissionsResult(isSuccess: Boolean) {

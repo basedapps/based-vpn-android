@@ -31,7 +31,9 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -55,9 +57,11 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.bottomSheet.BottomSheetNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import co.uk.basedapps.vpn.R
 import co.uk.basedapps.vpn.ui.screens.countries.CountriesScreen
+import co.uk.basedapps.vpn.ui.screens.dashboard.popup.NotificationsPopupScreen
 import co.uk.basedapps.vpn.ui.screens.demo.StatusCardDemoScreen
 import co.uk.basedapps.vpn.ui.screens.settings.SettingsScreen
 import co.uk.basedapps.vpn.ui.theme.BasedAppColor
@@ -78,6 +82,7 @@ import io.norselabs.vpn.common.ext.mailTo
 import io.norselabs.vpn.common.state.Status
 import io.norselabs.vpn.common.status_card.StatusCardState
 import io.norselabs.vpn.common_compose.EffectHandler
+import io.norselabs.vpn.common_compose.permissions.rememberNotificationPermissionState
 import io.norselabs.vpn.common_compose.status_card.StatusCardHost
 import io.norselabs.vpn.common_flags.mapToFlag
 import io.norselabs.vpn.common_map.WorldMap
@@ -85,6 +90,10 @@ import io.norselabs.vpn.core_vpn.user.UserStatus
 import io.norselabs.vpn.core_vpn.vpn.Destination
 import io.norselabs.vpn.core_vpn.vpn.utils.getVpnPermissionRequest
 import timber.log.Timber
+
+val LocalDashboardScreenViewModel = compositionLocalOf<DashboardScreenViewModel> {
+  error("No DashboardScreenViewModel provided")
+}
 
 class DashboardScreen : Screen {
 
@@ -102,45 +111,62 @@ class DashboardScreen : Screen {
       viewModel.onPermissionsResult(result.resultCode == Activity.RESULT_OK)
     }
 
-    EffectHandler(viewModel.stateHolder.effects) { effect ->
-      when (effect) {
-        is Effect.ShowAd -> viewModel.onAdShown()
+    val notificationPermission = rememberNotificationPermissionState(
+      onResult = { viewModel.onNotificationPermissionResult() },
+      checker = viewModel.notificationPermissionChecker,
+    )
 
-        is Effect.ShowSelectServer -> navigator.push(CountriesScreen())
+    CompositionLocalProvider(LocalDashboardScreenViewModel provides viewModel) {
+      BottomSheetNavigator(
+        sheetShape = RoundedCornerShape(16.dp),
+      ) { bottomSheetNavigator ->
 
-        is Effect.CheckVpnPermission -> {
-          val intent = getVpnPermissionRequest(context)
-          if (intent != null) {
-            vpnPermissionRequest.launch(intent)
-          } else {
-            viewModel.onPermissionsResult(true)
+        EffectHandler(viewModel.stateHolder.effects) { effect ->
+          when (effect) {
+            is Effect.ShowAd -> viewModel.onAdShown()
+
+            is Effect.ShowSelectServer -> navigator.push(CountriesScreen())
+
+            is Effect.CheckVpnPermission -> {
+              val intent = getVpnPermissionRequest(context)
+              if (intent != null) {
+                vpnPermissionRequest.launch(intent)
+              } else {
+                viewModel.onPermissionsResult(true)
+              }
+            }
+
+            is Effect.ShowNotificationsPopup ->
+              bottomSheetNavigator.show(NotificationsPopupScreen())
+
+            is Effect.RequestNotificationPermission -> notificationPermission.request()
+
+            is Effect.ShowSettings -> navigator.push(SettingsScreen())
+
+            is Effect.ShowGooglePlay -> context.goToGooglePlay()
+
+            is Effect.EmailToSupport -> context.mailTo("hello@world.com")
+
+            is Effect.ShowRating -> {
+              Timber.tag("DashboardScreenEffect").d("ShowRating")
+            }
           }
         }
 
-        is Effect.ShowSettings -> navigator.push(SettingsScreen())
-
-        is Effect.ShowGooglePlay -> context.goToGooglePlay()
-
-        is Effect.EmailToSupport -> context.mailTo("hello@world.com")
-
-        is Effect.ShowRating -> {
-          Timber.tag("DashboardScreenEffect").d("ShowRating")
-        }
+        DashboardScreenStateless(
+          state = state,
+          onConnectClick = viewModel::onConnectClick,
+          onDisconnectClick = viewModel::onDisconnectClick,
+          onQuickConnectClick = viewModel::onQuickConnectClick,
+          onSelectServerClick = viewModel::onSelectServerClick,
+          onSettingsClick = viewModel::onSettingsClick,
+          onTryAgainClick = viewModel::onTryAgainClick,
+          onUpdateClick = viewModel::onUpdateClick,
+          onRatingClick = viewModel::onRatingClick,
+          onDemoClick = { navigator.push(StatusCardDemoScreen()) },
+        )
       }
     }
-
-    DashboardScreenStateless(
-      state = state,
-      onConnectClick = viewModel::onConnectClick,
-      onDisconnectClick = viewModel::onDisconnectClick,
-      onQuickConnectClick = viewModel::onQuickConnectClick,
-      onSelectServerClick = viewModel::onSelectServerClick,
-      onSettingsClick = viewModel::onSettingsClick,
-      onTryAgainClick = viewModel::onTryAgainClick,
-      onUpdateClick = viewModel::onUpdateClick,
-      onRatingClick = viewModel::onRatingClick,
-      onDemoClick = { navigator.push(StatusCardDemoScreen()) },
-    )
   }
 }
 

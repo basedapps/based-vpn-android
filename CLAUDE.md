@@ -21,9 +21,9 @@ This is the canonical agent doc. For deeper reference see [`docs/`](docs/).
 
 | Gradle module | Artifact | Version | Role |
 |---|---|---|---|
-| `:based_vpn` | `based` | 1.6.1 (Nexus) | High-level reuse layer: ViewModels, Hilt DI, `AppConfig` |
+| `:based_vpn` | `based` | 1.7.0 (mavenLocal; Nexus: 1.6.1) | High-level reuse layer: ViewModels, Hilt DI, `AppConfig` |
 | `:core_vpn` | `core_vpn` | 1.3.0 (Nexus) | Low-level VPN orchestration |
-| `:common` | `common` | 1.0.0 | Utils, preferences, state holders, StatusCardController |
+| `:common` | `common` | 1.1.0 (mavenLocal; Nexus: 1.0.0) | Utils, preferences, state holders, StatusCardController, notification-permission checker/prompt storage |
 | `:common_logger` | `common_logger` | 0.0.4 | Timber + file logging + upload |
 | `:common_flags` | `common_flags` | 0.0.2 | Country flag assets |
 | `:common_map` | `common_map` | 0.0.4 | Compose map components |
@@ -31,7 +31,7 @@ This is the canonical agent doc. For deeper reference see [`docs/`](docs/).
 | `:common_referral` | `common_referral` | 0.0.4 | Branch + Ads referral |
 | `:common_purchases` | `common_purchases` | 0.0.2 | RevenueCat logic |
 | `:common_purchases_ui` | `common_purchases_ui` | 0.0.3 | RevenueCat paywall UI |
-| `:common_compose` | `common_compose` | 1.2.1 | Reusable Compose components (StatusCard) |
+| `:common_compose` | `common_compose` | 1.3.0 (mavenLocal; Nexus: 1.2.1) | Reusable Compose components (StatusCard, notification-permission state, PromptSheetContent) |
 | `:app` | `co.uk.basedapps:vpn` | _not published_ | Original BasedVPN reference app |
 
 Each module's version lives in the `publishing { }` block of its `build.gradle`.
@@ -148,6 +148,17 @@ More in [docs/conventions.md](docs/conventions.md).
   after cloning, matching the version in `app/build.gradle` (26.5.9).
 - **Publish order matters** (commons → core_vpn → based); publishing out of order
   resolves stale transitive versions.
+- **Notification-permission flow lives in the VM layer (`based` 1.7.0, mavenLocal).** `based_vpn`
+  provides `NotificationPermissionChecker` (`AppModule`) + `NotificationPromptStorage`
+  (`StorageModule`), declares `POST_NOTIFICATIONS` in its manifest, and gates
+  `DashboardScreenViewModel.initConnection()` on `shouldSuggestNotifications()` (first Connect tap →
+  `ShowNotificationsPopup` effect; the shown-flag is written only by
+  `onNotificationsPopupConfirm`/`Dismiss`, so a sheet swipe re-prompts). Settings VM exposes
+  `isNotificationsAllowed` + `onNotificationsRowClick`/`onNotificationsPopupConfirm`. Breaking vs
+  1.6.1: dashboard VM + settings StateHolder/VM ctors. The Compose side (bottom-sheet host,
+  `PromptSheetContent` popups, settings row, strings) is app-owned — see the reference `:app`
+  (`ui/screens/dashboard/popup/`, `ui/screens/settings/notifications/`). Consumers' `EffectHandler`
+  `when`s must cover the new dashboard/settings effects. See `SolarLabs/docs/versions.md` item 9.
 - **Planned refactoring: dashboard VM layering.** A review of `DashboardScreenViewModel`
   (2026-07-18) found four pieces of domain logic to extract; #1 (IP-fetch retry policy) shipped
   as `NetworkInfoUpdater` in `core_vpn` 1.3.0 (see above). Still pending: rating state machine,

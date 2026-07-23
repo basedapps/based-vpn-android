@@ -9,6 +9,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import io.norselabs.vpn.based.app_config.AppConfig
+import io.norselabs.vpn.common.permissions.NotificationPromptStorage
 import io.norselabs.vpn.core_vpn.storage.CoreStorage
 import javax.inject.Singleton
 
@@ -33,5 +34,13 @@ class StorageModule {
     prefs: SharedPreferences,
   ): CoreStorage {
     return CoreStorage(prefs)
+  }
+
+  @Provides
+  @Singleton
+  fun provideNotificationPromptStorage(
+    prefs: SharedPreferences,
+  ): NotificationPromptStorage {
+    return NotificationPromptStorage(prefs)
   }
 }

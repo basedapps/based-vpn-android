@@ -71,6 +71,7 @@ dependencies {
     implementation libs.dagger.hilt
     implementation libs.lifecycle.runtime
     implementation libs.bundles.voyager
+    implementation libs.voyager.bottom.sheet.navigator
     implementation libs.bundles.compose
     implementation platform(libs.google.firebase.bom)
     implementation libs.google.firebase.crashlytics

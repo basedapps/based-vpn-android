@@ -5,6 +5,8 @@ import cafe.adriel.voyager.core.model.screenModelScope
 import io.norselabs.vpn.based.language.LanguageManager
 import io.norselabs.vpn.based.viewModel.settings.SettingsScreenEffect as Effect
 import io.norselabs.vpn.based.viewModel.settings.dto.AppLang
+import io.norselabs.vpn.common.permissions.NotificationPermissionChecker
+import io.norselabs.vpn.common.permissions.NotificationPermissionStatus
 import io.norselabs.vpn.common_logger.share.LogsSender
 import io.norselabs.vpn.core_vpn.storage.CoreStorage
 import io.norselabs.vpn.core_vpn.vpn.Protocol
@@ -20,6 +22,7 @@ class SettingsScreenViewModel
   private val dnsConfigurator: DnsConfigurator,
   private val coreStorage: CoreStorage,
   private val logsSender: LogsSender,
+  val notificationPermissionChecker: NotificationPermissionChecker,
 ) : ScreenModel {
 
   private val state: SettingsScreenState
@@ -36,6 +39,25 @@ class SettingsScreenViewModel
         )
       }
     }
+    observeNotificationPermission()
+  }
+
+  private fun observeNotificationPermission() {
+    screenModelScope.launch {
+      notificationPermissionChecker.status.collect { status ->
+        stateHolder.updateState {
+          copy(isNotificationsAllowed = status == NotificationPermissionStatus.Granted)
+        }
+      }
+    }
+  }
+
+  fun onNotificationsRowClick() {
+    stateHolder.sendEffect(Effect.ShowNotificationsPopup)
+  }
+
+  fun onNotificationsPopupConfirm() {
+    stateHolder.sendEffect(Effect.RequestNotificationPermission)
   }
 
   fun onDnsRowClick() {

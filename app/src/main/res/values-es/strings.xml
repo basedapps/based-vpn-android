@@ -23,6 +23,14 @@
     <string name="settings_row_dns">Servidor DNS</string>
     <string name="settings_row_protocol">Protocolo VPN</string>
     <string name="settings_row_logs">Compartir registros</string>
+    <string name="settings_row_notifications">Notificación del estado de VPN</string>
+    <string name="settings_notifications_on">Activada</string>
+    <string name="settings_notifications_off">Desactivada</string>
+
+    <string name="notifications_popup_title">Activar notificaciones</string>
+    <string name="notifications_popup_description">Permite las notificaciones para ver el estado de tu conexión VPN mientras la aplicación está en segundo plano.</string>
+    <string name="notifications_popup_confirm">Activar</string>
+    <string name="notifications_popup_later">Ahora no</string>
 
     <string name="settings_protocol_change_title">Elegir protocolo</string>
 

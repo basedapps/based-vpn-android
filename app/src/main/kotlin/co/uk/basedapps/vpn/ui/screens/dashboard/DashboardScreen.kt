@@ -30,12 +30,12 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import android.content.Context
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -57,16 +57,13 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.bottomSheet.BottomSheetNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import co.uk.basedapps.vpn.R
 import co.uk.basedapps.vpn.ui.screens.countries.CountriesScreen
-import co.uk.basedapps.vpn.ui.screens.dashboard.popup.NotificationsPopupScreen
 import co.uk.basedapps.vpn.ui.screens.demo.StatusCardDemoScreen
 import co.uk.basedapps.vpn.ui.screens.settings.SettingsScreen
 import co.uk.basedapps.vpn.ui.theme.BasedAppColor
 import co.uk.basedapps.vpn.ui.theme.BasedVPNTheme
-import co.uk.basedapps.vpn.ui.widget.BasedAlertDialog
 import co.uk.basedapps.vpn.ui.widget.BasedButton
 import co.uk.basedapps.vpn.ui.widget.ButtonStyle
 import co.uk.basedapps.vpn.ui.widget.ErrorScreen
@@ -83,17 +80,20 @@ import io.norselabs.vpn.common.state.Status
 import io.norselabs.vpn.common.status_card.StatusCardState
 import io.norselabs.vpn.common_compose.EffectHandler
 import io.norselabs.vpn.common_compose.permissions.rememberNotificationPermissionState
+import io.norselabs.vpn.common_compose.prompt_sheet.PromptData
+import io.norselabs.vpn.common_compose.prompt_sheet.PromptDialogHost
+import io.norselabs.vpn.common_compose.prompt_sheet.PromptResult
+import io.norselabs.vpn.common_compose.prompt_sheet.PromptSheetHost
+import io.norselabs.vpn.common_compose.prompt_sheet.rememberPromptHostState
 import io.norselabs.vpn.common_compose.status_card.StatusCardHost
 import io.norselabs.vpn.common_flags.mapToFlag
 import io.norselabs.vpn.common_map.WorldMap
 import io.norselabs.vpn.core_vpn.user.UserStatus
 import io.norselabs.vpn.core_vpn.vpn.Destination
 import io.norselabs.vpn.core_vpn.vpn.utils.getVpnPermissionRequest
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.launch
 import timber.log.Timber
-
-val LocalDashboardScreenViewModel = compositionLocalOf<DashboardScreenViewModel> {
-  error("No DashboardScreenViewModel provided")
-}
 
 class DashboardScreen : Screen {
 
@@ -104,6 +104,7 @@ class DashboardScreen : Screen {
 
     val context = LocalContext.current
     val navigator = LocalNavigator.currentOrThrow
+    val scope = rememberCoroutineScope()
 
     val vpnPermissionRequest = rememberLauncherForActivityResult(
       ActivityResultContracts.StartActivityForResult(),
@@ -116,59 +117,94 @@ class DashboardScreen : Screen {
       checker = viewModel.notificationPermissionChecker,
     )
 
-    CompositionLocalProvider(LocalDashboardScreenViewModel provides viewModel) {
-      BottomSheetNavigator(
-        sheetShape = RoundedCornerShape(16.dp),
-      ) { bottomSheetNavigator ->
+    val promptHost = rememberPromptHostState()
+    val ratingPromptHost = rememberPromptHostState()
 
-        EffectHandler(viewModel.stateHolder.effects) { effect ->
-          when (effect) {
-            is Effect.ShowAd -> viewModel.onAdShown()
+    EffectHandler(viewModel.stateHolder.effects) { effect ->
+      when (effect) {
+        is Effect.ShowAd -> viewModel.onAdShown()
 
-            is Effect.ShowSelectServer -> navigator.push(CountriesScreen())
+        is Effect.ShowSelectServer -> navigator.push(CountriesScreen())
 
-            is Effect.CheckVpnPermission -> {
-              val intent = getVpnPermissionRequest(context)
-              if (intent != null) {
-                vpnPermissionRequest.launch(intent)
-              } else {
-                viewModel.onPermissionsResult(true)
-              }
-            }
-
-            is Effect.ShowNotificationsPopup ->
-              bottomSheetNavigator.show(NotificationsPopupScreen())
-
-            is Effect.RequestNotificationPermission -> notificationPermission.request()
-
-            is Effect.ShowSettings -> navigator.push(SettingsScreen())
-
-            is Effect.ShowGooglePlay -> context.goToGooglePlay()
-
-            is Effect.EmailToSupport -> context.mailTo("hello@world.com")
-
-            is Effect.ShowRating -> {
-              Timber.tag("DashboardScreenEffect").d("ShowRating")
-            }
+        is Effect.CheckVpnPermission -> {
+          val intent = getVpnPermissionRequest(context)
+          if (intent != null) {
+            vpnPermissionRequest.launch(intent)
+          } else {
+            viewModel.onPermissionsResult(true)
           }
         }
 
-        DashboardScreenStateless(
-          state = state,
-          onConnectClick = viewModel::onConnectClick,
-          onDisconnectClick = viewModel::onDisconnectClick,
-          onQuickConnectClick = viewModel::onQuickConnectClick,
-          onSelectServerClick = viewModel::onSelectServerClick,
-          onSettingsClick = viewModel::onSettingsClick,
-          onTryAgainClick = viewModel::onTryAgainClick,
-          onUpdateClick = viewModel::onUpdateClick,
-          onRatingClick = viewModel::onRatingClick,
-          onDemoClick = { navigator.push(StatusCardDemoScreen()) },
-        )
+        is Effect.ShowNotificationsPopup -> scope.launch {
+          val result = try {
+            promptHost.show(notificationsPromptData(context))
+          } catch (e: CancellationException) {
+            // The screen went away with the prompt open (e.g. configuration
+            // change) — abandon the connect attempt like a swipe dismiss.
+            viewModel.onNotificationsPopupClosed()
+            throw e
+          }
+          when (result) {
+            PromptResult.Confirmed -> viewModel.onNotificationsPopupConfirm()
+            PromptResult.Dismissed -> viewModel.onNotificationsPopupDismiss()
+            PromptResult.Closed -> viewModel.onNotificationsPopupClosed()
+          }
+        }
+
+        is Effect.RequestNotificationPermission -> notificationPermission.request()
+
+        is Effect.ShowSettings -> navigator.push(SettingsScreen())
+
+        is Effect.ShowGooglePlay -> context.goToGooglePlay()
+
+        is Effect.EmailToSupport -> context.mailTo("hello@world.com")
+
+        is Effect.ShowRatingPrompt -> scope.launch {
+          val result = ratingPromptHost.show(
+            PromptData(
+              title = context.getString(R.string.dashboard_rating),
+              confirmLabel = context.getString(R.string.common_yes),
+              dismissLabel = context.getString(R.string.common_no),
+            ),
+          )
+          viewModel.onRatingClick(
+            when (result) {
+              PromptResult.Confirmed -> RatingClick.Positive
+              PromptResult.Dismissed -> RatingClick.Negative
+              PromptResult.Closed -> RatingClick.Dismiss
+            },
+          )
+        }
+
+        is Effect.ShowRating -> {
+          Timber.tag("DashboardScreenEffect").d("ShowRating")
+        }
       }
     }
+
+    DashboardScreenStateless(
+      state = state,
+      onConnectClick = viewModel::onConnectClick,
+      onDisconnectClick = viewModel::onDisconnectClick,
+      onQuickConnectClick = viewModel::onQuickConnectClick,
+      onSelectServerClick = viewModel::onSelectServerClick,
+      onSettingsClick = viewModel::onSettingsClick,
+      onTryAgainClick = viewModel::onTryAgainClick,
+      onUpdateClick = viewModel::onUpdateClick,
+      onDemoClick = { navigator.push(StatusCardDemoScreen()) },
+    )
+
+    PromptSheetHost(promptHost)
+    PromptDialogHost(ratingPromptHost)
   }
 }
+
+internal fun notificationsPromptData(context: Context) = PromptData(
+  title = context.getString(R.string.notifications_popup_title),
+  description = context.getString(R.string.notifications_popup_description),
+  confirmLabel = context.getString(R.string.notifications_popup_confirm),
+  dismissLabel = context.getString(R.string.notifications_popup_later),
+)
 
 @Composable
 fun DashboardScreenStateless(
@@ -180,7 +216,6 @@ fun DashboardScreenStateless(
   onSettingsClick: () -> Unit,
   onTryAgainClick: () -> Unit,
   onUpdateClick: () -> Unit,
-  onRatingClick: (RatingClick) -> Unit,
   onDemoClick: () -> Unit,
 ) {
   val isFullScreenError = state.status is Status.Error &&
@@ -211,7 +246,6 @@ fun DashboardScreenStateless(
       onSelectServerClick = onSelectServerClick,
       onSettingsClick = onSettingsClick,
       onTryAgainClick = onTryAgainClick,
-      onRatingClick = onRatingClick,
       onDemoClick = onDemoClick,
     )
   }
@@ -226,7 +260,6 @@ private fun Content(
   onSelectServerClick: () -> Unit,
   onSettingsClick: () -> Unit,
   onTryAgainClick: () -> Unit,
-  onRatingClick: (RatingClick) -> Unit,
   onDemoClick: () -> Unit,
 ) {
   Box(
@@ -278,14 +311,6 @@ private fun Content(
     }
     if (state.status is Status.Loading) {
       LoadingOverlay()
-    }
-    if (state.isRatingAlertVisible) {
-      BasedAlertDialog(
-        title = stringResource(R.string.dashboard_rating),
-        onConfirmClick = { onRatingClick(RatingClick.Positive) },
-        onDismissClick = { onRatingClick(RatingClick.Negative) },
-        onDismissRequest = { onRatingClick(RatingClick.Dismiss) },
-      )
     }
   }
 }
@@ -586,7 +611,6 @@ fun DashboardScreenPreview() {
       onSettingsClick = {},
       onTryAgainClick = {},
       onUpdateClick = {},
-      onRatingClick = {},
       onDemoClick = {},
     )
   }

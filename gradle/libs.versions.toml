@@ -100,7 +100,6 @@ voyager-navigator = { module = "cafe.adriel.voyager:voyager-navigator", version.
 voyager-screenmodel = { module = "cafe.adriel.voyager:voyager-screenmodel", version.ref = "voyager" }
 voyager-transitions = { module = "cafe.adriel.voyager:voyager-transitions", version.ref = "voyager" }
 voyager-hilt = { module = "cafe.adriel.voyager:voyager-hilt", version.ref = "voyager" }
-voyager-bottom-sheet-navigator = { module = "cafe.adriel.voyager:voyager-bottom-sheet-navigator", version.ref = "voyager" }
 
 # Install referrers
 branch = { module = "io.branch.sdk.android:library", version = "5.15.1" }

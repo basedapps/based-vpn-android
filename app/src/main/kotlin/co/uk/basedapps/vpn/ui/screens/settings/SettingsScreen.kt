@@ -8,17 +8,16 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -27,11 +26,10 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.hilt.getScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.bottomSheet.BottomSheetNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import co.sentinel.based_vpn.R as BasedR
 import co.uk.basedapps.vpn.R
-import co.uk.basedapps.vpn.ui.screens.settings.notifications.NotificationsPopupScreen
+import co.uk.basedapps.vpn.ui.screens.dashboard.notificationsPromptData
 import co.uk.basedapps.vpn.ui.screens.settings.widgets.DnsDialog
 import co.uk.basedapps.vpn.ui.screens.settings.widgets.ProtocolDialog
 import co.uk.basedapps.vpn.ui.screens.split_tunneling.SplitTunnelingScreen
@@ -42,12 +40,12 @@ import io.norselabs.vpn.based.viewModel.settings.SettingsScreenState as State
 import io.norselabs.vpn.based.viewModel.settings.SettingsScreenViewModel
 import io.norselabs.vpn.common_compose.EffectHandler
 import io.norselabs.vpn.common_compose.permissions.rememberNotificationPermissionState
+import io.norselabs.vpn.common_compose.prompt_sheet.PromptResult
+import io.norselabs.vpn.common_compose.prompt_sheet.PromptSheetHost
+import io.norselabs.vpn.common_compose.prompt_sheet.rememberPromptHostState
 import io.norselabs.vpn.core_vpn.vpn.Protocol
 import io.norselabs.vpn.core_vpn.vpn.dns.DnsProvider
-
-val LocalSettingsScreenViewModel = compositionLocalOf<SettingsScreenViewModel> {
-  error("No SettingsScreenViewModel provided")
-}
+import kotlinx.coroutines.launch
 
 class SettingsScreen : Screen {
 
@@ -56,47 +54,51 @@ class SettingsScreen : Screen {
     val viewModel = getScreenModel<SettingsScreenViewModel>()
     val state by viewModel.stateHolder.state.collectAsState()
 
+    val context = LocalContext.current
     val navigator = LocalNavigator.currentOrThrow
+    val scope = rememberCoroutineScope()
 
     val notificationPermission = rememberNotificationPermissionState(
       checker = viewModel.notificationPermissionChecker,
     )
 
-    CompositionLocalProvider(LocalSettingsScreenViewModel provides viewModel) {
-      BottomSheetNavigator(
-        sheetShape = RoundedCornerShape(16.dp),
-      ) { bottomSheetNavigator ->
+    val promptHost = rememberPromptHostState()
 
-        EffectHandler(viewModel.stateHolder.effects) { effect ->
-          when (effect) {
-            is Effect.GoBack -> navigator.pop()
+    EffectHandler(viewModel.stateHolder.effects) { effect ->
+      when (effect) {
+        is Effect.GoBack -> navigator.pop()
 
-            is Effect.OpenTelegram -> Unit
+        is Effect.OpenTelegram -> Unit
 
-            is Effect.SplitTunneling -> navigator.push(SplitTunnelingScreen())
+        is Effect.SplitTunneling -> navigator.push(SplitTunnelingScreen())
 
-            is Effect.ShowNotificationsPopup ->
-              bottomSheetNavigator.show(NotificationsPopupScreen())
-
-            is Effect.RequestNotificationPermission -> notificationPermission.request()
+        is Effect.ShowNotificationsPopup -> scope.launch {
+          // Any close without a confirm (button, swipe, scrim) just leaves
+          // the row as is — nothing to record or roll back here.
+          if (promptHost.show(notificationsPromptData(context)) == PromptResult.Confirmed) {
+            viewModel.onNotificationsPopupConfirm()
           }
         }
 
-        SettingsScreenStateless(
-          state = state,
-          navigateBack = viewModel::onBackClick,
-          onDnsRowClick = viewModel::onDnsRowClick,
-          onDnsDialogConfirmClick = viewModel::onDnsSelected,
-          onDnsDialogDismissClick = viewModel::onDnsDialogDismissClick,
-          onProtocolRowClick = viewModel::onProtocolRowClick,
-          onProtocolDialogConfirmClick = viewModel::onProtocolSelected,
-          onProtocolDialogDismissClick = viewModel::onProtocolDialogDismissClick,
-          onSplitTunnelingClick = viewModel::onSplitTunnelClick,
-          onLogsRowClick = viewModel::onLogsRowClick,
-          onNotificationsRowClick = viewModel::onNotificationsRowClick,
-        )
+        is Effect.RequestNotificationPermission -> notificationPermission.request()
       }
     }
+
+    SettingsScreenStateless(
+      state = state,
+      navigateBack = viewModel::onBackClick,
+      onDnsRowClick = viewModel::onDnsRowClick,
+      onDnsDialogConfirmClick = viewModel::onDnsSelected,
+      onDnsDialogDismissClick = viewModel::onDnsDialogDismissClick,
+      onProtocolRowClick = viewModel::onProtocolRowClick,
+      onProtocolDialogConfirmClick = viewModel::onProtocolSelected,
+      onProtocolDialogDismissClick = viewModel::onProtocolDialogDismissClick,
+      onSplitTunnelingClick = viewModel::onSplitTunnelClick,
+      onLogsRowClick = viewModel::onLogsRowClick,
+      onNotificationsRowClick = viewModel::onNotificationsRowClick,
+    )
+
+    PromptSheetHost(promptHost)
   }
 }
 

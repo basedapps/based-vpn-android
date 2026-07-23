@@ -31,7 +31,7 @@ This is the canonical agent doc. For deeper reference see [`docs/`](docs/).
 | `:common_referral` | `common_referral` | 0.0.4 | Branch + Ads referral |
 | `:common_purchases` | `common_purchases` | 0.0.2 | RevenueCat logic |
 | `:common_purchases_ui` | `common_purchases_ui` | 0.0.3 | RevenueCat paywall UI |
-| `:common_compose` | `common_compose` | 1.3.0 (mavenLocal; Nexus: 1.2.1) | Reusable Compose components (StatusCard, notification-permission state, PromptSheetContent) |
+| `:common_compose` | `common_compose` | 1.3.0 (mavenLocal; Nexus: 1.2.1) | Reusable Compose components (StatusCard, notification-permission state, PromptSheetContent/Host) |
 | `:app` | `co.uk.basedapps:vpn` | _not published_ | Original BasedVPN reference app |
 
 Each module's version lives in the `publishing { }` block of its `build.gradle`.
@@ -152,8 +152,17 @@ More in [docs/conventions.md](docs/conventions.md).
   provides `NotificationPermissionChecker` (`AppModule`) + `NotificationPromptStorage`
   (`StorageModule`), declares `POST_NOTIFICATIONS` in its manifest, and gates
   `DashboardScreenViewModel.initConnection()` on `shouldSuggestNotifications()` (first Connect tap →
-  `ShowNotificationsPopup` effect; the shown-flag is written only by
-  `onNotificationsPopupConfirm`/`Dismiss`, so a sheet swipe re-prompts). Settings VM exposes
+  optimistic `Connecting` + `ShowNotificationsPopup` effect; the shown-flag is written only by
+  `onNotificationsPopupConfirm`/`Dismiss`, so a sheet swipe re-prompts — the swipe must call
+  `onNotificationsPopupClosed()` to roll the status back to `Disconnected`. The reference `:app`
+  shows the prompt via `common_compose`'s `PromptSheetHost` (SnackbarHostState-style
+  `suspend show() → Confirmed/Dismissed/Closed`, M3 `ModalBottomSheet` inside) and maps the
+  result to the VM callbacks in the effect handler; don't present it as a Voyager
+  `BottomSheetNavigator` screen — Voyager has no dismiss callback and doesn't even dispose sheet
+  content on a gesture dismiss, so the `Closed` path would be silently lost. The rating prompt
+  uses the same contract with the dialog-shaped `PromptDialogHost`: `ShowRatingPrompt` effect
+  (`isRatingAlertVisible` removed from the state), result mapped to `onRatingClick(RatingClick)`. A confirm while
+  `Disabled` rolls back too, since the settings-screen path has no result callback. Settings VM exposes
   `isNotificationsAllowed` + `onNotificationsRowClick`/`onNotificationsPopupConfirm`. Breaking vs
   1.6.1: dashboard VM + settings StateHolder/VM ctors. The Compose side (bottom-sheet host,
   `PromptSheetContent` popups, settings row, strings) is app-owned — see the reference `:app`

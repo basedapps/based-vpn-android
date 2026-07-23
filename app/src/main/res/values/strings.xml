@@ -5,6 +5,8 @@
     <string name="common_ok">OK</string>
     <string name="common_cancel">Cancel</string>
     <string name="common_clear">Clear</string>
+    <string name="common_yes">Yes</string>
+    <string name="common_no">No</string>
 
     <string name="dashboard_your_ip">Your IP address</string>
     <string name="dashboard_loading">Preparing your account…</string>

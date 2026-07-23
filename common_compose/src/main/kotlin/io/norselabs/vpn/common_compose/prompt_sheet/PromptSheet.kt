@@ -33,7 +33,7 @@ import io.norselabs.vpn.common_compose.VerticalSpacer
 @Composable
 fun PromptSheetContent(
   title: String,
-  description: String,
+  description: String?,
   confirmLabel: String,
   onConfirmClick: () -> Unit,
   modifier: Modifier = Modifier,
@@ -52,12 +52,14 @@ fun PromptSheetContent(
       color = colors.title,
       modifier = Modifier.fillMaxWidth(),
     )
-    VerticalSpacer(12.dp)
-    Text(
-      text = description,
-      style = textStyles.description,
-      color = colors.description,
-    )
+    if (description != null) {
+      VerticalSpacer(12.dp)
+      Text(
+        text = description,
+        style = textStyles.description,
+        color = colors.description,
+      )
+    }
     VerticalSpacer(20.dp)
     Row {
       PromptButton(
@@ -84,7 +86,7 @@ fun PromptSheetContent(
 }
 
 @Composable
-private fun PromptButton(
+internal fun PromptButton(
   text: String,
   onClick: () -> Unit,
   containerColor: Color,

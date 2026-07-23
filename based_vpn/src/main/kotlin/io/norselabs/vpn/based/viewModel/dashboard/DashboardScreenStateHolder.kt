@@ -21,7 +21,6 @@ data class DashboardScreenState(
   val clientInitStatus: InitStatus = InitStatus.Connecting(attempt = 0, total = 0),
   val successCardDismissed: Boolean = false,
   val connectionErrorVisible: Boolean = false,
-  val isRatingAlertVisible: Boolean = false,
 ) {
   val cardState: ConnectionCardState? = when {
     connectionErrorVisible -> {
@@ -87,6 +86,11 @@ sealed interface DashboardScreenEffect {
   data object ShowSelectServer : DashboardScreenEffect
   data object ShowSettings : DashboardScreenEffect
   data object ShowGooglePlay : DashboardScreenEffect
+
+  /** Ask the user whether they like the app (the rating prompt itself). */
+  data object ShowRatingPrompt : DashboardScreenEffect
+
+  /** Positive answer given — open the platform in-app review flow. */
   data object ShowRating : DashboardScreenEffect
   data object EmailToSupport : DashboardScreenEffect
 }

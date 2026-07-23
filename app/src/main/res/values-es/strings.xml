@@ -2,6 +2,9 @@
     <string name="common_settings">Configuración</string>
     <string name="common_ok">Aceptar</string>
     <string name="common_cancel">Cancelar</string>
+    <string name="common_yes">Sí</string>
+    <string name="common_no">No</string>
+    <string name="dashboard_rating">¿Te gusta nuestra aplicación?</string>
 
     <string name="dashboard_your_ip">Tu dirección IP</string>
     <string name="dashboard_loading">Preparando tu cuenta…</string>

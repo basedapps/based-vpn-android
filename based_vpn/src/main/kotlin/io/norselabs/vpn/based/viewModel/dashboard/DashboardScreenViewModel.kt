@@ -212,6 +212,11 @@ class DashboardScreenViewModel
       return
     }
     if (shouldSuggestNotifications()) {
+      // Optimistic Connecting for the whole prompt round-trip (same pattern
+      // as the VPN-permission wait), so connect controls reflect an ongoing
+      // attempt while the popup is up. Every popup exit either proceeds or
+      // rolls the status back to Disconnected.
+      setVpnStatus(VpnStatus.Connecting)
       stateHolder.sendEffect(Effect.ShowNotificationsPopup)
       return
     }
@@ -220,10 +225,7 @@ class DashboardScreenViewModel
 
   // The "prompt shown" flag is written only on an explicit button tap, so an
   // accidental swipe/scrim dismiss neither records the prompt nor continues
-  // the flow — the next Connect tap shows the popup again. Confirm: for
-  // Denied (API 33+) the system dialog fires and the connect resumes on its
-  // result; for Disabled (API 26-32) the notification settings screen opens
-  // and the connect flow deliberately stops there.
+  // the flow — the next Connect tap shows the popup again.
   private fun shouldSuggestNotifications(): Boolean {
     return !notificationPromptStorage.wasPromptShown &&
       notificationPermissionChecker.refresh() != NotificationPermissionStatus.Granted
@@ -237,12 +239,34 @@ class DashboardScreenViewModel
 
   fun onNotificationsPopupConfirm() {
     notificationPromptStorage.wasPromptShown = true
-    stateHolder.sendEffect(Effect.RequestNotificationPermission)
+    when (notificationPermissionChecker.refresh()) {
+      // System dialog fires; the connect resumes on its result regardless
+      // of the answer (onNotificationPermissionResult).
+      NotificationPermissionStatus.Denied ->
+        stateHolder.sendEffect(Effect.RequestNotificationPermission)
+
+      // API 26-32 toggle: the notification settings screen opens and the
+      // connect flow deliberately stops there — roll the status back.
+      NotificationPermissionStatus.Disabled -> {
+        stateHolder.sendEffect(Effect.RequestNotificationPermission)
+        setVpnStatus(VpnStatus.Disconnected)
+      }
+
+      // Granted while the popup was up (e.g. from a notification shade
+      // shortcut) — nothing to request, just connect.
+      NotificationPermissionStatus.Granted -> proceedConnection()
+    }
   }
 
   fun onNotificationsPopupDismiss() {
     notificationPromptStorage.wasPromptShown = true
     proceedConnection()
+  }
+
+  // Swipe/scrim dismiss: the prompt isn't recorded as shown and the connect
+  // attempt is abandoned — undo the optimistic Connecting.
+  fun onNotificationsPopupClosed() {
+    setVpnStatus(VpnStatus.Disconnected)
   }
 
   fun onNotificationPermissionResult() {
@@ -326,7 +350,7 @@ class DashboardScreenViewModel
       }
 
       RatingStatus.RequestOnNext -> {
-        stateHolder.updateState { copy(isRatingAlertVisible = true) }
+        stateHolder.sendEffect(Effect.ShowRatingPrompt)
       }
 
       RatingStatus.Requested -> Unit
@@ -349,7 +373,6 @@ class DashboardScreenViewModel
         appStorage.setRatingStatus(RatingStatus.New)
       }
     }
-    stateHolder.updateState { copy(isRatingAlertVisible = false) }
   }
 
   companion object {

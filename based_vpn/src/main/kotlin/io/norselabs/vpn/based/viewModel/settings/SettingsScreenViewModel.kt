@@ -12,6 +12,7 @@ import io.norselabs.vpn.core_vpn.storage.CoreStorage
 import io.norselabs.vpn.core_vpn.vpn.Protocol
 import io.norselabs.vpn.core_vpn.vpn.dns.DnsConfigurator
 import io.norselabs.vpn.core_vpn.vpn.dns.DnsProvider
+import io.norselabs.vpn.v2ray.repo.V2RayRepository
 import javax.inject.Inject
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.launch
@@ -23,6 +24,7 @@ class SettingsScreenViewModel
   private val coreStorage: CoreStorage,
   private val logsSender: LogsSender,
   val notificationPermissionChecker: NotificationPermissionChecker,
+  private val v2RayRepository: V2RayRepository,
 ) : ScreenModel {
 
   private val state: SettingsScreenState
@@ -36,6 +38,7 @@ class SettingsScreenViewModel
         copy(
           currentDnsProvider = dns,
           currentProtocol = protocol,
+          isSpeedNotificationEnabled = v2RayRepository.isSpeedNotificationEnabled(),
         )
       }
     }
@@ -98,6 +101,12 @@ class SettingsScreenViewModel
 
   fun onProtocolDialogDismissClick() {
     stateHolder.updateState { copy(isProtocolSelectorVisible = false) }
+  }
+
+  fun onSpeedNotificationToggle() {
+    val isEnabled = !state.isSpeedNotificationEnabled
+    v2RayRepository.enableSpeedNotification(isEnabled)
+    stateHolder.updateState { copy(isSpeedNotificationEnabled = isEnabled) }
   }
 
   fun onSplitTunnelClick() {

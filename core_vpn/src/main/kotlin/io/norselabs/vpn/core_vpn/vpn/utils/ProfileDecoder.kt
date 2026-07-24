@@ -7,16 +7,21 @@ import io.norselabs.vpn.v2ray.model.VpnProfile
 
 object ProfileDecoder {
 
-  fun decode(credentials: Credentials): VpnProfile? {
+  fun decode(
+    credentials: Credentials,
+    label: String? = null,
+  ): VpnProfile? {
     return when (credentials) {
       is Credentials.Wireguard -> decodeWireguard(
         privateKey = credentials.privateKey,
         payload = credentials.payload,
+        label = label,
       )
 
       is Credentials.V2Ray -> decodeVmess(
         payload = credentials.payload,
         uid = credentials.uid,
+        label = label,
       )
     }
   }
@@ -24,6 +29,7 @@ object ProfileDecoder {
   private fun decodeVmess(
     payload: String,
     uid: String,
+    label: String?,
   ): VpnProfile? {
     return try {
       Base64.decode(payload, Base64.DEFAULT).let { bytes ->
@@ -48,6 +54,7 @@ object ProfileDecoder {
           address = address,
           listenPort = port,
           transport = transport,
+          label = label,
         )
       }
     } catch (e: Exception) {
@@ -58,6 +65,7 @@ object ProfileDecoder {
   private fun decodeWireguard(
     privateKey: String,
     payload: String,
+    label: String?,
   ): VpnProfile? {
     return try {
       Base64.decode(payload, Base64.DEFAULT).let { bytes ->
@@ -73,6 +81,7 @@ object ProfileDecoder {
           host = host,
           listenPort = port,
           peerPubKeyBase64 = peerPubKeyBase64,
+          label = label,
         )
       }
     } catch (e: Exception) {

@@ -29,6 +29,7 @@
     <string name="settings_row_notifications">Notificación del estado de VPN</string>
     <string name="settings_notifications_on">Activada</string>
     <string name="settings_notifications_off">Desactivada</string>
+    <string name="settings_row_speed">Velocidad en la notificación</string>
 
     <string name="notifications_popup_title">Activar notificaciones</string>
     <string name="notifications_popup_description">Permite las notificaciones para ver el estado de tu conexión VPN mientras la aplicación está en segundo plano.</string>
@@ -50,4 +51,8 @@
     <string name="update_required_title">Actualización requerida</string>
     <string name="update_required_description">Por favor, descarga la versión más reciente de la aplicación</string>
     <string name="update_required_button">Ir a Play Store</string>
+
+    <!-- VPN foreground notification (overrides io.norselabs.vpn:v2ray) -->
+    <string name="v2ray_notification_title">BasedVPN — conectado</string>
+    <string name="notification_action_stop_v2ray">Desconectar</string>
 </resources>

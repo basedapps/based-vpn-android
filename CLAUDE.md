@@ -21,8 +21,8 @@ This is the canonical agent doc. For deeper reference see [`docs/`](docs/).
 
 | Gradle module | Artifact | Version | Role |
 |---|---|---|---|
-| `:based_vpn` | `based` | 1.7.0 (Nexus) | High-level reuse layer: ViewModels, Hilt DI, `AppConfig` |
-| `:core_vpn` | `core_vpn` | 1.3.0 (Nexus) | Low-level VPN orchestration |
+| `:based_vpn` | `based` | 1.8.0 (Nexus) | High-level reuse layer: ViewModels, Hilt DI, `AppConfig` |
+| `:core_vpn` | `core_vpn` | 1.4.0 (Nexus) | Low-level VPN orchestration |
 | `:common` | `common` | 1.1.0 (Nexus) | Utils, preferences, state holders, StatusCardController, notification-permission checker/prompt storage |
 | `:common_logger` | `common_logger` | 0.0.4 | Timber + file logging + upload |
 | `:common_flags` | `common_flags` | 0.0.2 | Country flag assets |
@@ -107,8 +107,19 @@ More in [docs/conventions.md](docs/conventions.md).
   `AppConfig.getBaseUrl()`). The never-consumed `AppConfig.getProxy()` hook is removed (breaking
   vs `based` 1.4.2) — the SOCKS port comes from `V2RayRepository.getSocksProxyPort()`, not config.
   See `SolarLabs/docs/tunnel-routing-policy.md`.
-- **`v2ray` 2.1.x adopted.** The catalog pins v2ray **2.1.1** (2.1.0 + consumer ProGuard rules —
-  fixes the R8 release crash in `TProxyService`; `based` **1.6.1**, Nexus 2026-07-20, is that dep
+- **Brandable VPN notification (`v2ray` 2.2.0 / `core_vpn` 1.4.0 / `based` 1.8.0, Nexus
+  2026-07-23).** The catalog pins v2ray **2.2.0**: `VpnProfile` gains an optional `label` that
+  becomes the notification subtitle; `VPNConnector` derives it from the selected `Destination`
+  (Country / "Country • City" / "City • ServerName"), `ProfileDecoder.decode` takes it as a second
+  param. Title (`v2ray_notification_title`) and Disconnect action label
+  (`notification_action_stop_v2ray`) are app-overridable string resources; speed readout is
+  runtime-toggleable via `V2RayRepository.enableSpeedNotification()`/`isSpeedNotificationEnabled()`
+  (applies on the next connect). `based` 1.8.0 adds the settings toggle:
+  `SettingsScreenState.isSpeedNotificationEnabled` + `onSpeedNotificationToggle()`, settings VM
+  ctor takes `V2RayRepository` (breaking vs 1.7.0); the reference `:app` shows it as an On/Off
+  row (`settings_row_speed`). See `SolarLabs/docs/versions.md` item 10.
+- **`v2ray` 2.1.x migration (done 2026-07-14).** v2ray 2.1.1 = 2.1.0 + consumer ProGuard rules
+  (fixes the R8 release crash in `TProxyService`; `based` **1.6.1**, Nexus 2026-07-20, is that dep
   bump only, see `SolarLabs/docs/versions.md` item 8); the 2.1.0 migration itself landed 2026-07-14.
   Migration done: `VPNDriver`/`Analytics`/`VPNDriverImpl` use
   `V2RayStartError` (the 1.x `V2RayError` is gone), `ProfileDecoder` maps the
@@ -148,7 +159,7 @@ More in [docs/conventions.md](docs/conventions.md).
   after cloning, matching the version in `app/build.gradle` (26.5.9).
 - **Publish order matters** (commons → core_vpn → based); publishing out of order
   resolves stale transitive versions.
-- **Notification-permission flow lives in the VM layer (`based` 1.7.0, mavenLocal).** `based_vpn`
+- **Notification-permission flow lives in the VM layer (`based` 1.7.0, Nexus).** `based_vpn`
   provides `NotificationPermissionChecker` (`AppModule`) + `NotificationPromptStorage`
   (`StorageModule`), declares `POST_NOTIFICATIONS` in its manifest, and gates
   `DashboardScreenViewModel.initConnection()` on `shouldSuggestNotifications()` (first Connect tap →

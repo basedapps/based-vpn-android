@@ -96,6 +96,7 @@ class SettingsScreen : Screen {
       onSplitTunnelingClick = viewModel::onSplitTunnelClick,
       onLogsRowClick = viewModel::onLogsRowClick,
       onNotificationsRowClick = viewModel::onNotificationsRowClick,
+      onSpeedNotificationRowClick = viewModel::onSpeedNotificationToggle,
     )
 
     PromptSheetHost(promptHost)
@@ -115,6 +116,7 @@ fun SettingsScreenStateless(
   onSplitTunnelingClick: () -> Unit,
   onLogsRowClick: () -> Unit,
   onNotificationsRowClick: () -> Unit,
+  onSpeedNotificationRowClick: () -> Unit,
 ) {
   Scaffold(
     containerColor = BasedAppColor.Background,
@@ -137,6 +139,7 @@ fun SettingsScreenStateless(
         onSplitTunnelingClick = onSplitTunnelingClick,
         onLogsRowClick = onLogsRowClick,
         onNotificationsRowClick = onNotificationsRowClick,
+        onSpeedNotificationRowClick = onSpeedNotificationRowClick,
       )
     },
   )
@@ -155,6 +158,7 @@ fun Content(
   onSplitTunnelingClick: () -> Unit,
   onLogsRowClick: () -> Unit,
   onNotificationsRowClick: () -> Unit,
+  onSpeedNotificationRowClick: () -> Unit,
 ) {
   Box {
     Column(
@@ -202,6 +206,17 @@ fun Content(
           state.isNotificationsAllowed -> Modifier
           else -> Modifier.clickable(onClick = onNotificationsRowClick)
         },
+      )
+      HorizontalDivider(color = BasedAppColor.Divider)
+      SettingsRow(
+        title = stringResource(R.string.settings_row_speed),
+        value = stringResource(
+          when {
+            state.isSpeedNotificationEnabled -> R.string.settings_notifications_on
+            else -> R.string.settings_notifications_off
+          },
+        ),
+        modifier = Modifier.clickable(onClick = onSpeedNotificationRowClick),
       )
       HorizontalDivider(color = BasedAppColor.Divider)
     }

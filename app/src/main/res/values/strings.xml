@@ -35,6 +35,7 @@
     <string name="settings_row_notifications">VPN status notification</string>
     <string name="settings_notifications_on">On</string>
     <string name="settings_notifications_off">Off</string>
+    <string name="settings_row_speed">Speed in notification</string>
 
     <string name="notifications_popup_title">Enable notifications</string>
     <string name="notifications_popup_description">Allow notifications to see your VPN connection status while the app is in the background.</string>
@@ -62,4 +63,8 @@
     <string name="split_tunneling_enabled">Enable DVPN for selected apps</string>
     <string name="split_tunneling_bypass">Disable DVPN for selected apps</string>
     <string name="split_tunneling_disabled">Disabled</string>
+
+    <!-- VPN foreground notification (overrides io.norselabs.vpn:v2ray) -->
+    <string name="v2ray_notification_title">BasedVPN — connected</string>
+    <string name="notification_action_stop_v2ray">Disconnect</string>
 </resources>

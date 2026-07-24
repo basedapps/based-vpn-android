@@ -44,6 +44,8 @@ data class SettingsScreenState(
 
   val isNotificationsAllowed: Boolean = true,
 
+  val isSpeedNotificationEnabled: Boolean = false,
+
   val appVersion: String = "",
 )
 

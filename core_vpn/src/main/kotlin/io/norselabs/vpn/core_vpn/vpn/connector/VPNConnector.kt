@@ -37,7 +37,7 @@ class VPNConnector(
         .onLeft { error -> reporter.credentialsFailed(error) }
         .flatMap { credentials ->
           reporter.credentialsReceived(credentials.serverId)
-          connectVpn(credentials, attemptId)
+          connectVpn(credentials, attemptId, destination.toConnectionLabel())
         }
     } catch (ce: CancellationException) {
       reporter.cancelled(ce)
@@ -145,8 +145,9 @@ class VPNConnector(
   private suspend fun connectVpn(
     credentials: Credentials,
     attemptId: AttemptId,
+    label: String?,
   ): Either<Error, Unit> {
-    val profile = ProfileDecoder.decode(credentials)
+    val profile = ProfileDecoder.decode(credentials, label)
     if (profile == null) {
       reporter.disconnect(DisconnectReason.InvalidProfile)
       return Either.Left(Error.StartV2Ray)
@@ -163,6 +164,14 @@ class VPNConnector(
         Either.Right(Unit)
       },
     )
+  }
+
+  // Mirrors the user's selection granularity in the VPN notification subtitle.
+  private fun Destination.toConnectionLabel(): String? = when (this) {
+    is Destination.Country -> countryName
+    is Destination.City -> "$countryName • $cityName"
+    is Destination.Server -> "$cityName • $serverName"
+    is Destination.Random, is Destination.Deeplink -> null
   }
 
   sealed interface Error {

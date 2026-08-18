@@ -21,7 +21,7 @@ This is the canonical agent doc. For deeper reference see [`docs/`](docs/).
 
 | Gradle module | Artifact | Version | Role |
 |---|---|---|---|
-| `:based_vpn` | `based` | 1.8.0 (Nexus) | High-level reuse layer: ViewModels, Hilt DI, `AppConfig` |
+| `:based_vpn` | `based` | 1.8.1 (Nexus) | High-level reuse layer: ViewModels, Hilt DI, `AppConfig` |
 | `:core_vpn` | `core_vpn` | 1.4.0 (Nexus) | Low-level VPN orchestration |
 | `:common` | `common` | 1.1.0 (Nexus) | Utils, preferences, state holders, StatusCardController, notification-permission checker/prompt storage |
 | `:common_logger` | `common_logger` | 0.0.4 | Timber + file logging + upload |
@@ -108,8 +108,9 @@ More in [docs/conventions.md](docs/conventions.md).
   vs `based` 1.4.2) — the SOCKS port comes from `V2RayRepository.getSocksProxyPort()`, not config.
   See `SolarLabs/docs/tunnel-routing-policy.md`.
 - **Brandable VPN notification (`v2ray` 2.2.0 / `core_vpn` 1.4.0 / `based` 1.8.0, Nexus
-  2026-07-23).** The catalog pins v2ray **2.2.0**: `VpnProfile` gains an optional `label` that
-  becomes the notification subtitle; `VPNConnector` derives it from the selected `Destination`
+  2026-07-23).** The catalog pins v2ray **2.2.1** (2.2.1 = the Samsung `ConnectivityChecker`
+  fix, see the root `CLAUDE.md`; `based` 1.8.1 is that dep bump only): `VpnProfile` gains an
+  optional `label` that becomes the notification subtitle; `VPNConnector` derives it from the selected `Destination`
   (Country / "Country • City" / "City • ServerName"), `ProfileDecoder.decode` takes it as a second
   param. Title (`v2ray_notification_title`) and Disconnect action label
   (`notification_action_stop_v2ray`) are app-overridable string resources; speed readout is

@@ -21,7 +21,7 @@ This is the canonical agent doc. For deeper reference see [`docs/`](docs/).
 
 | Gradle module | Artifact | Version | Role |
 |---|---|---|---|
-| `:based_vpn` | `based` | 1.8.1 (Nexus) | High-level reuse layer: ViewModels, Hilt DI, `AppConfig` |
+| `:based_vpn` | `based` | 1.8.2 (Nexus) | High-level reuse layer: ViewModels, Hilt DI, `AppConfig` |
 | `:core_vpn` | `core_vpn` | 1.4.0 (Nexus) | Low-level VPN orchestration |
 | `:common` | `common` | 1.1.0 (Nexus) | Utils, preferences, state holders, StatusCardController, notification-permission checker/prompt storage |
 | `:common_logger` | `common_logger` | 0.0.4 | Timber + file logging + upload |
@@ -29,8 +29,8 @@ This is the canonical agent doc. For deeper reference see [`docs/`](docs/).
 | `:common_map` | `common_map` | 0.0.4 | Compose map components |
 | `:common_net_apps` | `common_net_apps` | 0.0.1 | Installed-apps utilities |
 | `:common_referral` | `common_referral` | 0.0.4 | Branch + Ads referral |
-| `:common_purchases` | `common_purchases` | 0.0.2 | RevenueCat logic |
-| `:common_purchases_ui` | `common_purchases_ui` | 0.0.3 | RevenueCat paywall UI |
+| `:common_purchases` | `common_purchases` | 1.0.0 (Nexus) | RevenueCat logic |
+| `:common_purchases_ui` | `common_purchases_ui` | 1.0.0 (Nexus) | RevenueCat paywall UI |
 | `:common_compose` | `common_compose` | 1.3.0 (Nexus) | Reusable Compose components (StatusCard, notification-permission state, PromptSheetContent, PromptSheet/Dialog hosts) |
 | `:app` | `co.uk.basedapps:vpn` | _not published_ | Original BasedVPN reference app |
 
